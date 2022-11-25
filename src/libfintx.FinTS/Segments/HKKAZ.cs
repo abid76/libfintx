@@ -57,14 +57,14 @@ namespace libfintx.FinTS
             {
                 if (string.IsNullOrEmpty(Startpoint))
                 {
-                    if (Convert.ToInt16(client.HIKAZS) < 7)
+                    if (client.HIKAZS < 7 && client.HISPAS_AccountNationalAllowed)
                         segments = "HKKAZ:" + client.SEGNUM + ":" + client.HIKAZS + "+" + activeAccount.AccountNumber + "::280:" + activeAccount.AccountBankCode + "+N'";
                     else
                         segments = "HKKAZ:" + client.SEGNUM + ":" + client.HIKAZS + "+" + activeAccount.AccountIban + ":" + activeAccount.AccountBic + ":" + activeAccount.AccountNumber + "::280:" + activeAccount.AccountBankCode + "+N'";
                 }
                 else
                 {
-                    if (Convert.ToInt16(client.HIKAZS) < 7)
+                    if (client.HIKAZS < 7 && client.HISPAS_AccountNationalAllowed)
                         segments = "HKKAZ:" + client.SEGNUM + ":" + client.HIKAZS + "+" + activeAccount.AccountNumber + "::280:" + activeAccount.AccountBankCode + "+N++++" + Startpoint + "'";
                     else
                         segments = "HKKAZ:" + client.SEGNUM + ":" + client.HIKAZS + "+" + activeAccount.AccountIban + ":" + activeAccount.AccountBic + ":" + activeAccount.AccountNumber + "::280:" + activeAccount.AccountBankCode + "+N++++" + Startpoint + "'";
@@ -74,14 +74,14 @@ namespace libfintx.FinTS
             {
                 if (string.IsNullOrEmpty(Startpoint))
                 {
-                    if (Convert.ToInt16(client.HIKAZS) < 7)
+                    if (client.HIKAZS < 7 && client.HISPAS_AccountNationalAllowed)
                         segments = "HKKAZ:" + client.SEGNUM + ":" + client.HIKAZS + "+" + activeAccount.AccountNumber + "::280:" + activeAccount.AccountBankCode + "+N+" + FromDate + "+" + ToDate + "'";
                     else
                         segments = "HKKAZ:" + client.SEGNUM + ":" + client.HIKAZS + "+" + activeAccount.AccountIban + ":" + activeAccount.AccountBic + ":" + activeAccount.AccountNumber + "::280:" + activeAccount.AccountBankCode + "+N+" + FromDate + "+" + ToDate + "'";
                 }
                 else
                 {
-                    if (Convert.ToInt16(client.HIKAZS) < 7)
+                    if (client.HIKAZS < 7 && client.HISPAS_AccountNationalAllowed)
                         segments = "HKKAZ:" + client.SEGNUM + ":" + client.HIKAZS + "+" + activeAccount.AccountNumber + "::280:" + activeAccount.AccountBankCode + "+N+" + FromDate + "+" + ToDate + "++" + Startpoint + "'";
                    else
                         segments = "HKKAZ:" + client.SEGNUM + ":" + client.HIKAZS + "+" + activeAccount.AccountIban + ":" + activeAccount.AccountBic + ":" + activeAccount.AccountNumber + "::280:" + activeAccount.AccountBankCode + "+N+" + FromDate + "+" + ToDate + "++" + Startpoint + "'";

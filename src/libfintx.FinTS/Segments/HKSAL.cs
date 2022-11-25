@@ -55,7 +55,7 @@ namespace libfintx.FinTS
 
             client.SEGNUM = Convert.ToInt16(SEG_NUM.Seg3);
 
-            if (Convert.ToInt16(client.HISALS) >= 7)
+            if (client.HISALS >= 7 || !client.HISPAS_AccountNationalAllowed)
                 segments = "HKSAL:" + client.SEGNUM + ":" + client.HISALS + "+" + activeAccount.AccountIban + ":" + activeAccount.AccountBic + "+N'";
             else
                 segments = "HKSAL:" + client.SEGNUM + ":" + client.HISALS + "+" + activeAccount.AccountNumber + "::280:" + activeAccount.AccountBankCode + "+N'";

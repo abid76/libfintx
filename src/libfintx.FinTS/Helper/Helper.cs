@@ -297,7 +297,8 @@ namespace libfintx.FinTS
 
                     if (segment.Name == "HISALS")
                     {
-                        client.HISALS = segment.Version;
+                        if (client.HISALS < segment.Version)
+                            client.HISALS = segment.Version;
                     }
 
                     if (segment.Name == "HITANS")
@@ -341,15 +342,23 @@ namespace libfintx.FinTS
 
                     if (segment.Name == "HISPAS")
                     {
-                        if (segment.Payload.Contains("pain.001.001.03"))
-                            client.HISPAS = 1;
-                        else if (segment.Payload.Contains("pain.001.002.03"))
-                            client.HISPAS = 2;
-                        else if (segment.Payload.Contains("pain.001.003.03"))
-                            client.HISPAS = 3;
+                        var hispas = segment as HISPAS;
+                        if (client.HISPAS < segment.Version)
+                        {
+                            client.HISPAS = segment.Version;
 
-                        if (client.HISPAS == 0)
-                            client.HISPAS = 3; // -> Fallback. Most banks accept the newest pain version
+                            if (hispas.Payload.Contains("pain.001.001.03"))
+                                client.HISPAS_Pain = 1;
+                            else if (hispas.Payload.Contains("pain.001.002.03"))
+                                client.HISPAS_Pain = 2;
+                            else if (hispas.Payload.Contains("pain.001.003.03"))
+                                client.HISPAS_Pain = 3;
+
+                            if (client.HISPAS_Pain == 0)
+                                client.HISPAS_Pain = 3; // -> Fallback. Most banks accept the newest pain version
+
+                            client.HISPAS_AccountNationalAllowed = hispas.IsAccountNationalAllowed;
+                        }
                     }
                 }
 

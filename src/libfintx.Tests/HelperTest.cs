@@ -122,7 +122,7 @@ HNHBS:7:1+2'".Replace(Environment.NewLine, string.Empty);
         [Fact]
         public void Test_Parse_Segments_HISALS()
         {
-            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"Resources\BankMessage.txt");
+            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"Resources\BankMessage_1.txt");
             var message = File.ReadAllText(path);
             var conn = new FinTS.Data.ConnectionDetails();
             conn.Blz = 1234567;
@@ -130,6 +130,19 @@ HNHBS:7:1+2'".Replace(Environment.NewLine, string.Empty);
             Helper.Parse_Segments(client, message);
 
             Assert.Equal(7, client.HISALS);
+        }
+
+        [Fact]
+        public void Test_Parse_Segments_HNHBK()
+        {
+            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"Resources\BankMessage_2.txt");
+            var message = File.ReadAllText(path);
+            var conn = new FinTS.Data.ConnectionDetails();
+            conn.Blz = 1234567;
+            FinTsClient client = new FinTsClient(conn);
+            Helper.Parse_Segments(client, message);
+
+            Assert.Equal("#3xufqdASFyM12120221127131048%", client.HNHBK);
         }
     }
 }

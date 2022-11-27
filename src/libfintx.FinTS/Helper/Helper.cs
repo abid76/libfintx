@@ -277,8 +277,11 @@ namespace libfintx.FinTS
 
                     if (segment.Name == "HNHBK")
                     {
-                        var ID = Parse_String(segment.Payload, "+1+", ":1");
-                        client.HNHBK = ID;
+                        if (segment.DataElements.Count < 3)
+                            throw new InvalidOperationException($"Expected segment '{segment}' to contain at least 3 data elements in payload.");
+
+                        var dialogId = segment.DataElements[2];
+                        client.HNHBK = dialogId;
                     }
 
                     if (segment.Name == "HISYN")

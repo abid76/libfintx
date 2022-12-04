@@ -47,6 +47,7 @@ namespace libfintx.FinTS
                 {
                     AccountNumber = connectionDetails.Account,
                     AccountBankCode = connectionDetails.Blz.ToString(),
+                    SubAccountFeature = connectionDetails.SubAccount,
                     AccountIban = connectionDetails.Iban,
                     AccountBic = connectionDetails.Bic,
                 };

@@ -58,7 +58,7 @@ namespace libfintx.FinTS
             if (client.HISALS >= 7)
                 segments = "HKSAL:" + client.SEGNUM + ":" + client.HISALS + "+" + activeAccount.AccountIban + ":" + activeAccount.AccountBic + "+N'";
             else
-                segments = "HKSAL:" + client.SEGNUM + ":" + client.HISALS + "+" + activeAccount.AccountNumber + "::280:" + activeAccount.AccountBankCode + "+N'";
+                segments = "HKSAL:" + client.SEGNUM + ":" + client.HISALS + "+" + activeAccount.AccountNumber + ":" + activeAccount.SubAccountFeature + ":280:" + activeAccount.AccountBankCode + "+N'";
 
             if (Helper.IsTANRequired("HKSAL"))
             {

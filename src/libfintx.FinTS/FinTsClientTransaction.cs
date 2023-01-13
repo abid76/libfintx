@@ -86,7 +86,7 @@ namespace libfintx.FinTS
             {
                 Helper.Parse_Message(this, BankCode_);
 
-                string Startpoint = new Regex(@"\+3040::[^:]+:(?<startpoint>[^']+)'").Match(BankCode_).Groups["startpoint"].Value;
+                string Startpoint = Helper.Parse_Transactions_Startpoint(BankCode_);
 
                 BankCode_ = await Transaction.HKKAZ(this, startDateStr, endDateStr, Startpoint);
                 result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode_), BankCode_);
@@ -213,7 +213,10 @@ namespace libfintx.FinTS
 
             while (BankCode_.Contains("+3040::"))
             {
-                string Startpoint = new Regex(@"\+3040::[^:]+:(?<startpoint>[^']+)'").Match(BankCode_).Groups["startpoint"].Value;
+                Helper.Parse_Message(this, BankCode_);
+
+                string Startpoint = Helper.Parse_Transactions_Startpoint(BankCode_);
+
                 BankCode_ = await Transaction.HKCAZ(this, startDateStr, endDateStr, Startpoint, camtVers);
                 result = new HBCIDialogResult<List<CamtStatement>>(Helper.Parse_BankCode(BankCode_), BankCode_);
                 if (!result.IsSuccess)

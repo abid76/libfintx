@@ -395,7 +395,7 @@ namespace libfintx.FinTS
         /// </summary>
         /// <param name="Message"></param>
         /// <returns></returns>
-        public static bool Parse_Message(FinTsClient client, string Message)
+        public static List<Segment> Parse_Message(FinTsClient client, string Message)
         {
             List<string> values = SplitEncryptedSegments(Message);
 
@@ -428,7 +428,7 @@ namespace libfintx.FinTS
                 }
             }
 
-            return client.HNHBS > 0;
+            return segments;
         }
 
         /// <summary>
@@ -522,6 +522,11 @@ namespace libfintx.FinTS
             }
 
             return balance;
+        }
+
+        internal static string Parse_Transactions_Startpoint(string bankCode)
+        {
+            return Regex.Match(bankCode, @"\+3040::[^:]+:(?<startpoint>[^'\+:]+)['\+:]").Groups["startpoint"].Value;
         }
 
         /// <summary>

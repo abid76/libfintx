@@ -145,5 +145,19 @@ HNHBS:7:1+2'".Replace(Environment.NewLine, string.Empty);
 
             Assert.Equal("#3xufqdASFyM12120221127131048%", client.HNHBK);
         }
+
+        [Fact]
+        public void Test_Parse_Transactions_Startpoint()
+        {
+            var message = @"HIRMS:4:2:3+3040::*Es liegen noch weitere CAMT Umsätze vor:0_=2#=20210727#=12080533#=0#=0#=0+0900::Freigabe erfolgreich'";
+            var startpoint = Helper.Parse_Transactions_Startpoint(message);
+
+            Assert.Equal("0_=2#=20210727#=12080533#=0#=0#=0", startpoint);
+
+            message = @"HIRMS:4:2:3+0020::Der Auftrag wurde ausgeführt.+0020::Die gebuchten Umsätze wurden übermittelt.+3040::Es liegen weitere Informationen vor.:7587-01-13-11.32.26.675878'";
+            startpoint = Helper.Parse_Transactions_Startpoint(message);
+
+            Assert.Equal("7587-01-13-11.32.26.675878", startpoint);
+        }
     }
 }

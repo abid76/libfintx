@@ -54,7 +54,7 @@ namespace libfintx.FinTS
                     if (connectionDetails.HbciVersion == Convert.ToInt16(HBCI.v220))
                     {
                         string segments_ =
-                            "HKIDN:" + SEG_NUM.Seg3 + ":2+" + SEG_Country.Germany + ":" + connectionDetails.BlzPrimary + "+" + connectionDetails.UserId + "+" + client.SystemId + "+1'" +
+                            "HKIDN:" + SEG_NUM.Seg3 + ":2+" + SEG_Country.Germany + ":" + connectionDetails.BlzPrimary + "+" + connectionDetails.UserIdEscaped + "+" + client.SystemId + "+1'" +
                             "HKVVB:" + SEG_NUM.Seg4 + ":2+0+0+0+" + FinTsGlobals.ProductId + "+" + FinTsGlobals.Version + "'";
 
                         segments = segments_;
@@ -62,7 +62,7 @@ namespace libfintx.FinTS
                     else if (connectionDetails.HbciVersion == Convert.ToInt16(HBCI.v300))
                     {
                         string segments_ =
-                            "HKIDN:" + SEG_NUM.Seg3 + ":2+" + SEG_Country.Germany + ":" + connectionDetails.BlzPrimary + "+" + connectionDetails.UserId + "+" + client.SystemId + "+1'" +
+                            "HKIDN:" + SEG_NUM.Seg3 + ":2+" + SEG_Country.Germany + ":" + connectionDetails.BlzPrimary + "+" + connectionDetails.UserIdEscaped + "+" + client.SystemId + "+1'" +
                             "HKVVB:" + SEG_NUM.Seg4 + ":3+0+0+0+" + FinTsGlobals.ProductId + "+" + FinTsGlobals.Version + "'";
 
                         if (client.HITANS >= 6)
@@ -138,7 +138,7 @@ namespace libfintx.FinTS
 
                     client.SEGNUM = Convert.ToInt16(SEG_NUM.Seg4);
 
-                    string message = FinTsMessageAnonymous.Create(connectionDetails.HbciVersion, "1", "0", connectionDetails.Blz, connectionDetails.UserId, connectionDetails.Pin, "0", segments, null, client.SEGNUM);
+                    string message = FinTsMessageAnonymous.Create(connectionDetails.HbciVersion, "1", "0", connectionDetails.Blz, connectionDetails.UserIdEscaped, connectionDetails.Pin, "0", segments, null, client.SEGNUM);
                     string response = await FinTSMessage.Send(client, message);
 
                     var messages = Helper.Parse_Segments(client, response);
@@ -158,7 +158,7 @@ namespace libfintx.FinTS
                     if (connectionDetails.HbciVersion == Convert.ToInt16(HBCI.v300))
                     {
                         string segments__ =
-                            "HKIDN:" + SEG_NUM.Seg3 + ":2+" + SEG_Country.Germany + ":" + connectionDetails.BlzPrimary + "+" + connectionDetails.UserId + "+" + client.SystemId + "+1'" +
+                            "HKIDN:" + SEG_NUM.Seg3 + ":2+" + SEG_Country.Germany + ":" + connectionDetails.BlzPrimary + "+" + connectionDetails.UserIdEscaped + "+" + client.SystemId + "+1'" +
                             "HKVVB:" + SEG_NUM.Seg4 + ":3+0+0+0+" + FinTsGlobals.ProductId + "+" + FinTsGlobals.Version + "'" +
                             "HKSYN:" + SEG_NUM.Seg5 + ":3+0'";
 

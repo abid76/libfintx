@@ -71,7 +71,7 @@ namespace libfintx.FinTS.Message
 
             int Version = client.ConnectionDetails.HbciVersion;
             int BLZ = client.ConnectionDetails.BlzPrimary;
-            string UserID = client.ConnectionDetails.UserId;
+            string UserID = client.ConnectionDetails.UserIdEscaped;
             string PIN = client.ConnectionDetails.Pin;
             int SegmentNum = client.SEGNUM;
 
@@ -232,9 +232,6 @@ namespace libfintx.FinTS.Message
 
             Log.Write(msgEnd);
 
-            UserID = string.Empty;
-            PIN = null;
-
             return msgHead + encHead + payload + msgEnd;
         }
 
@@ -254,7 +251,7 @@ namespace libfintx.FinTS.Message
             if (Trace.Enabled)
             {
                 if (Trace.MaskCredentials)
-                    Trace.Write(Message, client.ConnectionDetails.UserId, client.ConnectionDetails.Pin);
+                    Trace.Write(Message, client.ConnectionDetails.UserIdEscaped, client.ConnectionDetails.Pin);
                 else
                     Trace.Write(Message);
             }
@@ -306,7 +303,7 @@ namespace libfintx.FinTS.Message
                 if (Trace.Enabled)
                 {
                     if (Trace.MaskCredentials)
-                        Trace.Write(FinTSMessage, client.ConnectionDetails.UserId, client.ConnectionDetails.Pin);
+                        Trace.Write(FinTSMessage, client.ConnectionDetails.UserIdEscaped, client.ConnectionDetails.Pin);
                     else
                         Trace.Write(FinTSMessage);
                 }

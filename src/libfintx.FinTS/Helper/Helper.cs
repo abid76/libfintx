@@ -38,6 +38,8 @@ namespace libfintx.FinTS
 {
     public static partial class Helper
     {
+        public const string DefaultEncoding = "ISO-8859-1";
+
         /// <summary>
         /// Regex pattern for HIRMG/HIRMS messages.
         /// </summary>
@@ -76,10 +78,23 @@ namespace libfintx.FinTS
         /// <returns></returns>
         public static string EncodeTo64(string toEncode)
         {
-            byte[] toEncodeAsBytes = Encoding.ASCII.GetBytes(toEncode);
+            byte[] toEncodeAsBytes = Encoding.GetEncoding(DefaultEncoding).GetBytes(toEncode);
             string returnValue = Convert.ToBase64String(toEncodeAsBytes);
 
             return returnValue;
+        }
+
+        /// <summary>
+        /// Encode to Base64
+        /// </summary>
+        /// <param name="toEncode"></param>
+        /// <returns></returns>
+        public static byte[] EncodeTo64Bytes(string toEncode)
+        {
+            byte[] toEncodeAsBytes = Encoding.GetEncoding(DefaultEncoding).GetBytes(toEncode);
+            string returnValue = Convert.ToBase64String(toEncodeAsBytes);
+
+            return Encoding.GetEncoding(DefaultEncoding).GetBytes(returnValue);
         }
 
         /// <summary>
@@ -90,7 +105,7 @@ namespace libfintx.FinTS
         public static string DecodeFrom64(string encodedData)
         {
             byte[] encodedDataAsBytes = Convert.FromBase64String(encodedData);
-            string returnValue = Encoding.ASCII.GetString(encodedDataAsBytes);
+            string returnValue = Encoding.GetEncoding(DefaultEncoding).GetString(encodedDataAsBytes);
 
             return returnValue;
         }
@@ -103,7 +118,7 @@ namespace libfintx.FinTS
         public static string DecodeFrom64EncodingDefault(string encodedData)
         {
             byte[] encodedDataAsBytes = Convert.FromBase64String(encodedData);
-            string returnValue = Encoding.GetEncoding("ISO-8859-1").GetString(encodedDataAsBytes);
+            string returnValue = Encoding.GetEncoding(DefaultEncoding).GetString(encodedDataAsBytes);
 
             return returnValue;
         }

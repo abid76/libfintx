@@ -273,7 +273,7 @@ namespace libfintx.FinTS.Message
                 ServicePointManager.SecurityProtocol = client.ConnectionDetails.SecurityProtocol;
                 var req = WebRequest.Create(client.ConnectionDetails.Url) as HttpWebRequest;
 
-                byte[] data = Encoding.ASCII.GetBytes(Helper.EncodeTo64(Message));
+                byte[] data = Helper.EncodeTo64Bytes(Message);
 
                 req.Method = "POST";
                 req.Timeout = 10000;
@@ -291,7 +291,7 @@ namespace libfintx.FinTS.Message
                 {
                     using (var resStream = res.GetResponseStream())
                     {
-                        using (var streamReader = new StreamReader(resStream, Encoding.UTF8))
+                        using (var streamReader = new StreamReader(resStream, Encoding.GetEncoding(Helper.DefaultEncoding)))
                         {
                             FinTSMessage = Helper.DecodeFrom64EncodingDefault(streamReader.ReadToEnd());
                         }

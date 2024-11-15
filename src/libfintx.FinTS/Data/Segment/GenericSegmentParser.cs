@@ -31,7 +31,7 @@ namespace libfintx.FinTS.Data.Segment
     {
         public Segment ParseSegment(Segment segment)
         {
-            var match = Regex.Match(segment.Value, @"^(?<Name>[A-Z]+):(?<Number>\d+):(?<Version>\d+)(:(?<Ref>\d+))?\+(?<Payload>.*)");
+            var match = Regex.Match(segment.Value, @"^(?<Name>[A-Z]+):(?<Number>\d+):(?<Version>\d+)(:(?<Ref>\d+))?\+(?<Payload>.*)", RegexOptions.Singleline);
             if (!match.Success)
                 throw new ArgumentException($"Segment has invalid format.{Environment.NewLine}{segment.Value}");
 

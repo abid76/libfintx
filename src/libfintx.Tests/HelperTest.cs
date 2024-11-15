@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using libfintx.FinTS;
 using libfintx.FinTS.Data;
 using libfintx.FinTS.Data.Segment;
@@ -157,6 +158,33 @@ HNHBS:7:1+2'".Replace(Environment.NewLine, string.Empty);
             Helper.Parse_Segments(client, message);
 
             Assert.Equal("#3xufqdASFyM12120221127131048%", client.HNHBK);
+        }
+
+        [Fact]
+        public void Test_Parse_Segments_HITAN_PhotoTAN()
+        {
+            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"Resources\PhotoTan_message_2.txt");
+            var message = File.ReadAllText(path);
+
+            var processname = "photoTAN";
+            // PhotoTAN
+            if (processname.Equals("photoTAN-Verfahren") || processname.Equals("photoTAN"))
+            {
+                // HITAN:5:5:4+4++nmf3VmGQDT4qZ20190130091914641+Bitte geben Sie die photoTan ein+@3031@       image/pngÃŠÂ‰PNG
+                var match = Regex.Match(message, @"HITAN.+@\d+@(.+)'(HNHBS|HNSHA)", RegexOptions.Singleline);
+                if (match.Success)
+                {
+                    var PhotoBinary = match.Groups[1].Value;
+                    // Ggf. ist das Datenelement "Gültigkeitszeitraum" enthalten
+                    match = Regex.Match(PhotoBinary, @"^(.+)\+\d+:\d+", RegexOptions.Singleline);
+                    if (match.Success)
+                    {
+                        PhotoBinary = match.Groups[1].Value;
+                    }
+
+                    Assert.NotNull(PhotoBinary)
+                }
+            }
         }
 
         [Fact]

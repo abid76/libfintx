@@ -159,9 +159,16 @@ namespace libfintx.FinTS
             {
                 // HITAN:5:5:4+4++nmf3VmGQDT4qZ20190130091914641+Bitte geben Sie die photoTan ein+@3031@       image/pngÃŠÂ‰PNG
                 var match = Regex.Match(dialogResult.RawData, @"HITAN.+@\d+@(.+)'(HNHBS|HNSHA)", RegexOptions.Singleline);
+
                 if (match.Success)
                 {
                     var PhotoBinary = match.Groups[1].Value;
+                    // Ggf. ist das Datenelement "Gültigkeitszeitraum" enthalten
+                    match = Regex.Match(PhotoBinary, @"^(.+)\+\d+:\d+$");
+                    if (match.Success)
+                    {
+                        PhotoBinary = match.Groups[1].Value;
+                    }
 
                     var mCode = new MatrixCode(PhotoBinary);
 

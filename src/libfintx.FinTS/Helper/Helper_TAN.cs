@@ -33,14 +33,6 @@ namespace libfintx.FinTS
                     segments.Add(segment);
             }
 
-            var BankCode_ = "HIRMS" + Parse_String(dialogResult.RawData, "'HIRMS", "'");
-            string[] values = BankCode_.Split('+');
-            foreach (var item in values)
-            {
-                if (!item.StartsWith("HIRMS"))
-                    TransactionConsole.Output = item.Replace("::", ": ");
-            }
-
             var HITAN = segments.FirstOrDefault(s => s.Name == "HITAN");
             var HITAN_value = HITAN?.Value;
             var HITAN_challenge = HITAN.DataElements.Count > 4 ? HITAN.DataElements[4] : null;

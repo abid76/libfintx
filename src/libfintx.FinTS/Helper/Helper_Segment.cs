@@ -124,11 +124,10 @@ namespace libfintx.FinTS
 
                             currentDataElement.Append(code.Substring(match.Index + match.Length, binaryLength));
                             code = code.Substring(match.Index + match.Length + binaryLength);
-
-                            // binary data must be followed by +,:,'
-                            var allowedChars = new[] { '+', ':', '\'' };
-                            if (code.Length == 0 || !allowedChars.Contains(code[0]))
-                                throw new ArgumentException($"Invalid segment. Binary data must be followed by +,:,'. Message is: {Truncate(code)}");
+                            if (code.Length == 0)
+                            {
+                                dataElements.Add(currentDataElement.ToString());
+                            }
 
                             break;
                         }
@@ -136,7 +135,7 @@ namespace libfintx.FinTS
                         {
                             currentDataElement.Append(code.Substring(0, match.Index));
                             dataElements.Add(currentDataElement.ToString());
-                            currentDataElement = new StringBuilder();
+                            currentDataElement.Clear();
 
                             code = code.Substring(match.Index + match.Length);
 
@@ -188,19 +187,14 @@ namespace libfintx.FinTS
                         }
                     case Delimiter.Binary:
                         {
-                            var lengthStr = match.Value.Substring(1, match.Length - 2);
+                            var lengthStr = match.Value.Substring(1, match.Value.Length - 2);
                             var binaryLength = Convert.ToInt32(lengthStr);
-
-                            currentSegment.Append(message.Substring(0, match.Index + match.Length));
-                            message = message.Substring(match.Index + match.Length);
-
-                            Encoding iso = Encoding.GetEncoding("ISO-8859-1");
-                            var messageBytes = iso.GetBytes(message);
-                            if (messageBytes.Length < binaryLength)
+                            var length = match.Index + match.Value.Length + binaryLength;
+                            if (message.Length < length)
                                 throw new ArgumentException($"Invalid segment. Given binary length {binaryLength} exceeds actual message length. Message is: {Truncate(message)}");
 
-                            currentSegment.Append(iso.GetString(messageBytes, 0, binaryLength));
-                            message = iso.GetString(messageBytes, binaryLength, messageBytes.Length - binaryLength);
+                            currentSegment.Append(message.Substring(0, length));
+                            message = message.Substring(length);
 
                             // binary data must be followed by +,:,'
                             var allowedChars = new[] { '+', ':', '\'' };

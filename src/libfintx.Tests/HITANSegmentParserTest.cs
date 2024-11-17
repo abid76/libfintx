@@ -53,5 +53,26 @@ namespace libfintx.Tests
             Assert.Equal(6, hitanSegment.DataElements.Count);
             Assert.Equal(3030, hitanSegment.DataElements[4].Length);
         }
+
+        [Fact]
+        public void Test_HITAN_4()
+        {
+            var rawData = File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"Resources\PhotoTAN_message_4.txt"));
+            List<string> rawSegments = Helper.SplitEncryptedSegments(rawData);
+            List<Segment> segments = new List<Segment>();
+            foreach (var item in rawSegments)
+            {
+                var segment = Helper.Parse_Segment(item);
+                if (segment != null)
+                    segments.Add(segment);
+            }
+
+            var hitanSegment = segments.Where(s => s.Name == "HITAN").FirstOrDefault();
+
+            Assert.NotNull(hitanSegment);
+            Assert.Equal("HITAN", hitanSegment.Name);
+            Assert.Equal(6, hitanSegment.DataElements.Count);
+            Assert.Equal(3030, hitanSegment.DataElements[4].Length);
+        }
     }
 }

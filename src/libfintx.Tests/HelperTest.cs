@@ -182,7 +182,7 @@ HNHBS:7:1+2'".Replace(Environment.NewLine, string.Empty);
                         PhotoBinary = match.Groups[1].Value;
                     }
 
-                    Assert.NotNull(PhotoBinary)
+                    Assert.NotNull(PhotoBinary);
                 }
             }
         }

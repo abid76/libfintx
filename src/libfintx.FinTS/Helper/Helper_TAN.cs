@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using libfintx.FinTS.Data.Segment;
 using libfintx.Logger.Log;
 
 namespace libfintx.FinTS
@@ -23,6 +24,15 @@ namespace libfintx.FinTS
         /// <param name="renderFlickerCodeAsGif"></param>
         public static async Task<string> WaitForTanAsync(FinTsClient client, HBCIDialogResult dialogResult, TANDialog tanDialog)
         {
+            List<string> rawSegments = SplitEncryptedSegments(dialogResult.RawData);
+            List<Segment> segments = new List<Segment>();
+            foreach (var item in rawSegments)
+            {
+                var segment = Parse_Segment(item);
+                if (segment != null)
+                    segments.Add(segment);
+            }
+
             var BankCode_ = "HIRMS" + Parse_String(dialogResult.RawData, "'HIRMS", "'");
             string[] values = BankCode_.Split('+');
             foreach (var item in values)
@@ -31,9 +41,9 @@ namespace libfintx.FinTS
                     TransactionConsole.Output = item.Replace("::", ": ");
             }
 
-            var HITAN = "HITAN" + Parse_String(dialogResult.RawData.Replace("?'", "").Replace("?:", ":").Replace("<br>", Environment.NewLine).Replace("?+", "??"), "'HITAN", "'");
-
-            string HITANFlicker = string.Empty;
+            var HITAN = segments.FirstOrDefault(s => s.Name == "HITAN");
+            var HITAN_value = HITAN?.Value;
+            var HITAN_challenge = HITAN.DataElements.Count > 4 ? HITAN.DataElements[4] : null;
 
             var processes = BPD.HITANS.Where(h => h.Version == client.HITANS).SelectMany(t => t.TanProcesses);
 
@@ -47,36 +57,13 @@ namespace libfintx.FinTS
 
             Log.Write($"Processing TAN process '{processname}' ...");
 
+            string HITANFlicker = string.Empty;
+
             // Smart-TAN plus optisch
             // chipTAN optisch
             if (processname.Equals("Smart-TAN plus optisch") || processname.Contains("chipTAN optisch"))
             {
-                HITANFlicker = HITAN;
-            }
-
-            String[] values_ = HITAN.Split('+');
-
-            int i = 1;
-
-            foreach (var item in values_)
-            {
-                i = i + 1;
-
-                if (i == 6)
-                {
-                    TransactionConsole.Output = TransactionConsole.Output + "??" + item.Replace("::", ": ").TrimStart();
-
-                    TransactionConsole.Output = TransactionConsole.Output.Replace("??", " ")
-                            .Replace("0030: ", "")
-                            .Replace("1.", Environment.NewLine + "1.")
-                            .Replace("2.", Environment.NewLine + "2.")
-                            .Replace("3.", Environment.NewLine + "3.")
-                            .Replace("4.", Environment.NewLine + "4.")
-                            .Replace("5.", Environment.NewLine + "5.")
-                            .Replace("6.", Environment.NewLine + "6.")
-                            .Replace("7.", Environment.NewLine + "7.")
-                            .Replace("8.", Environment.NewLine + "8.");
-                }
+                HITANFlicker = HITAN_value;
             }
 
             // chipTAN optisch
@@ -84,7 +71,7 @@ namespace libfintx.FinTS
             {
                 string FlickerCode = string.Empty;
 
-                FlickerCode = "CHLGUC" + Helper.Parse_String(HITAN, "CHLGUC", "CHLGTEXT") + "CHLGTEXT";
+                FlickerCode = "CHLGUC" + Helper.Parse_String(HITAN_value, "CHLGUC", "CHLGTEXT") + "CHLGTEXT";
 
                 FlickerCode flickerCode = new FlickerCode(FlickerCode);
                 flickerCodeRenderer = new FlickerRenderer(flickerCode.Render(), tanDialog.PictureBox);
@@ -108,7 +95,7 @@ namespace libfintx.FinTS
             // Smart-TAN plus optisch
             if (processname.Equals("Smart-TAN plus optisch"))
             {
-                HITANFlicker = HITAN.Replace("?@", "??");
+                HITANFlicker = HITAN_value.Replace("?@", "??");
 
                 string FlickerCode = string.Empty;
 
@@ -144,37 +131,14 @@ namespace libfintx.FinTS
             }
 
             // Smart-TAN photo
-            if (processname.Equals("Smart-TAN photo"))
+            if (processname.Equals("Smart-TAN photo") || processname.Equals("photoTAN-Verfahren") || processname.Equals("photoTAN"))
             {
-                var PhotoCode = Parse_String(dialogResult.RawData, ".+@", "'HNSHA");
+                var PhotoCode = HITAN_challenge;
 
-                var mCode = new MatrixCode(PhotoCode.Substring(5, PhotoCode.Length - 5));
+                var mCode = new MatrixCode(PhotoCode);
 
                 tanDialog.MatrixImage = mCode.CodeImage;
                 mCode.Render(tanDialog.PictureBox);
-            }
-
-            // PhotoTAN
-            if (processname.Equals("photoTAN-Verfahren") || processname.Equals("photoTAN"))
-            {
-                // HITAN:5:5:4+4++nmf3VmGQDT4qZ20190130091914641+Bitte geben Sie die photoTan ein+@3031@       image/pngÃŠÂ‰PNG
-                var match = Regex.Match(dialogResult.RawData, @"HITAN.+@\d+@(.+)'(HNHBS|HNSHA)", RegexOptions.Singleline);
-
-                if (match.Success)
-                {
-                    var PhotoBinary = match.Groups[1].Value;
-                    // Ggf. ist das Datenelement "Gültigkeitszeitraum" enthalten
-                    match = Regex.Match(PhotoBinary, @"^(.+)\+\d+:\d+$");
-                    if (match.Success)
-                    {
-                        PhotoBinary = match.Groups[1].Value;
-                    }
-
-                    var mCode = new MatrixCode(PhotoBinary);
-
-                    tanDialog.MatrixImage = mCode.CodeImage;
-                    mCode.Render(tanDialog.PictureBox);
-                }
             }
 
             return await tanDialog.WaitForTanAsync();

@@ -22,7 +22,14 @@ namespace libfintx.Tests
             Assert.Equal(23, segment.Number);
             Assert.Equal(6, segment.Version);
             Assert.Equal(4, segment.Ref);
-            Assert.False(string.IsNullOrWhiteSpace(segment.Payload));
+            Assert.Equal(4, segment.DataElements.Count);
+            Assert.Equal("20", segment.DataElements[0].Value) ;
+            Assert.Equal("1", segment.DataElements[1].Value);
+            Assert.Equal("1", segment.DataElements[2].Value);
+            Assert.True(segment.DataElements[3].IsDataElementGroup);
+            Assert.Equal("90", segment.DataElements[3].DataElements[0].Value);
+            Assert.Equal("N", segment.DataElements[3].DataElements[1].Value);
+            Assert.Equal("N", segment.DataElements[3].DataElements[2].Value);
         }
 
         [Fact]
@@ -37,7 +44,46 @@ namespace libfintx.Tests
             Assert.Equal(7, segment.Version);
             Assert.Equal(3, segment.Ref);
             Assert.Equal(3, segment.DataElements.Count);
-            Assert.Equal("eNmo9/2dEocBAACRO?+gjhW?+owAQA", segment.DataElements[2]);
+            Assert.Equal("S", segment.DataElements[0].Value);
+            Assert.Equal("", segment.DataElements[1].Value);
+            Assert.Equal("eNmo9/2dEocBAACRO?+gjhW?+owAQA", segment.DataElements[2].Value);
+        }
+
+        [Fact]
+        public void TestBinaryData_1()
+        {
+            var segmentCode = "ABCDE:1:2:3+@8@12345678";
+            var segment = new Segment(segmentCode);
+            segment = new GenericSegmentParser().ParseSegment(segment);
+
+            Assert.Equal("ABCDE", segment.Name);
+            Assert.Equal(1, segment.Number);
+            Assert.Equal(2, segment.Version);
+            Assert.Equal(3, segment.Ref);
+
+            Assert.Single(segment.DataElements);
+            Assert.Equal("12345678", segment.DataElements[0].Value);
+        }
+
+        [Fact]
+        public void TestBinaryData_2()
+        {
+            var segmentCode = "ABCDE:1:2:3+1+X:Y:@8@12345678";
+            var segment = new Segment(segmentCode);
+            segment = new GenericSegmentParser().ParseSegment(segment);
+
+            Assert.Equal("ABCDE", segment.Name);
+            Assert.Equal(1, segment.Number);
+            Assert.Equal(2, segment.Version);
+            Assert.Equal(3, segment.Ref);
+
+            Assert.Equal(2, segment.DataElements.Count);
+            Assert.Equal("1", segment.DataElements[0].Value);
+            Assert.True(segment.DataElements[1].IsDataElementGroup);
+            Assert.Equal(3, segment.DataElements[1].DataElements.Count);
+            Assert.Equal("X", segment.DataElements[1].DataElements[0].Value);
+            Assert.Equal("Y", segment.DataElements[1].DataElements[1].Value);
+            Assert.Equal("12345678", segment.DataElements[1].DataElements[2].Value);
         }
     }
 }

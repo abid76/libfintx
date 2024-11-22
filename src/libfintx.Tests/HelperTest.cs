@@ -141,6 +141,7 @@ HNHBS:7:1+2'".Replace(Environment.NewLine, string.Empty);
             var message = File.ReadAllText(path);
             var conn = new ConnectionDetails();
             conn.Blz = 1234567;
+            conn.UserId = "test";
             FinTsClient client = new FinTsClient(conn);
             Helper.Parse_Segments(client, message);
 
@@ -154,6 +155,7 @@ HNHBS:7:1+2'".Replace(Environment.NewLine, string.Empty);
             var message = File.ReadAllText(path);
             var conn = new ConnectionDetails();
             conn.Blz = 1234567;
+            conn.UserId = "test";
             FinTsClient client = new FinTsClient(conn);
             Helper.Parse_Segments(client, message);
 
@@ -199,6 +201,19 @@ HNHBS:7:1+2'".Replace(Environment.NewLine, string.Empty);
             startpoint = Helper.Parse_Transactions_Startpoint(message);
 
             Assert.Equal("7587-01-13-11.32.26.675878", startpoint);
+        }
+
+        [Fact]
+        public void Test_Parse_BankCode_Message()
+        {
+            var message = @"HIRMS:5:2:4+3050::BPD nicht mehr aktuell, aktuelle Version enthalten.+3920::Zugelassene Zwei-Schritt-Verfahren für den Benutzer.:923+0020::Der Auftrag wurde ausgeführt.";
+            Segment segment = Helper.Parse_Segment(message);
+            Assert.Equal("HIRMS", segment.Name);
+            Assert.Equal(3, segment.DataElements.Count);
+
+            var hBCIBankMessages = Helper.Parse_BankCode_Messages(segment);
+            Assert.NotNull(hBCIBankMessages);
+            Assert.Equal(3, hBCIBankMessages.Count);
         }
     }
 }

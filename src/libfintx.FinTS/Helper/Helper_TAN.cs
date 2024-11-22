@@ -35,7 +35,7 @@ namespace libfintx.FinTS
 
             var HITAN = segments.FirstOrDefault(s => s.Name == "HITAN");
             var HITAN_value = HITAN?.Value;
-            var HITAN_challenge = HITAN.DataElements.Count > 4 ? HITAN.DataElements[4] : null;
+            var HITAN_challenge = HITAN.DataElements.Count > 4 ? HITAN.DataElements[4].Value : null;
 
             var processes = BPD.HITANS.Where(h => h.Version == client.HITANS).SelectMany(t => t.TanProcesses);
 

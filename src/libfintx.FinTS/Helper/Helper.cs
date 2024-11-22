@@ -306,7 +306,7 @@ namespace libfintx.FinTS
                         if (segment.DataElements.Count < 3)
                             throw new InvalidOperationException($"Expected segment '{segment}' to contain at least 3 data elements in payload.");
 
-                        var dialogId = segment.DataElements[2];
+                        var dialogId = segment.DataElements[2].Value;
                         client.HNHBK = dialogId;
                     }
 
@@ -353,7 +353,7 @@ namespace libfintx.FinTS
                         // HITAN:5:7:4+4++8578-06-23-13.22.43.709351+Bitte Auftrag in Ihrer App freigeben.
                         if (segment.DataElements.Count < 3)
                             throw new InvalidOperationException($"Invalid HITAN segment '{segment}'. Payload must have at least 3 data elements.");
-                        client.HITAN = segment.DataElements[2];
+                        client.HITAN = segment.DataElements[2].Value;
                     }
 
                     if (segment.Name == "HIKAZS")
@@ -449,7 +449,7 @@ namespace libfintx.FinTS
                     // HITAN:5:6:4+4++76ma3j/MKH0BAABsRcJNhG?+owAQA+Eine neue TAN steht zur Abholung bereit.  Die TAN wurde reserviert am  16.11.2021 um 13?:54?:59 Uhr. Eine Push-Nachricht wurde versandt.  Bitte geben Sie die TAN ein.'
                     if (segment.DataElements.Count < 3)
                         throw new InvalidOperationException($"Invalid HITAN segment '{segment}'. Payload must have at least 3 data elements.");
-                    client.HITAN = segment.DataElements[2];
+                    client.HITAN = segment.DataElements[2].Value;
                 }
             }
 
@@ -666,12 +666,10 @@ namespace libfintx.FinTS
                 if (segment.Name == "HIRMG" || segment.Name == "HIRMS")
                 {
                     // HIRMS:4:2:3+9210::*?'Ausführung bis?' muss nach ?'Ausführung ab?' liegen.+9210::*Die BIC wurde angepasst.+0900::Freigabe erfolgreich
-                    var messages = segment.DataElements;
-                    foreach (var HIRMG_message in messages)
+                    var message = Parse_BankCode_Message(segment.Payload);
+                    if (message != null)
                     {
-                        var message = Parse_BankCode_Message(HIRMG_message);
-                        if (message != null)
-                            result.Add(message);
+                        result.Add(message);
                     }
                 }
             }

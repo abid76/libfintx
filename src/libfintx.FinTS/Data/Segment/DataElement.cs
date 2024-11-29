@@ -37,5 +37,10 @@ namespace libfintx.FinTS.Data.Segment
         {
             Value = value;
         }
+
+        public override string ToString()
+        {
+            return IsDataElementGroup ? string.Join(" ", DataElements) : Value;
+        }
     }
 }

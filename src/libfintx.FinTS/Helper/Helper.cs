@@ -237,41 +237,54 @@ namespace libfintx.FinTS
                         // HIRMG:2:2+9050::Die Nachricht enthÃ¤lt Fehler.+9800::Dialog abgebrochen+9010::Initialisierung fehlgeschlagen, Auftrag nicht bearbeitet.
                         // HIRMG:2:2+9800::Dialogabbruch.
 
-                        string[] HIRMG_messages = segment.Payload.Split('+');
-                        foreach (var HIRMG_message in HIRMG_messages)
+                        foreach (var message in segment.DataElements)
                         {
-                            var message = Parse_BankCode_Message(HIRMG_message);
-                            if (message != null)
-                                result.Add(message);
+                            var bankMessage = Parse_BankCode_Message(message);
+                            if (bankMessage != null)
+                                result.Add(bankMessage);
                         }
+
+                        //string[] HIRMG_messages = segment.Payload.Split('+');
+                        //foreach (var HIRMG_message in HIRMG_messages)
+                        //{
+                        //    var message = Parse_BankCode_Message(HIRMG_message);
+                        //    if (message != null)
+                        //        result.Add(message);
+                        //}
                     }
 
                     if (segment.Name == "HIRMS")
                     {
                         // HIRMS:3:2:2+9942::PIN falsch. Zugang gesperrt.'
-                        string[] HIRMS_messages = segment.Payload.Split('+');
-                        foreach (var HIRMS_message in HIRMS_messages)
+
+                        foreach (var message in segment.DataElements)
                         {
-                            var message = Parse_BankCode_Message(HIRMS_message);
-                            if (message != null)
-                                result.Add(message);
+                            var bankMessage = Parse_BankCode_Message(message);
+                            if (bankMessage != null)
+                                result.Add(bankMessage);
                         }
+
+                        //string[] HIRMS_messages = segment.Payload.Split('+');
+                        //foreach (var HIRMS_message in HIRMS_messages)
+                        //{
+                        //    var message = Parse_BankCode_Message(HIRMS_message);
+                        //    if (message != null)
+                        //        result.Add(message);
+                        //}
 
                         var securityMessage = result.FirstOrDefault(m => m.Code == "3920");
                         if (securityMessage != null)
                         {
-                            string message = securityMessage.Message;
-
                             string TAN = string.Empty;
                             string TANf = string.Empty;
 
-                            string[] procedures = Regex.Split(message, @"\D+");
+                            List<string> procedures = securityMessage.ParamList;
 
                             foreach (string value in procedures)
                             {
                                 if (!string.IsNullOrEmpty(value) && int.TryParse(value, out int i))
                                 {
-                                    if (value.StartsWith("9"))
+                                    if (value.StartsWith("9") && i > 0)
                                     {
                                         if (string.IsNullOrEmpty(TAN))
                                             TAN = i.ToString();
@@ -641,6 +654,39 @@ namespace libfintx.FinTS
                 return new HBCIBankMessage(code, message);
             }
             return null;
+        }
+
+        /// <summary>
+        /// Parse a single bank result message.
+        /// </summary>
+        /// <param name="BankCodeMessage"></param>
+        /// <returns></returns>
+        public static HBCIBankMessage Parse_BankCode_Message(DataElement singleMessage)
+        {
+            string code;
+            string refElement = null;
+            string messageText;
+            string[] paramList = null;
+
+            if (singleMessage.DataElements.Count >= 4)
+            {
+                code = singleMessage.DataElements[0].Value;
+                refElement = singleMessage.DataElements[1].Value;
+                messageText = singleMessage.DataElements[2].Value;
+                paramList = singleMessage.DataElements.Skip(3).Select(d => d.Value).ToArray();
+            }
+            else if (singleMessage.DataElements.Count == 3)
+            {
+                code = singleMessage.DataElements[0].Value;
+                refElement = singleMessage.DataElements[1].Value;
+                messageText = singleMessage.DataElements[2].Value;
+            }
+            else
+            {
+                return null;
+            }
+
+            return new HBCIBankMessage(code, string.IsNullOrWhiteSpace(refElement) ? null : refElement, messageText, paramList);
         }
 
         /// <summary>

@@ -203,17 +203,42 @@ HNHBS:7:1+2'".Replace(Environment.NewLine, string.Empty);
             Assert.Equal("7587-01-13-11.32.26.675878", startpoint);
         }
 
+        //[Fact]
+        //public void Test_Parse_BankCode_Message()
+        //{
+        //    var message = @"HIRMS:5:2:4+3050::BPD nicht mehr aktuell, aktuelle Version enthalten.+3920::Zugelassene Zwei-Schritt-Verfahren für den Benutzer.:923+0020::Der Auftrag wurde ausgeführt.";
+        //    Segment segment = Helper.Parse_Segment(message);
+        //    Assert.Equal("HIRMS", segment.Name);
+        //    Assert.Equal(3, segment.DataElements.Count);
+
+        //    var hBCIBankMessages = Helper.Parse_BankCode_Message(segment);
+        //    Assert.NotNull(hBCIBankMessages);
+        //    Assert.Equal(3, hBCIBankMessages.Count);
+        //}
+
         [Fact]
         public void Test_Parse_BankCode_Message()
         {
-            var message = @"HIRMS:5:2:4+3050::BPD nicht mehr aktuell, aktuelle Version enthalten.+3920::Zugelassene Zwei-Schritt-Verfahren für den Benutzer.:923+0020::Der Auftrag wurde ausgeführt.";
-            Segment segment = Helper.Parse_Segment(message);
-            Assert.Equal("HIRMS", segment.Name);
-            Assert.Equal(3, segment.DataElements.Count);
+            var message = "HIRMS:4:2:4+1040::BPD nicht mehr aktuell. Aktuelle Version folgt.+3920::Meldung unterstützter Ein- und Zwei-Schritt-Verfahren:901:902+0940::Letzte Anmeldung am 17.11.2024 - 11?:16?:31:17.11.2024 - 11?:16?:31'";
+            var segments = Helper.Parse_Segments(new FinTsClient(new ConnectionDetails()), message);
 
-            var hBCIBankMessages = Helper.Parse_BankCode_Messages(segment);
-            Assert.NotNull(hBCIBankMessages);
-            Assert.Equal(3, hBCIBankMessages.Count);
+            Assert.Equal(3, segments.Count);
+
+            Assert.Equal("1040", segments[0].Code);
+            Assert.Null(segments[0].RefElement);
+            Assert.Equal("BPD nicht mehr aktuell. Aktuelle Version folgt.", segments[0].Message);
+
+            Assert.Equal("3920", segments[1].Code);
+            Assert.Null(segments[1].RefElement);
+            Assert.Equal("Meldung unterstützter Ein- und Zwei-Schritt-Verfahren", segments[1].Message);
+            Assert.Equal(2, segments[1].ParamList.Count);
+            Assert.Equal("901", segments[1].ParamList[0]);
+            Assert.Equal("902", segments[1].ParamList[1]);
+
+            Assert.Equal("0940", segments[2].Code);
+            Assert.Null(segments[2].RefElement);
+            Assert.Equal("Letzte Anmeldung am 17.11.2024 - 11?:16?:31", segments[2].Message);
+            Assert.Equal("17.11.2024 - 11?:16?:31", segments[2].ParamList[0]);
         }
     }
 }

@@ -237,8 +237,8 @@ HNHBS:7:1+2'".Replace(Environment.NewLine, string.Empty);
 
             Assert.Equal("0940", segments[2].Code);
             Assert.Null(segments[2].RefElement);
-            Assert.Equal("Letzte Anmeldung am 17.11.2024 - 11?:16?:31", segments[2].Message);
-            Assert.Equal("17.11.2024 - 11?:16?:31", segments[2].ParamList[0]);
+            Assert.Equal("Letzte Anmeldung am 17.11.2024 - 11:16:31", segments[2].Message);
+            Assert.Equal("17.11.2024 - 11:16:31", segments[2].ParamList[0]);
         }
     }
 }

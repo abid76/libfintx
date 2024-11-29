@@ -672,14 +672,14 @@ namespace libfintx.FinTS
             {
                 code = singleMessage.DataElements[0].Value;
                 refElement = singleMessage.DataElements[1].Value;
-                messageText = singleMessage.DataElements[2].Value;
-                paramList = singleMessage.DataElements.Skip(3).Select(d => d.Value).ToArray();
+                messageText = singleMessage.DataElements[2].EscapedValue;
+                paramList = singleMessage.DataElements.Skip(3).Select(d => d.EscapedValue).ToArray();
             }
             else if (singleMessage.DataElements.Count == 3)
             {
                 code = singleMessage.DataElements[0].Value;
                 refElement = singleMessage.DataElements[1].Value;
-                messageText = singleMessage.DataElements[2].Value;
+                messageText = singleMessage.DataElements[2].EscapedValue;
             }
             else
             {

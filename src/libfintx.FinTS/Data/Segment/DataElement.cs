@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace libfintx.FinTS.Data.Segment
 {
     public class DataElement
     {
         public string Value { get; set; }
+
+        public string EscapedValue => Value != null ? Regex.Replace(Value, @"\?(\+|:|'|\?|@)", "$1") : null;
 
         private List<DataElement> _dataElements;
         /// <summary>

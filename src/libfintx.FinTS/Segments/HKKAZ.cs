@@ -37,8 +37,8 @@ namespace libfintx.FinTS
         {
             Log.Write("Starting job HKKAZ: Request transactions");
 
-            var connectionDetails = client.ConnectionDetails;
             string segments = string.Empty;
+            var connectionDetails = client.ConnectionDetails;
             AccountInformation activeAccount;
             if (client.activeAccount != null)
                 activeAccount = client.activeAccount;

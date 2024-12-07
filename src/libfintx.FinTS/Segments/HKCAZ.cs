@@ -38,6 +38,18 @@ namespace libfintx.FinTS
         {
             string segments = string.Empty;
             var connectionDetails = client.ConnectionDetails;
+            AccountInformation activeAccount;
+            if (client.activeAccount != null)
+                activeAccount = client.activeAccount;
+            else
+                activeAccount = new AccountInformation()
+                {
+                    AccountNumber = connectionDetails.Account,
+                    AccountBankCode = connectionDetails.Blz.ToString(),
+                    SubAccountFeature = connectionDetails.SubAccount,
+                    AccountIban = connectionDetails.Iban,
+                    AccountBic = connectionDetails.Bic,
+                };
 
             client.SEGNUM = Convert.ToInt16(SEG_NUM.Seg3);
 
@@ -50,22 +62,22 @@ namespace libfintx.FinTS
                     {
                         if (string.IsNullOrEmpty(Startpoint))
                         {
-                            segments = "HKCAZ:" + client.SEGNUM + ":" + client.HICAZS + "+" + connectionDetails.Iban + ":" + connectionDetails.Bic + ":" + connectionDetails.Account + "::280:" + connectionDetails.Blz + "+" + client.HICAZS_Camt + "+N'";
+                            segments = "HKCAZ:" + client.SEGNUM + ":" + client.HICAZS + "+" + connectionDetails.Iban + ":" + connectionDetails.Bic + ":" + connectionDetails.Account + ":" + activeAccount.SubAccountFeature + ":280:" + connectionDetails.Blz + "+" + client.HICAZS_Camt + "+N'";
                         }
                         else
                         {
-                            segments = "HKCAZ:" + client.SEGNUM + ":" + client.HICAZS + "+" + connectionDetails.Iban + ":" + connectionDetails.Bic + ":" + connectionDetails.Account + "::280:" + connectionDetails.Blz + "+" + client.HICAZS_Camt + "+N++++" + Startpoint + "'";
+                            segments = "HKCAZ:" + client.SEGNUM + ":" + client.HICAZS + "+" + connectionDetails.Iban + ":" + connectionDetails.Bic + ":" + connectionDetails.Account + ":" + activeAccount.SubAccountFeature + ":280:" + connectionDetails.Blz + "+" + client.HICAZS_Camt + "+N++++" + Startpoint + "'";
                         }
                     }
                     else
                     {
                         if (string.IsNullOrEmpty(Startpoint))
                         {
-                            segments = "HKCAZ:" + client.SEGNUM + ":" + client.HICAZS + "+" + connectionDetails.Iban + ":" + connectionDetails.Bic + ":" + connectionDetails.Account + "::280:" + connectionDetails.Blz + "+" + client.HICAZS_Camt + "+N+" + FromDate + "+" + ToDate + "'";
+                            segments = "HKCAZ:" + client.SEGNUM + ":" + client.HICAZS + "+" + connectionDetails.Iban + ":" + connectionDetails.Bic + ":" + connectionDetails.Account + ":" + activeAccount.SubAccountFeature + ":280:" + connectionDetails.Blz + "+" + client.HICAZS_Camt + "+N+" + FromDate + "+" + ToDate + "'";
                         }
                         else
                         {
-                            segments = "HKCAZ:" + client.SEGNUM + ":" + client.HICAZS + "+" + connectionDetails.Iban + ":" + connectionDetails.Bic + ":" + connectionDetails.Account + "::280:" + connectionDetails.Blz + "+" + client.HICAZS_Camt + "+N+" + FromDate + "+" + ToDate + "++" + Startpoint + "'";
+                            segments = "HKCAZ:" + client.SEGNUM + ":" + client.HICAZS + "+" + connectionDetails.Iban + ":" + connectionDetails.Bic + ":" + connectionDetails.Account + ":" + activeAccount.SubAccountFeature + ":280:" + connectionDetails.Blz + "+" + client.HICAZS_Camt + "+N+" + FromDate + "+" + ToDate + "++" + Startpoint + "'";
                         }
                     }
 
@@ -79,22 +91,22 @@ namespace libfintx.FinTS
                     {
                         if (string.IsNullOrEmpty(Startpoint))
                         {
-                            segments = "HKCAZ:" + client.SEGNUM + ":" + client.HICAZS + "+" + connectionDetails.Iban + ":" + connectionDetails.Bic + ":" + connectionDetails.Account + "::280:" + connectionDetails.Blz + "+" + CamtScheme.Camt053 + "+N'";
+                            segments = "HKCAZ:" + client.SEGNUM + ":" + client.HICAZS + "+" + connectionDetails.Iban + ":" + connectionDetails.Bic + ":" + connectionDetails.Account + ":" + activeAccount.SubAccountFeature + ":280:" + connectionDetails.Blz + "+" + CamtScheme.Camt053 + "+N'";
                         }
                         else
                         {
-                            segments = "HKCAZ:" + client.SEGNUM + ":" + client.HICAZS + "+" + connectionDetails.Iban + ":" + connectionDetails.Bic + ":" + connectionDetails.Account + "::280:" + connectionDetails.Blz + "+" + CamtScheme.Camt053 + "+N++++" + Startpoint + "'";
+                            segments = "HKCAZ:" + client.SEGNUM + ":" + client.HICAZS + "+" + connectionDetails.Iban + ":" + connectionDetails.Bic + ":" + connectionDetails.Account + ":" + activeAccount.SubAccountFeature + ":280:" + connectionDetails.Blz + "+" + CamtScheme.Camt053 + "+N++++" + Startpoint + "'";
                         }
                     }
                     else
                     {
                         if (string.IsNullOrEmpty(Startpoint))
                         {
-                            segments = "HKCAZ:" + client.SEGNUM + ":" + client.HICAZS + "+" + connectionDetails.Iban + ":" + connectionDetails.Bic + ":" + connectionDetails.Account + "::280:" + connectionDetails.Blz + "+" + CamtScheme.Camt053 + "+N+" + FromDate + "+" + ToDate + "'";
+                            segments = "HKCAZ:" + client.SEGNUM + ":" + client.HICAZS + "+" + connectionDetails.Iban + ":" + connectionDetails.Bic + ":" + connectionDetails.Account + ":" + activeAccount.SubAccountFeature + ":280:" + connectionDetails.Blz + "+" + CamtScheme.Camt053 + "+N+" + FromDate + "+" + ToDate + "'";
                         }
                         else
                         {
-                            segments = "HKCAZ:" + client.SEGNUM + ":" + client.HICAZS + "+" + connectionDetails.Iban + ":" + connectionDetails.Bic + ":" + connectionDetails.Account + "::280:" + connectionDetails.Blz + "+" + CamtScheme.Camt053 + "+N+" + FromDate + "+" + ToDate + "++" + Startpoint + "'";
+                            segments = "HKCAZ:" + client.SEGNUM + ":" + client.HICAZS + "+" + connectionDetails.Iban + ":" + connectionDetails.Bic + ":" + connectionDetails.Account + ":" + activeAccount.SubAccountFeature + ":280:" + connectionDetails.Blz + "+" + CamtScheme.Camt053 + "+N+" + FromDate + "+" + ToDate + "++" + Startpoint + "'";
                         }
                     }
 

@@ -714,7 +714,7 @@ namespace libfintx.Sample.Ui
         private TANDialog CreateTANDialog(FinTsClient client)
         {
             var dialog = new TANDialog(WaitForTanAsync, pBox_tan);
-            if (client.HIRMS == "922")
+            if (client.HIRMS == "922" || client.HIRMS == "923")
                 dialog.IsDecoupled = true;
 
             return dialog;

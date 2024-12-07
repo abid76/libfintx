@@ -87,6 +87,8 @@
             this.btn_daueraufträge_abholen = new System.Windows.Forms.Button();
             this.btn_terminueberweisungen_abholen = new System.Windows.Forms.Button();
             this.chk_tracingMaskCredentials = new System.Windows.Forms.CheckBox();
+            this.lbl_unterkontomerkmal = new System.Windows.Forms.Label();
+            this.txt_unterkontomerkmal = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.pBox_tan)).BeginInit();
             this.SuspendLayout();
             // 
@@ -434,7 +436,7 @@
             this.txt_kontonummer.Location = new System.Drawing.Point(204, 11);
             this.txt_kontonummer.Margin = new System.Windows.Forms.Padding(6);
             this.txt_kontonummer.Name = "txt_kontonummer";
-            this.txt_kontonummer.Size = new System.Drawing.Size(605, 29);
+            this.txt_kontonummer.Size = new System.Drawing.Size(237, 29);
             this.txt_kontonummer.TabIndex = 44;
             this.txt_kontonummer.TextChanged += new System.EventHandler(this.Txt_kontonummer_TextChanged);
             // 
@@ -676,11 +678,31 @@
             this.chk_tracingMaskCredentials.Text = "Zugangsdaten maskieren";
             this.chk_tracingMaskCredentials.UseVisualStyleBackColor = true;
             // 
+            // lbl_unterkontomerkmal
+            // 
+            this.lbl_unterkontomerkmal.AutoSize = true;
+            this.lbl_unterkontomerkmal.Location = new System.Drawing.Point(467, 17);
+            this.lbl_unterkontomerkmal.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.lbl_unterkontomerkmal.Name = "lbl_unterkontomerkmal";
+            this.lbl_unterkontomerkmal.Size = new System.Drawing.Size(187, 25);
+            this.lbl_unterkontomerkmal.TabIndex = 103;
+            this.lbl_unterkontomerkmal.Text = "Unterkontomerkmal:";
+            // 
+            // txt_unterkontomerkmal
+            // 
+            this.txt_unterkontomerkmal.Location = new System.Drawing.Point(672, 14);
+            this.txt_unterkontomerkmal.Margin = new System.Windows.Forms.Padding(6);
+            this.txt_unterkontomerkmal.Name = "txt_unterkontomerkmal";
+            this.txt_unterkontomerkmal.Size = new System.Drawing.Size(137, 29);
+            this.txt_unterkontomerkmal.TabIndex = 104;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(2237, 1401);
+            this.Controls.Add(this.txt_unterkontomerkmal);
+            this.Controls.Add(this.lbl_unterkontomerkmal);
             this.Controls.Add(this.chk_tracingMaskCredentials);
             this.Controls.Add(this.btn_terminueberweisungen_abholen);
             this.Controls.Add(this.btn_daueraufträge_abholen);
@@ -813,6 +835,8 @@
         internal System.Windows.Forms.Button btn_daueraufträge_abholen;
         internal System.Windows.Forms.Button btn_terminueberweisungen_abholen;
         private System.Windows.Forms.CheckBox chk_tracingMaskCredentials;
+        internal System.Windows.Forms.Label lbl_unterkontomerkmal;
+        internal System.Windows.Forms.TextBox txt_unterkontomerkmal;
     }
 }
 

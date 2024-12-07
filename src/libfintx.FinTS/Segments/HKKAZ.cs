@@ -37,12 +37,15 @@ namespace libfintx.FinTS
         {
             Log.Write("Starting job HKKAZ: Request transactions");
 
-            var connectionDetails = client.ConnectionDetails;
             string segments = string.Empty;
+            var connectionDetails = client.ConnectionDetails;
             AccountInformation activeAccount;
             if (client.activeAccount != null)
+            {
                 activeAccount = client.activeAccount;
+            }
             else
+            {
                 activeAccount = new AccountInformation()
                 {
                     AccountNumber = connectionDetails.Account,
@@ -51,6 +54,7 @@ namespace libfintx.FinTS
                     AccountIban = connectionDetails.Iban,
                     AccountBic = connectionDetails.Bic,
                 };
+            }
 
             client.SEGNUM = Convert.ToInt16(SEG_NUM.Seg3);
 

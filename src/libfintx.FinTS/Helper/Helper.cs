@@ -639,28 +639,6 @@ namespace libfintx.FinTS
         /// </summary>
         /// <param name="BankCodeMessage"></param>
         /// <returns></returns>
-        public static HBCIBankMessage Parse_BankCode_Message(string BankCodeMessage)
-        {
-            var match = Regex.Match(BankCodeMessage, PatternResultMessage);
-            if (match.Success)
-            {
-                var code = match.Groups[1].Value;
-                var message = match.Groups[2].Value;
-
-                message = message.Replace("?:", ":");
-                message = message.Replace("?'", "'");
-                message = message.Replace("?+", "+");
-
-                return new HBCIBankMessage(code, message);
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// Parse a single bank result message.
-        /// </summary>
-        /// <param name="BankCodeMessage"></param>
-        /// <returns></returns>
         public static HBCIBankMessage Parse_BankCode_Message(DataElement singleMessage)
         {
             string code;
@@ -711,11 +689,12 @@ namespace libfintx.FinTS
             {
                 if (segment.Name == "HIRMG" || segment.Name == "HIRMS")
                 {
-                    // HIRMS:4:2:3+9210::*?'Ausführung bis?' muss nach ?'Ausführung ab?' liegen.+9210::*Die BIC wurde angepasst.+0900::Freigabe erfolgreich
-                    var message = Parse_BankCode_Message(segment.Payload);
-                    if (message != null)
+                    //// HIRMS:4:2:3+9210::*?'Ausführung bis?' muss nach ?'Ausführung ab?' liegen.+9210::*Die BIC wurde angepasst.+0900::Freigabe erfolgreich
+                    foreach (var message in segment.DataElements)
                     {
-                        result.Add(message);
+                        var bankMessage = Parse_BankCode_Message(message);
+                        if (bankMessage != null)
+                            result.Add(bankMessage);
                     }
                 }
             }

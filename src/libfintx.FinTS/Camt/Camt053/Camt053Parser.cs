@@ -269,7 +269,7 @@ namespace libfintx.FinTS.Camt.Camt053
 
                         tr.CustomerRef = entry.AcctSvcrRef;
 
-                        if (txDetails?.BkTxCd.Prtry.Cd != null)
+                        if (txDetails?.BkTxCd?.Prtry?.Cd != null)
                         {
                             // NTRF+177+9310+997
                             // NSTO+152+00900. look for SEPA Geschäftsvorfallcodes

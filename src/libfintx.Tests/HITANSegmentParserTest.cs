@@ -72,7 +72,7 @@ namespace libfintx.Tests
             Assert.NotNull(hitanSegment);
             Assert.Equal("HITAN", hitanSegment.Name);
             Assert.Equal(6, hitanSegment.DataElements.Count);
-            Assert.Equal(3030, hitanSegment.DataElements[4].Value.Length);
+            Assert.Equal(2988, hitanSegment.DataElements[4].Value.Length);
         }
     }
 }

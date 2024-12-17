@@ -546,7 +546,7 @@ namespace libfintx.FinTS.Camt.Camt052
 
                         tr.CustomerRef = entry.AcctSvcrRef;
 
-                        if (txDetails?.BkTxCd.Prtry.Cd != null)
+                        if (txDetails?.BkTxCd?.Prtry?.Cd != null)
                         {
                             // NTRF+177+9310+997
                             // NSTO+152+00900. look for SEPA Geschäftsvorfallcodes
@@ -563,7 +563,7 @@ namespace libfintx.FinTS.Camt.Camt052
                         }
 
                         // for SEPA direct debit batches, there are multiple TxDtls records
-                        if (entryDetails.TxDtls?.Count() > 1)
+                        if (entryDetails?.TxDtls?.Count() > 1)
                         {
                             tr.PartnerName = string.Empty;
                             tr.Description = string.Format("SEPA Sammel-Basislastschrift mit {0} Lastschriften", entryDetails.TxDtls?.Count());

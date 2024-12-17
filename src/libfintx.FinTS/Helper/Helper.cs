@@ -41,11 +41,6 @@ namespace libfintx.FinTS
         public const string DefaultEncoding = "ISO-8859-1";
 
         /// <summary>
-        /// Regex pattern for HIRMG/HIRMS messages.
-        /// </summary>
-        private const string PatternResultMessage = @"(\d{4}):.*?:(.+)";
-
-        /// <summary>
         /// Escapes all special Characters (':', '+', ''') with a question mark '?'.
         /// </summary>
         /// <param name="str"></param>
@@ -306,11 +301,6 @@ namespace libfintx.FinTS
                                     throw new Exception($"Invalid HIRMS/Tan-Mode {client.HIRMS} detected. Please choose one of the allowed modes: {TANf}");
                             }
                             client.HIRMSf = TANf;
-
-                            // Parsing TAN processes
-                            if (!string.IsNullOrEmpty(client.HIRMS))
-                                Parse_TANProcesses(client, bpd);
-
                         }
                     }
 
@@ -358,6 +348,8 @@ namespace libfintx.FinTS
                             if (hitans.TanProcesses.Any(tp => tp.TanCode == Convert.ToInt32(client.HIRMS)))
                                 client.HITANS = segment.Version;
                         }
+
+                        TanProcesses.Items = hitans.TanProcesses.Select(ht => new TanProcess() { ProcessName = ht.Name, ProcessNumber = ht.TanCode.ToString() }).ToList();
                     }
 
                     if (segment.Name == "HITAN")
@@ -565,51 +557,6 @@ namespace libfintx.FinTS
         internal static string Parse_Transactions_Startpoint(string bankCode)
         {
             return Regex.Match(bankCode, @"\+3040::[^:]+:(?<startpoint>[^'\+:]+)['\+:]").Groups["startpoint"].Value;
-        }
-
-        /// <summary>
-        /// Parse tan processes
-        /// </summary>
-        /// <returns></returns>
-        private static bool Parse_TANProcesses(FinTsClient client, string bpd)
-        {
-            try
-            {
-                List<TanProcess> list = new List<TanProcess>();
-
-                string[] processes = client.HIRMSf.Split(';');
-
-                // Examples from bpd
-
-                // 944:2:SECUREGO:
-                // 920:2:smsTAN:
-                // 920:2:BestSign:
-
-                foreach (var process in processes)
-                {
-                    string pattern = process + ":.*?:.*?:(?'name'.*?):.*?:(?'name2'.*?):";
-
-                    Regex rgx = new Regex(pattern);
-
-                    foreach (Match match in rgx.Matches(bpd))
-                    {
-                        int i = 0;
-
-                        if (!process.Equals("999")) // -> PIN/TAN step 1
-                        {
-                            if (int.TryParse(match.Groups["name2"].Value, out i))
-                                list.Add(new TanProcess { ProcessNumber = process, ProcessName = match.Groups["name"].Value });
-                            else
-                                list.Add(new TanProcess { ProcessNumber = process, ProcessName = match.Groups["name2"].Value });
-                        }
-                    }
-                }
-
-                TanProcesses.Items = list;
-
-                return true;
-            }
-            catch { return false; }
         }
 
         public static List<string> Parse_TANMedium(string BankCode)

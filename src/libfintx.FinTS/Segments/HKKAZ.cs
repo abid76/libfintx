@@ -41,8 +41,11 @@ namespace libfintx.FinTS
             var connectionDetails = client.ConnectionDetails;
             AccountInformation activeAccount;
             if (client.activeAccount != null)
+            {
                 activeAccount = client.activeAccount;
+            }
             else
+            {
                 activeAccount = new AccountInformation()
                 {
                     AccountNumber = connectionDetails.Account,
@@ -51,6 +54,7 @@ namespace libfintx.FinTS
                     AccountIban = connectionDetails.Iban,
                     AccountBic = connectionDetails.Bic,
                 };
+            }
 
             client.SEGNUM = Convert.ToInt16(SEG_NUM.Seg3);
 

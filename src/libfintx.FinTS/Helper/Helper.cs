@@ -41,11 +41,6 @@ namespace libfintx.FinTS
         public const string DefaultEncoding = "ISO-8859-1";
 
         /// <summary>
-        /// Regex pattern for HIRMG/HIRMS messages.
-        /// </summary>
-        private const string PatternResultMessage = @"(\d{4}):.*?:(.+)";
-
-        /// <summary>
         /// Escapes all special Characters (':', '+', ''') with a question mark '?'.
         /// </summary>
         /// <param name="str"></param>
@@ -237,41 +232,54 @@ namespace libfintx.FinTS
                         // HIRMG:2:2+9050::Die Nachricht enthÃ¤lt Fehler.+9800::Dialog abgebrochen+9010::Initialisierung fehlgeschlagen, Auftrag nicht bearbeitet.
                         // HIRMG:2:2+9800::Dialogabbruch.
 
-                        string[] HIRMG_messages = segment.Payload.Split('+');
-                        foreach (var HIRMG_message in HIRMG_messages)
+                        foreach (var message in segment.DataElements)
                         {
-                            var message = Parse_BankCode_Message(HIRMG_message);
-                            if (message != null)
-                                result.Add(message);
+                            var bankMessage = Parse_BankCode_Message(message);
+                            if (bankMessage != null)
+                                result.Add(bankMessage);
                         }
+
+                        //string[] HIRMG_messages = segment.Payload.Split('+');
+                        //foreach (var HIRMG_message in HIRMG_messages)
+                        //{
+                        //    var message = Parse_BankCode_Message(HIRMG_message);
+                        //    if (message != null)
+                        //        result.Add(message);
+                        //}
                     }
 
                     if (segment.Name == "HIRMS")
                     {
                         // HIRMS:3:2:2+9942::PIN falsch. Zugang gesperrt.'
-                        string[] HIRMS_messages = segment.Payload.Split('+');
-                        foreach (var HIRMS_message in HIRMS_messages)
+
+                        foreach (var message in segment.DataElements)
                         {
-                            var message = Parse_BankCode_Message(HIRMS_message);
-                            if (message != null)
-                                result.Add(message);
+                            var bankMessage = Parse_BankCode_Message(message);
+                            if (bankMessage != null)
+                                result.Add(bankMessage);
                         }
+
+                        //string[] HIRMS_messages = segment.Payload.Split('+');
+                        //foreach (var HIRMS_message in HIRMS_messages)
+                        //{
+                        //    var message = Parse_BankCode_Message(HIRMS_message);
+                        //    if (message != null)
+                        //        result.Add(message);
+                        //}
 
                         var securityMessage = result.FirstOrDefault(m => m.Code == "3920");
                         if (securityMessage != null)
                         {
-                            string message = securityMessage.Message;
-
                             string TAN = string.Empty;
                             string TANf = string.Empty;
 
-                            string[] procedures = Regex.Split(message, @"\D+");
+                            List<string> procedures = securityMessage.ParamList;
 
                             foreach (string value in procedures)
                             {
                                 if (!string.IsNullOrEmpty(value) && int.TryParse(value, out int i))
                                 {
-                                    if (value.StartsWith("9"))
+                                    if (value.StartsWith("9") && i > 0)
                                     {
                                         if (string.IsNullOrEmpty(TAN))
                                             TAN = i.ToString();
@@ -293,11 +301,6 @@ namespace libfintx.FinTS
                                     throw new Exception($"Invalid HIRMS/Tan-Mode {client.HIRMS} detected. Please choose one of the allowed modes: {TANf}");
                             }
                             client.HIRMSf = TANf;
-
-                            // Parsing TAN processes
-                            if (!string.IsNullOrEmpty(client.HIRMS))
-                                Parse_TANProcesses(client, bpd);
-
                         }
                     }
 
@@ -306,7 +309,7 @@ namespace libfintx.FinTS
                         if (segment.DataElements.Count < 3)
                             throw new InvalidOperationException($"Expected segment '{segment}' to contain at least 3 data elements in payload.");
 
-                        var dialogId = segment.DataElements[2];
+                        var dialogId = segment.DataElements[2].Value;
                         client.HNHBK = dialogId;
                     }
 
@@ -345,6 +348,8 @@ namespace libfintx.FinTS
                             if (hitans.TanProcesses.Any(tp => tp.TanCode == Convert.ToInt32(client.HIRMS)))
                                 client.HITANS = segment.Version;
                         }
+
+                        TanProcesses.Items = hitans.TanProcesses.Select(ht => new TanProcess() { ProcessName = ht.Name, ProcessNumber = ht.TanCode.ToString() }).ToList();
                     }
 
                     if (segment.Name == "HITAN")
@@ -353,7 +358,7 @@ namespace libfintx.FinTS
                         // HITAN:5:7:4+4++8578-06-23-13.22.43.709351+Bitte Auftrag in Ihrer App freigeben.
                         if (segment.DataElements.Count < 3)
                             throw new InvalidOperationException($"Invalid HITAN segment '{segment}'. Payload must have at least 3 data elements.");
-                        client.HITAN = segment.DataElements[2];
+                        client.HITAN = segment.DataElements[2].Value;
                     }
 
                     if (segment.Name == "HIKAZS")
@@ -449,7 +454,7 @@ namespace libfintx.FinTS
                     // HITAN:5:6:4+4++76ma3j/MKH0BAABsRcJNhG?+owAQA+Eine neue TAN steht zur Abholung bereit.  Die TAN wurde reserviert am  16.11.2021 um 13?:54?:59 Uhr. Eine Push-Nachricht wurde versandt.  Bitte geben Sie die TAN ein.'
                     if (segment.DataElements.Count < 3)
                         throw new InvalidOperationException($"Invalid HITAN segment '{segment}'. Payload must have at least 3 data elements.");
-                    client.HITAN = segment.DataElements[2];
+                    client.HITAN = segment.DataElements[2].Value;
                 }
             }
 
@@ -554,67 +559,57 @@ namespace libfintx.FinTS
             return Regex.Match(bankCode, @"\+3040::[^:]+:(?<startpoint>[^'\+:]+)['\+:]").Groups["startpoint"].Value;
         }
 
-        /// <summary>
-        /// Parse tan processes
-        /// </summary>
-        /// <returns></returns>
-        private static bool Parse_TANProcesses(FinTsClient client, string bpd)
-        {
-            try
-            {
-                List<TanProcess> list = new List<TanProcess>();
-
-                string[] processes = client.HIRMSf.Split(';');
-
-                // Examples from bpd
-
-                // 944:2:SECUREGO:
-                // 920:2:smsTAN:
-                // 920:2:BestSign:
-
-                foreach (var process in processes)
-                {
-                    string pattern = process + ":.*?:.*?:(?'name'.*?):.*?:(?'name2'.*?):";
-
-                    Regex rgx = new Regex(pattern);
-
-                    foreach (Match match in rgx.Matches(bpd))
-                    {
-                        int i = 0;
-
-                        if (!process.Equals("999")) // -> PIN/TAN step 1
-                        {
-                            if (int.TryParse(match.Groups["name2"].Value, out i))
-                                list.Add(new TanProcess { ProcessNumber = process, ProcessName = match.Groups["name"].Value });
-                            else
-                                list.Add(new TanProcess { ProcessNumber = process, ProcessName = match.Groups["name2"].Value });
-                        }
-                    }
-                }
-
-                TanProcesses.Items = list;
-
-                return true;
-            }
-            catch { return false; }
-        }
-
         public static List<string> Parse_TANMedium(string BankCode)
         {
-            List<string> result = new List<string>();
-
+            // HITAB:4:4:3+0+G:1:::::::::::Abids iPhone 14+G:1:::::::::::iPhone 11
             // HITAB:5:4:3+0+A:1:::::::::::Handy::::::::+A:2:::::::::::iPhone Abid::::::::
             // HITAB:4:4:3+0+M:1:::::::::::mT?:MFN1:********0340'
             // HITAB:5:4:3+0+M:2:::::::::::Unregistriert 1::01514/654321::::::+M:1:::::::::::Handy:*********4321:::::::
             // HITAB:4:4:3+0+M:1:::::::::::mT?:MFN1:********0340+G:1:SO?:iPhone:00:::::::::SO?:iPhone''
 
-            // For easier matching, replace '?:' by some special character
-            BankCode = BankCode.Replace("?:", @"\");
+            List<string> result = new List<string>();
 
-            foreach (Match match in Regex.Matches(BankCode, @"\+[AGMS]:[012]:(?<Kartennummer>[^:]*):(?<Kartenfolgenummer>[^:]*):+(?<Bezeichnung>[^+:]+)"))
+            var segments = SplitEncryptedSegments(BankCode);
+            foreach (var rawSegment in segments)
             {
-                result.Add(match.Groups["Bezeichnung"].Value.Replace(@"\", "?:"));
+                var segment = Parse_Segment(rawSegment);
+                if (segment.Name == "HITAB")
+                {
+                    for (int i = 1; i < segment.DataElements.Count; i++)
+                    {
+                        var deg = segment.DataElements[i];
+                        if (!deg.IsDataElementGroup)
+                        {
+                            continue;
+                        }
+                        string tanMediumName = null;
+                        if (segment.Version == 4)
+                        {
+                            if (deg.DataElements.Count < 12)
+                            {
+                                continue;
+                            }
+                            tanMediumName = deg.DataElements[11].Value;
+                        }
+                        else if (deg.DataElements.Count >= 12)
+                        {
+                            tanMediumName = deg.DataElements[11].Value;
+                        }
+                        if (!string.IsNullOrEmpty(tanMediumName))
+                        {
+                            result.Add(tanMediumName);
+                        }
+                    }
+                }
             }
+
+            // For easier matching, replace '?:' by some special character
+            //BankCode = BankCode.Replace("?:", @"\");
+
+            //foreach (Match match in Regex.Matches(BankCode, @"\+[AGMS]:[012]:(?<Kartennummer>[^:]*):(?<Kartenfolgenummer>[^:]*):+(?<Bezeichnung>[^+:]+)"))
+            //{
+            //    result.Add(match.Groups["Bezeichnung"].Value.Replace(@"\", "?:"));
+            //}
 
             return result;
         }
@@ -626,21 +621,32 @@ namespace libfintx.FinTS
         /// </summary>
         /// <param name="BankCodeMessage"></param>
         /// <returns></returns>
-        public static HBCIBankMessage Parse_BankCode_Message(string BankCodeMessage)
+        public static HBCIBankMessage Parse_BankCode_Message(DataElement singleMessage)
         {
-            var match = Regex.Match(BankCodeMessage, PatternResultMessage);
-            if (match.Success)
+            string code;
+            string refElement = null;
+            string messageText;
+            string[] paramList = null;
+
+            if (singleMessage.DataElements.Count >= 4)
             {
-                var code = match.Groups[1].Value;
-                var message = match.Groups[2].Value;
-
-                message = message.Replace("?:", ":");
-                message = message.Replace("?'", "'");
-                message = message.Replace("?+", "+");
-
-                return new HBCIBankMessage(code, message);
+                code = singleMessage.DataElements[0].Value;
+                refElement = singleMessage.DataElements[1].Value;
+                messageText = singleMessage.DataElements[2].EscapedValue;
+                paramList = singleMessage.DataElements.Skip(3).Select(d => d.EscapedValue).ToArray();
             }
-            return null;
+            else if (singleMessage.DataElements.Count == 3)
+            {
+                code = singleMessage.DataElements[0].Value;
+                refElement = singleMessage.DataElements[1].Value;
+                messageText = singleMessage.DataElements[2].EscapedValue;
+            }
+            else
+            {
+                return null;
+            }
+
+            return new HBCIBankMessage(code, string.IsNullOrWhiteSpace(refElement) ? null : refElement, messageText, paramList);
         }
 
         /// <summary>
@@ -665,13 +671,12 @@ namespace libfintx.FinTS
             {
                 if (segment.Name == "HIRMG" || segment.Name == "HIRMS")
                 {
-                    // HIRMS:4:2:3+9210::*?'Ausführung bis?' muss nach ?'Ausführung ab?' liegen.+9210::*Die BIC wurde angepasst.+0900::Freigabe erfolgreich
-                    var messages = segment.DataElements;
-                    foreach (var HIRMG_message in messages)
+                    //// HIRMS:4:2:3+9210::*?'Ausführung bis?' muss nach ?'Ausführung ab?' liegen.+9210::*Die BIC wurde angepasst.+0900::Freigabe erfolgreich
+                    foreach (var message in segment.DataElements)
                     {
-                        var message = Parse_BankCode_Message(HIRMG_message);
-                        if (message != null)
-                            result.Add(message);
+                        var bankMessage = Parse_BankCode_Message(message);
+                        if (bankMessage != null)
+                            result.Add(bankMessage);
                     }
                 }
             }

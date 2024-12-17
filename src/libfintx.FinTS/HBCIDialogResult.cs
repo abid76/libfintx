@@ -105,8 +105,12 @@ namespace libfintx.FinTS
         public bool IsWarning { get => TypeEnum.Warning == Type; }
         public bool IsError { get => TypeEnum.Error == Type; }
         public bool IsUnknown { get => TypeEnum.Error == Type; }
+
         public string Code { get; }
+        public string RefElement { get; }
         public string Message { get; }
+        public List<string> ParamList { get; }
+
         public HBCIBankMessage(string code, string message)
         {
             Code = code;
@@ -123,9 +127,15 @@ namespace libfintx.FinTS
                 Type = TypeEnum.Unknown;
         }
 
+        public HBCIBankMessage(string code, string refElement, string message, params string[] paramList) : this(code, message)
+        {
+            RefElement = refElement;
+            ParamList = paramList?.ToList();
+        }
+
         public override string ToString()
         {
-            return $"{Code}: {Message}";
+            return $"{Code}: {(RefElement != null ? "Ref: [" + RefElement + "], " : "")} Message: '{Message}' {(ParamList?.Count > 0 ? ", Params: [" + string.Join(", ", ParamList) + "], " : "")}";
         }
     }
 }

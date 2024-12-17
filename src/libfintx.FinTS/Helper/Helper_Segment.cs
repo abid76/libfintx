@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using libfintx.FinTS.Data.Segment;
 
 namespace libfintx.FinTS
 {
@@ -65,17 +66,35 @@ namespace libfintx.FinTS
         private static DelimiterMatch FindNextDataElementDelimiter(string message)
         {
             var escapeMatch = Regex.Match(message, @"\?");
-            var binaryMatch = Regex.Match(message, @"@\d+@");
             var dataElementMatch = Regex.Match(message, @"\+");
+            var binaryMatch = Regex.Match(message, @"@\d+@");
 
-            var result = new Match[] { escapeMatch, binaryMatch, dataElementMatch }.Where(m => m.Success).OrderBy(m => m.Index).FirstOrDefault();
+            var result = new Match[] { escapeMatch, dataElementMatch, binaryMatch }.Where(m => m.Success).OrderBy(m => m.Index).FirstOrDefault();
+
+            if (result == escapeMatch)
+                return new DelimiterMatch(Delimiter.Escape, result.Index, result.Value);
+            if (result == dataElementMatch)
+                return new DelimiterMatch(Delimiter.DataElement, result.Index, result.Value);
+            if (result == binaryMatch)
+                return new DelimiterMatch(Delimiter.Binary, result.Index, result.Value);
+
+            return null;
+        }
+
+        private static DelimiterMatch FindNextDataElementInternalDelimiter(string message)
+        {
+            var escapeMatch = Regex.Match(message, @"\?");
+            var binaryMatch = Regex.Match(message, @"@\d+@");
+            var dataElementGroupMatch = Regex.Match(message, @":");
+
+            var result = new Match[] { escapeMatch, binaryMatch, dataElementGroupMatch }.Where(m => m.Success).OrderBy(m => m.Index).FirstOrDefault();
 
             if (result == escapeMatch)
                 return new DelimiterMatch(Delimiter.Escape, result.Index, result.Value);
             if (result == binaryMatch)
                 return new DelimiterMatch(Delimiter.Binary, result.Index, result.Value);
-            if (result == dataElementMatch)
-                return new DelimiterMatch(Delimiter.DataElement, result.Index, result.Value);
+            if (result == dataElementGroupMatch)
+                return new DelimiterMatch(Delimiter.DataElementGroup, result.Index, result.Value);
 
             return null;
         }
@@ -122,7 +141,7 @@ namespace libfintx.FinTS
                             if (code.Length < length)
                                 throw new ArgumentException($"Invalid segment. Given binary length {binaryLength} exceeds actual message code length. Code part is: {Truncate(code)}");
 
-                            currentDataElement.Append(code.Substring(match.Index + match.Length, binaryLength));
+                            currentDataElement.Append(code.Substring(0, match.Index + match.Length + binaryLength));
                             code = code.Substring(match.Index + match.Length + binaryLength);
                             if (code.Length == 0)
                             {
@@ -147,6 +166,84 @@ namespace libfintx.FinTS
             }
 
             return dataElements;
+        }
+
+        internal static List<DataElement> SplitSubDataElements(List<string> dataElements)
+        {
+            List<DataElement> list = new List<DataElement>();
+
+            foreach (string element in dataElements)
+            {
+                var currentDataElement = new DataElement();
+                var currentChunk = new StringBuilder();
+                var code = element;
+
+                while (code.Length > 0)
+                {
+                    var match = FindNextDataElementInternalDelimiter(code);
+                    if (match == null)
+                    {
+                        currentChunk.Append(code);
+                        break;
+                    }
+
+                    switch (match.Delimiter)
+                    {
+                        case Delimiter.Escape:
+                            {
+                                var length = match.Index + match.Length + 1;
+                                if (code.Length < length)
+                                    throw new ArgumentException($"Invalid code. There are no more characters after escape character. Code is: {Truncate(code)}");
+
+                                var allowedChars = new[] { '+', ':', '\'', '?', '@' };
+                                if (!allowedChars.Contains(code[length - 1]))
+                                    throw new ArgumentException($"Invalid code. Escape character must be followed by +,:,',?,@. Code is: {Truncate(code)}");
+
+                                currentChunk.Append(code.Substring(0, length));
+                                code = code.Substring(length);
+
+                                break;
+                            }
+                        case Delimiter.Binary:
+                            {
+                                var lengthStr = match.Value.Substring(1, match.Length - 2);
+                                var binaryLength = Convert.ToInt32(lengthStr);
+                                var length = match.Index + match.Length + binaryLength;
+                                if (code.Length < length)
+                                    throw new ArgumentException($"Invalid segment. Given binary length {binaryLength} exceeds actual message code length. Code part is: {Truncate(code)}");
+
+                                currentChunk.Append(code.Substring(match.Index + match.Length, binaryLength));
+                                code = code.Substring(match.Index + match.Length + binaryLength);
+
+                                break;
+                            }
+                        case Delimiter.DataElementGroup:
+                            {
+                                currentChunk.Append(code.Substring(0, match.Index));
+                                currentDataElement.DataElements.Add(new DataElement(currentChunk.ToString()));
+                                currentChunk.Clear();
+                                code = code.Substring(match.Index + 1);
+
+                                break;
+                            }
+                        default:
+                            break;
+                    }
+                }
+
+                if (currentDataElement.IsDataElementGroup)
+                {
+                    currentDataElement.DataElements.Add(new DataElement(currentChunk.ToString()));
+                }
+                else
+                {
+                    currentDataElement.Value = currentChunk.ToString();
+                }
+
+                list.Add(currentDataElement);
+            }
+
+            return list;
         }
 
         /// <summary>
@@ -287,6 +384,7 @@ namespace libfintx.FinTS
         Escape,
         Binary,
         Segment,
+        DataElementGroup,
         DataElement
     }
 
@@ -307,6 +405,8 @@ namespace libfintx.FinTS
         internal bool IsSegmentEnd => Delimiter == Delimiter.Segment;
 
         internal bool IsDataElement => Delimiter == Delimiter.DataElement;
+
+        internal bool IsDataElementGroup => Delimiter == Delimiter.DataElementGroup;
 
         internal DelimiterMatch(Delimiter delimiter, int index, string value)
         {

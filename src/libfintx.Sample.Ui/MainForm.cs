@@ -533,6 +533,7 @@ namespace libfintx.Sample.Ui
             {
                 AccountHolder = txt_empfängername.Text,
                 Account = txt_kontonummer.Text,
+                SubAccount = txt_unterkontomerkmal.Text,
                 Blz = Convert.ToInt32(txt_bankleitzahl.Text),
                 BlzHeadquarter = string.IsNullOrWhiteSpace(txt_bankleitzahl_zentrale.Text) ? (int?)null : Convert.ToInt32(txt_bankleitzahl_zentrale.Text),
                 Bic = txt_bic.Text,
@@ -713,7 +714,7 @@ namespace libfintx.Sample.Ui
         private TANDialog CreateTANDialog(FinTsClient client)
         {
             var dialog = new TANDialog(WaitForTanAsync, pBox_tan);
-            if (client.HIRMS == "922" || client.HIRMS == "923")
+            if (client.HIRMS == "922" || client.HIRMS == "923" || client.HIRMS == "921")
                 dialog.IsDecoupled = true;
 
             return dialog;
@@ -759,5 +760,4 @@ namespace libfintx.Sample.Ui
             }
         }
     }
-
 }

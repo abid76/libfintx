@@ -90,8 +90,48 @@ namespace libfintx.FinTS
             //    return result.TypedResult<List<string>>();
 
             BankCode = result.RawData;
-            string BankCode_ = "HITAB" + Helper.Parse_String(BankCode, "'HITAB", "'");
-            return result.TypedResult(Helper.Parse_TANMedium(BankCode_));
+
+            var tanMediumNameList = new List<string>();
+            var segments = Helper.SplitEncryptedSegments(BankCode);
+            foreach (var rawSegment in segments)
+            {
+                var segment = Helper.Parse_Segment(rawSegment);
+                if (segment.Name == "HITAB")
+                {
+                    for (int i = 1; i < segment.DataElements.Count; i++)
+                    {
+                        var deg = segment.DataElements[i];
+                        if (!deg.IsDataElementGroup)
+                        {
+                            continue;
+                        }
+                        string tanMediumName = null;
+                        if (segment.Version == 4)
+                        {
+                            if (deg.DataElements.Count < 11)
+                            {
+                                continue;
+                            }
+                            tanMediumName = deg.DataElements[10].Value;
+                            if (string.IsNullOrEmpty(tanMediumName) && deg.DataElements.Count > 12)
+                            {
+                                // Inconsistently with the spec, Postbank delivers version 4 but tan medium name in element 12
+                                tanMediumName = deg.DataElements[12].Value;
+                            }
+                        }
+                        else if (deg.DataElements.Count >= 12)
+                        {
+                            tanMediumName = deg.DataElements[11].Value;
+                        }
+                        if (!string.IsNullOrEmpty(tanMediumName))
+                        {
+                            tanMediumNameList.Add(tanMediumName);
+                        }
+                    }
+                }
+            }
+
+            return result.TypedResult(tanMediumNameList);
         }
     }
 }

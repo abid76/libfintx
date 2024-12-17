@@ -240,5 +240,14 @@ HNHBS:7:1+2'".Replace(Environment.NewLine, string.Empty);
             Assert.Equal("Letzte Anmeldung am 17.11.2024 - 11:16:31", segments[2].Message);
             Assert.Equal("17.11.2024 - 11:16:31", segments[2].ParamList[0]);
         }
+
+        [Fact]
+        public void Test_Parse_TANMedium()
+        {
+            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"Resources\BankMessage_5.txt");
+            var message = File.ReadAllText(path);
+            var result = Helper.Parse_TANMedium(message);
+            Assert.Equal(2, result.Count);
+        }
     }
 }

@@ -3827,7 +3827,7 @@ namespace libfintx.Sample.Ui
                 new Bank("10080900", null, "DRESDEFF199", null),
                 new Bank("10089260", null, "DRESDEFFI14", null),
                 new Bank("10089999", null, "DRESDEFFI99", null),
-                new Bank("10090000", null, "BEVODEBBXXX", "https://hbci11.fiducia.de/cgi-bin/hbciservlet"),
+                new Bank("10090000", null, "BEVODEBBXXX", "https://fints2.atruvia.de/cgi-bin/hbciservlet"),
                 new Bank("10090300", null, "GENODEF1BSB", null),
                 new Bank("10090603", null, "DAAEDED1003", null),
                 new Bank("10090603", null, "DAAEDED1042", null),

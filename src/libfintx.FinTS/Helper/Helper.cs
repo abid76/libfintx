@@ -374,11 +374,18 @@ namespace libfintx.FinTS
                     if (segment.Name == "HICAZS")
                     {
                         if (segment.Payload.Contains("camt.052.001.02"))
+                        {
                             client.HkcazCamtScheme = CamtScheme.Camt052_001_02;
+                        }
                         else if (segment.Payload.Contains("camt.052.001.08"))
-                            client.HkcazCamtScheme = CamtScheme.Camt052_001_08;
-                        else // Fallback
+                        {
+                            client.HkcazCamtScheme += CamtScheme.Camt052_001_08;
+                        }
+                        else
+                        {
+                            // Fallback
                             client.HkcazCamtScheme = CamtScheme.Camt052_001_02;
+                        }
                     }
 
                     if (segment.Name == "HISPAS")

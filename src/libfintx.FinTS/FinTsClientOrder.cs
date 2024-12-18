@@ -153,12 +153,6 @@ namespace libfintx.FinTS
         /// <param name="timeUnit"></param>
         /// <param name="rota"></param>
         /// <param name="executionDay"></param>
-        /// <param name="HIRMS">Numerical SecurityMode; e.g. 911 for "Sparkasse chipTan optisch"</param>
-        /// <param name="pictureBox">Picturebox which shows the TAN</param>
-        /// <param name="flickerImage">(Out) reference to an image object that shall receive the FlickerCode as GIF image</param>
-        /// <param name="flickerWidth">Width of the flicker code</param>
-        /// <param name="flickerHeight">Height of the flicker code</param>
-        /// <param name="renderFlickerCodeAsGif">Renders flicker code as GIF, if 'true'</param>
         /// <returns>
         /// Bank return codes
         /// </returns>

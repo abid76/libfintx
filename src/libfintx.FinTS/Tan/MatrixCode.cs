@@ -24,8 +24,6 @@
 // #define WINDOWS
 
 using libfintx.Logger.Log;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
 using System;
 using System.IO;
 using System.Text;
@@ -34,7 +32,7 @@ namespace libfintx.FinTS
 {
     public class MatrixCode
     {
-        public Image<Rgba32> CodeImage { get; set; }
+        public byte[] Image { get; private set; }
         public string ImageMimeType { get; set; }
 
         /// <summary>
@@ -65,8 +63,7 @@ namespace libfintx.FinTS
                 int len = data.Length - offset;
                 b = new byte[len];
                 Array.Copy(data, offset, b, 0, len);
-                var ms = new MemoryStream(b);
-                CodeImage = (Image<Rgba32>) Image.Load(ms);
+                Image = b;
             }
             catch (Exception ex)
             {

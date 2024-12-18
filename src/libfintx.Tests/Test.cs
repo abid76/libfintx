@@ -31,6 +31,8 @@ using Xunit;
 using Xunit.Abstractions;
 using System.Threading.Tasks;
 using libfintx.FinTS;
+using SixLabors.ImageSharp.PixelFormats;
+
 
 #if (DEBUG && WINDOWS)
 using hbci = libfintx;
@@ -137,11 +139,11 @@ namespace libfintx.Tests
         [Fact]
         public void Test_PhotoTAN()
         {
-            var PhotoCode = File.ReadAllText($"{AppDomain.CurrentDomain.BaseDirectory}\\..\\..\\assets\\matrixcode.txt");
+            var PhotoCode = File.ReadAllText($"{AppDomain.CurrentDomain.BaseDirectory}\\Resources\\matrixcode.txt");
 
             var mCode = new MatrixCode(PhotoCode);
-
-            mCode.CodeImage.SaveAsPng(File.OpenWrite(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "matrixcode.png")));
+            Image<Rgb24> image = (Image<Rgb24>) Image.Load(mCode.Image);
+            image.SaveAsPng(File.OpenWrite(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "matrixcode.png")));
         }
 
         [Fact]

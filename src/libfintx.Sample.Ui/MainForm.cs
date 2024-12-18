@@ -4,7 +4,6 @@ using libfintx.FinTS.Data;
 using libfintx.FinTSConfig;
 using libfintx.Globals;
 using libfintx.Sepa;
-using SixLabors.ImageSharp;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -620,9 +619,8 @@ namespace libfintx.Sample.Ui
             {
                 using (var memoryStream = new MemoryStream())
                 {
-                    tanDialog.MatrixImage.SaveAsBmp(memoryStream);
-                    memoryStream.Seek(0, SeekOrigin.Begin);
-                    pBox_tan.Image = new System.Drawing.Bitmap(memoryStream);
+                    memoryStream.Write(tanDialog.MatrixImage, 0, Convert.ToInt32(tanDialog.MatrixImage.Length));
+                    pBox_tan.Image = new System.Drawing.Bitmap(memoryStream, false);
                 }
             }
 
@@ -713,7 +711,7 @@ namespace libfintx.Sample.Ui
 
         private TANDialog CreateTANDialog(FinTsClient client)
         {
-            var dialog = new TANDialog(WaitForTanAsync, pBox_tan);
+            var dialog = new TANDialog(WaitForTanAsync);
             if (client.TanProcessCode == 922 || client.TanProcessCode == 923 || client.TanProcessCode == 922 || client.TanProcessCode == 946)
                 dialog.IsDecoupled = true;
 

@@ -168,10 +168,6 @@ namespace libfintx.FinTS
         /// <param name="HIRMS">Numerical SecurityMode; e.g. 911 for "Sparkasse chipTan optisch"</param>
         /// <param name="pictureBox">Picturebox which shows the TAN</param>
         /// <param name="anonymous"></param>
-        /// <param name="flickerImage">(Out) reference to an image object that shall receive the FlickerCode as GIF image</param>
-        /// <param name="flickerWidth">Width of the flicker code</param>
-        /// <param name="flickerHeight">Height of the flicker code</param>
-        /// <param name="renderFlickerCodeAsGif">Renders flicker code as GIF, if 'true'</param>  
         /// <returns>
         /// Bank return codes
         /// </returns>
@@ -210,12 +206,6 @@ namespace libfintx.FinTS
         /// <param name="mandateNumber"></param>
         /// <param name="mandateDate"></param>
         /// <param name="creditorIdNumber"></param>
-        /// <param name="HIRMS">Numerical SecurityMode; e.g. 911 for "Sparkasse chipTan optisch"</param>
-        /// <param name="pictureBox">Picturebox which shows the TAN</param>
-        /// <param name="flickerImage">(Out) reference to an image object that shall receive the FlickerCode as GIF image</param>
-        /// <param name="flickerWidth">Width of the flicker code</param>
-        /// <param name="flickerHeight">Height of the flicker code</param>
-        /// <param name="renderFlickerCodeAsGif">Renders flicker code as GIF, if 'true'</param>
         /// <returns>
         /// Bank return codes
         /// </returns>
@@ -248,13 +238,7 @@ namespace libfintx.FinTS
         /// <param name="settlementDate"></param>
         /// <param name="painData"></param>
         /// <param name="numberOfTransactions"></param>
-        /// <param name="totalAmount"></param>        
-        /// <param name="HIRMS">Numerical SecurityMode; e.g. 911 for "Sparkasse chipTan optisch"</param>
-        /// <param name="pictureBox">Picturebox which shows the TAN</param>
-        /// <param name="flickerImage">(Out) reference to an image object that shall receive the FlickerCode as GIF image</param>
-        /// <param name="flickerWidth">Width of the flicker code</param>
-        /// <param name="flickerHeight">Height of the flicker code</param>
-        /// <param name="renderFlickerCodeAsGif">Renders flicker code as GIF, if 'true'</param>
+        /// <param name="totalAmount"></param>      
         /// <returns>
         /// Bank return codes
         /// </returns>
@@ -286,13 +270,7 @@ namespace libfintx.FinTS
         /// </summary>
         /// <param name="mobileServiceProvider"></param>
         /// <param name="phoneNumber"></param>
-        /// <param name="amount">Amount to transfer</param>            
-        /// <param name="HIRMS">Numerical SecurityMode; e.g. 911 for "Sparkasse chipTan optisch"</param>
-        /// <param name="pictureBox">Picturebox which shows the TAN</param>
-        /// <param name="flickerImage">(Out) reference to an image object that shall receive the FlickerCode as GIF image</param>
-        /// <param name="flickerWidth">Width of the flicker code</param>
-        /// <param name="flickerHeight">Height of the flicker code</param>
-        /// <param name="renderFlickerCodeAsGif">Renders flicker code as GIF, if 'true'</param>
+        /// <param name="amount">Amount to transfer</param>  
         /// <returns>
         /// Bank return codes
         /// </returns>

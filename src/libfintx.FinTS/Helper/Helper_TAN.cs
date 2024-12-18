@@ -16,12 +16,9 @@ namespace libfintx.FinTS
         /// <summary>
         /// Fill given <code>TANDialog</code> and wait for user to enter a TAN.
         /// </summary>
-        /// <param name="BankCode"></param>
-        /// <param name="pictureBox"></param>
-        /// <param name="flickerImage"></param>
-        /// <param name="flickerWidth"></param>
-        /// <param name="flickerHeight"></param>
-        /// <param name="renderFlickerCodeAsGif"></param>
+        /// <param name="client"></param>
+        /// <param name="dialogResult"></param>
+        /// <param name="tanDialog"></param>
         public static async Task<string> WaitForTanAsync(FinTsClient client, HBCIDialogResult dialogResult, TANDialog tanDialog)
         {
             List<string> rawSegments = SplitEncryptedSegments(dialogResult.RawData);
@@ -49,88 +46,13 @@ namespace libfintx.FinTS
 
             Log.Write($"Processing TAN process '{processname}' ...");
 
-            string HITANFlicker = string.Empty;
-
-            // Smart-TAN plus optisch
-            // chipTAN optisch
-            if (processname.Equals("Smart-TAN plus optisch") || processname.Contains("chipTAN optisch"))
-            {
-                HITANFlicker = HITAN_value;
-            }
-
-            // chipTAN optisch
-            if (processname.Contains("chipTAN optisch"))
-            {
-                string FlickerCode = string.Empty;
-
-                FlickerCode = "CHLGUC" + Helper.Parse_String(HITAN_value, "CHLGUC", "CHLGTEXT") + "CHLGTEXT";
-
-                FlickerCode flickerCode = new FlickerCode(FlickerCode);
-                flickerCodeRenderer = new FlickerRenderer(flickerCode.Render(), tanDialog.PictureBox);
-                if (!tanDialog.RenderFlickerCodeAsGif)
-                {
-                    RUN_flickerCodeRenderer();
-
-                    Action action = STOP_flickerCodeRenderer;
-                    TimeSpan span = new TimeSpan(0, 0, 0, 50);
-
-                    ThreadStart start = delegate { RunAfterTimespan(action, span); };
-                    Thread thread = new Thread(start);
-                    thread.Start();
-                }
-                else
-                {
-                    tanDialog.FlickerImage = flickerCodeRenderer.RenderAsGif(tanDialog.FlickerWidth, tanDialog.FlickerHeight);
-                }
-            }
-
-            // Smart-TAN plus optisch
-            if (processname.Equals("Smart-TAN plus optisch"))
-            {
-                HITANFlicker = HITAN_value.Replace("?@", "??");
-
-                string FlickerCode = string.Empty;
-
-                String[] values__ = HITANFlicker.Split('@');
-
-                int ii = 1;
-
-                foreach (var item in values__)
-                {
-                    ii = ii + 1;
-
-                    if (ii == 4)
-                        FlickerCode = item;
-                }
-
-                FlickerCode flickerCode = new FlickerCode(FlickerCode.Trim());
-                flickerCodeRenderer = new FlickerRenderer(flickerCode.Render(), tanDialog.PictureBox);
-                if (!tanDialog.RenderFlickerCodeAsGif)
-                {
-                    RUN_flickerCodeRenderer();
-
-                    Action action = STOP_flickerCodeRenderer;
-                    TimeSpan span = new TimeSpan(0, 0, 0, 50);
-
-                    ThreadStart start = delegate { RunAfterTimespan(action, span); };
-                    Thread thread = new Thread(start);
-                    thread.Start();
-                }
-                else
-                {
-                    tanDialog.FlickerImage = flickerCodeRenderer.RenderAsGif(tanDialog.FlickerWidth, tanDialog.FlickerHeight);
-                }
-            }
-
             // Smart-TAN photo
             if (processname.Equals("Smart-TAN photo") || processname.Equals("photoTAN-Verfahren") || processname.Equals("photoTAN"))
             {
                 var PhotoCode = HITAN_challenge;
 
                 var mCode = new MatrixCode(PhotoCode);
-
-                tanDialog.MatrixImage = mCode.CodeImage;
-                mCode.Render(tanDialog.PictureBox);
+                tanDialog.MatrixImage = mCode.Image;
             }
 
             return await tanDialog.WaitForTanAsync();

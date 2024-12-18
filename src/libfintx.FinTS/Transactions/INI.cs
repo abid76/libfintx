@@ -65,14 +65,14 @@ namespace libfintx.FinTS
                             "HKIDN:" + SEG_NUM.Seg3 + ":2+" + SEG_Country.Germany + ":" + connectionDetails.BlzPrimary + "+" + connectionDetails.UserIdEscaped + "+" + client.SystemId + "+1'" +
                             "HKVVB:" + SEG_NUM.Seg4 + ":3+0+0+0+" + FinTsGlobals.ProductId + "+" + FinTsGlobals.Version + "'";
 
-                        if (client.HITANS >= 6)
+                        if (client.HktanVersion >= 6)
                         {
-                            client.SEGNUM = Convert.ToInt16(SEG_NUM.Seg5);
+                            client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg5);
                             segments_ = HKTAN.Init_HKTAN(client, segments_, hkTanSegmentId);
                         }
                         else
                         {
-                            client.SEGNUM = Convert.ToInt16(SEG_NUM.Seg4);
+                            client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg4);
                         }
 
                         segments = segments_;
@@ -88,7 +88,7 @@ namespace libfintx.FinTS
                         throw new Exception("HBCI version not supported");
                     }
 
-                    var message = FinTSMessage.Create(client, 1, "0", segments, client.HIRMS);
+                    var message = FinTSMessage.Create(client, 1, "0", segments, client.TanProcessCode);
                     var response = await FinTSMessage.Send(client, message);
 
                     Helper.Parse_Segments(client, response);
@@ -136,9 +136,9 @@ namespace libfintx.FinTS
                         throw new Exception("HBCI version not supported");
                     }
 
-                    client.SEGNUM = Convert.ToInt16(SEG_NUM.Seg4);
+                    client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg4);
 
-                    string message = FinTsMessageAnonymous.Create(connectionDetails.HbciVersion, "1", "0", connectionDetails.Blz, connectionDetails.UserIdEscaped, connectionDetails.Pin, "0", segments, null, client.SEGNUM);
+                    string message = FinTsMessageAnonymous.Create(connectionDetails.HbciVersion, "1", "0", connectionDetails.Blz, connectionDetails.UserIdEscaped, connectionDetails.Pin, "0", segments, null, client.SegmentNumber);
                     string response = await FinTSMessage.Send(client, message);
 
                     var messages = Helper.Parse_Segments(client, response);
@@ -171,9 +171,9 @@ namespace libfintx.FinTS
                         throw new Exception("HBCI version not supported");
                     }
 
-                    client.SEGNUM = Convert.ToInt16(SEG_NUM.Seg5);
+                    client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg5);
 
-                    message = FinTSMessage.Create(client, 1, "0", segments, client.HIRMS);
+                    message = FinTSMessage.Create(client, 1, "0", segments, client.TanProcessCode);
                     response = await FinTSMessage.Send(client, message);
 
                     Helper.Parse_Segments(client, response);

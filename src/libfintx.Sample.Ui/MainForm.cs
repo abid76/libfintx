@@ -184,7 +184,7 @@ namespace libfintx.Sample.Ui
             if (sync.IsSuccess)
             {
                 // TAN-Verfahren
-                client.HIRMS = txt_tanverfahren.Text;
+                client.TanProcessCode = Convert.ToInt16(txt_tanverfahren.Text);
 
                 if (!await InitTANMedium(client))
                     return;
@@ -214,7 +214,7 @@ namespace libfintx.Sample.Ui
             if (sync.IsSuccess)
             {
                 // TAN-Verfahren
-                client.HIRMS = txt_tanverfahren.Text;
+                client.TanProcessCode = Convert.ToInt16(txt_tanverfahren.Text);
 
                 if (!await InitTANMedium(client))
                     return;
@@ -276,7 +276,7 @@ namespace libfintx.Sample.Ui
             if (sync.IsSuccess)
             {
                 // TAN-Verfahren
-                client.HIRMS = txt_tanverfahren.Text;
+                client.TanProcessCode = Convert.ToInt16(txt_tanverfahren.Text);
 
                 if (!await InitTANMedium(client))
                     return;
@@ -327,7 +327,7 @@ namespace libfintx.Sample.Ui
             if (sync.IsSuccess)
             {
                 // TAN-Verfahren
-                client.HIRMS = txt_tanverfahren.Text;
+                client.TanProcessCode = Convert.ToInt16(txt_tanverfahren.Text);
 
                 if (!await InitTANMedium(client))
                     return;
@@ -373,7 +373,7 @@ namespace libfintx.Sample.Ui
             if (sync.IsSuccess)
             {
                 // TAN-Verfahren
-                client.HIRMS = txt_tanverfahren.Text;
+                client.TanProcessCode = Convert.ToInt16(txt_tanverfahren.Text);
 
                 if (!await InitTANMedium(client))
                     return;
@@ -411,7 +411,7 @@ namespace libfintx.Sample.Ui
             if (sync.IsSuccess)
             {
                 // TAN-Verfahren
-                client.HIRMS = txt_tanverfahren.Text;
+                client.TanProcessCode = Convert.ToInt16(txt_tanverfahren.Text);
 
                 if (!await InitTANMedium(client))
                     return;
@@ -460,12 +460,12 @@ namespace libfintx.Sample.Ui
             if (sync.IsSuccess)
             {
                 // TAN-Verfahren
-                client.HIRMS = txt_tanverfahren.Text;
+                client.TanProcessCode = Convert.ToInt16(txt_tanverfahren.Text);
 
                 await InitTANMedium(client);
 
                 var transfer = await client.Transfer(CreateTANDialog(client), txt_empfängername.Text, Regex.Replace(txt_empfängeriban.Text, @"\s+", ""), txt_empfängerbic.Text,
-                    decimal.Parse(txt_betrag.Text), txt_verwendungszweck.Text, client.HIRMS);
+                    decimal.Parse(txt_betrag.Text), txt_verwendungszweck.Text);
 
                 // Out image is needed e. g. for photoTAN
                 //var transfer = Main.Transfer(connectionDetails, txt_empfängername.Text, txt_empfängeriban.Text, txt_empfängerbic.Text,
@@ -490,7 +490,7 @@ namespace libfintx.Sample.Ui
 
             if (sync.IsSuccess)
             {
-                client.HIRMS = txt_tanverfahren.Text;
+                client.TanProcessCode = Convert.ToInt16(txt_tanverfahren.Text);
                 var result = await client.RequestTANMediumName();
 
                 HBCIOutput(result.Messages);
@@ -646,7 +646,7 @@ namespace libfintx.Sample.Ui
         private async Task<bool> InitTANMedium(FinTsClient client)
         {
             // TAN-Medium-Name
-            client.HITAB = txt_tan_medium.Text;
+            client.TanMedium = txt_tan_medium.Text;
             var accounts = await client.Accounts(CreateTANDialog(client));
             if (!accounts.IsSuccess)
             {
@@ -657,7 +657,7 @@ namespace libfintx.Sample.Ui
             AccountInformation accountInfo = UPD.GetAccountInformations(conn.Account, conn.Blz.ToString());
             if (accountInfo != null && accountInfo.IsSegmentPermitted("HKTAB"))
             {
-                client.HITAB = txt_tan_medium.Text;
+                client.TanMedium = txt_tan_medium.Text;
             }
 
             return true;
@@ -714,7 +714,7 @@ namespace libfintx.Sample.Ui
         private TANDialog CreateTANDialog(FinTsClient client)
         {
             var dialog = new TANDialog(WaitForTanAsync, pBox_tan);
-            if (client.HIRMS == "922" || client.HIRMS == "923" || client.HIRMS == "921")
+            if (client.TanProcessCode == 922 || client.TanProcessCode == 923 || client.TanProcessCode == 922 || client.TanProcessCode == 946)
                 dialog.IsDecoupled = true;
 
             return dialog;
@@ -731,7 +731,7 @@ namespace libfintx.Sample.Ui
             if (sync.IsSuccess)
             {
                 // TAN-Verfahren
-                client.HIRMS = txt_tanverfahren.Text;
+                client.TanProcessCode = Convert.ToInt16(txt_tanverfahren.Text);
 
                 if (!await InitTANMedium(client))
                     return;

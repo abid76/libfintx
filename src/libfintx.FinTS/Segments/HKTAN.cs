@@ -34,37 +34,37 @@ namespace libfintx.FinTS
         /// <returns></returns>
         public static string Init_HKTAN(FinTsClient client, string segments, string segmentId)
         {
-            if (String.IsNullOrEmpty(client.HITAB)) // TAN Medium Name not set
+            if (String.IsNullOrEmpty(client.TanMedium)) // TAN Medium Name not set
             {
                 // Erweiterung decoupled
                 // Torsten: Gemäß meiner Auffassung sendet HTAN#7 das Segment deckungsgleich HKTAN#6
-                if (client.HITANS >= 6)
-                    segments = segments + "HKTAN:" + client.SEGNUM + ":" + client.HITANS + "+4+" + segmentId + "'";
+                if (client.HktanVersion >= 6)
+                    segments = segments + "HKTAN:" + client.SegmentNumber + ":" + client.HktanVersion + "+4+" + segmentId + "'";
                 else
-                    segments = segments + "HKTAN:" + client.SEGNUM + ":" + client.HITANS + "+4+'";
+                    segments = segments + "HKTAN:" + client.SegmentNumber + ":" + client.HktanVersion + "+4+'";
             }
             else // TAN Medium Name set
             {
                 // Version 3, Process 4
-                if (client.HITANS == 3)
-                    segments = segments + "HKTAN:" + client.SEGNUM + ":" + client.HITANS + "+4++++++++" + client.HITAB + "'";
+                if (client.HktanVersion == 3)
+                    segments = segments + "HKTAN:" + client.SegmentNumber + ":" + client.HktanVersion + "+4++++++++" + client.TanMedium + "'";
                 // Version 4, Process 4
-                if (client.HITANS == 4)
-                    segments = segments + "HKTAN:" + client.SEGNUM + ":" + client.HITANS + "+4+++++++++" + client.HITAB + "'";
+                if (client.HktanVersion == 4)
+                    segments = segments + "HKTAN:" + client.SegmentNumber + ":" + client.HktanVersion + "+4+++++++++" + client.TanMedium + "'";
                 // Version 5, Process 4
-                if (client.HITANS == 5)
-                    segments = segments + "HKTAN:" + client.SEGNUM + ":" + client.HITANS + "+4+++++++++++" + client.HITAB + "'";
+                if (client.HktanVersion == 5)
+                    segments = segments + "HKTAN:" + client.SegmentNumber + ":" + client.HktanVersion + "+4+++++++++++" + client.TanMedium + "'";
                 // Version 6, Process 4
-                if (client.HITANS == 6)
+                if (client.HktanVersion == 6)
                 {
-                    segments = segments + "HKTAN:" + client.SEGNUM + ":" + client.HITANS + "+4+" + segmentId + "+++++++++" + client.HITAB + "'";
+                    segments = segments + "HKTAN:" + client.SegmentNumber + ":" + client.HktanVersion + "+4+" + segmentId + "+++++++++" + client.TanMedium + "'";
                 }
                 // Version 7, Process 4
                 // Erweiterung decoupled
                 // Torsten: Gemäß meiner Auffassung sendet HTAN#7 das Segment deckungsgleich HKTAN#6
-                if (client.HITANS == 7)
+                if (client.HktanVersion == 7)
                 {
-                    segments = segments + "HKTAN:" + client.SEGNUM + ":" + client.HITANS + "+4+" + segmentId + "+++++++++" + client.HITAB + "'";
+                    segments = segments + "HKTAN:" + client.SegmentNumber + ":" + client.HktanVersion + "+4+" + segmentId + "+++++++++" + client.TanMedium + "'";
                 }
             }
 

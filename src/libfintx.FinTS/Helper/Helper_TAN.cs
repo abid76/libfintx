@@ -37,13 +37,13 @@ namespace libfintx.FinTS
             var HITAN_value = HITAN?.Value;
             var HITAN_challenge = HITAN.DataElements.Count > 4 ? HITAN.DataElements[4].Value : null;
 
-            var processes = BPD.HITANS.Where(h => h.Version == client.HITANS).SelectMany(t => t.TanProcesses);
+            var processes = BPD.HITANS.Where(h => h.Version == client.HktanVersion).SelectMany(t => t.TanProcesses);
 
             var processname = string.Empty;
 
             foreach (var item in processes)
             {
-                if (item.TanCode == Convert.ToInt32(client.HIRMS))
+                if (item.TanCode == Convert.ToInt32(client.TanProcessCode))
                     processname = item.Name;
             }
 

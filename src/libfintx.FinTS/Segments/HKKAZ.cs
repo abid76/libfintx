@@ -56,50 +56,50 @@ namespace libfintx.FinTS
                 };
             }
 
-            client.SEGNUM = Convert.ToInt16(SEG_NUM.Seg3);
+            client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
 
             if (string.IsNullOrEmpty(FromDate))
             {
                 if (string.IsNullOrEmpty(Startpoint))
                 {
-                    if (client.HIKAZS < 7)
-                        segments = "HKKAZ:" + client.SEGNUM + ":" + client.HIKAZS + "+" + activeAccount.AccountNumber + ":" + activeAccount.SubAccountFeature + ":280:" + activeAccount.AccountBankCode + "+N'";
+                    if (client.HkkazVersion < 7)
+                        segments = "HKKAZ:" + client.SegmentNumber + ":" + client.HkkazVersion + "+" + activeAccount.AccountNumber + ":" + activeAccount.SubAccountFeature + ":280:" + activeAccount.AccountBankCode + "+N'";
                     else
-                        segments = "HKKAZ:" + client.SEGNUM + ":" + client.HIKAZS + "+" + activeAccount.AccountIban + ":" + activeAccount.AccountBic + ":" + activeAccount.AccountNumber + ":" + activeAccount.SubAccountFeature + ":280:" + activeAccount.AccountBankCode + "+N'";
+                        segments = "HKKAZ:" + client.SegmentNumber + ":" + client.HkkazVersion + "+" + activeAccount.AccountIban + ":" + activeAccount.AccountBic + ":" + activeAccount.AccountNumber + ":" + activeAccount.SubAccountFeature + ":280:" + activeAccount.AccountBankCode + "+N'";
                 }
                 else
                 {
-                    if (client.HIKAZS < 7)
-                        segments = "HKKAZ:" + client.SEGNUM + ":" + client.HIKAZS + "+" + activeAccount.AccountNumber + ":" + activeAccount.SubAccountFeature + ":280:" + activeAccount.AccountBankCode + "+N++++" + Startpoint + "'";
+                    if (client.HkkazVersion < 7)
+                        segments = "HKKAZ:" + client.SegmentNumber + ":" + client.HkkazVersion + "+" + activeAccount.AccountNumber + ":" + activeAccount.SubAccountFeature + ":280:" + activeAccount.AccountBankCode + "+N++++" + Startpoint + "'";
                     else
-                        segments = "HKKAZ:" + client.SEGNUM + ":" + client.HIKAZS + "+" + activeAccount.AccountIban + ":" + activeAccount.AccountBic + ":" + activeAccount.AccountNumber + ":" + activeAccount.SubAccountFeature + ":280:" + activeAccount.AccountBankCode + "+N++++" + Startpoint + "'";
+                        segments = "HKKAZ:" + client.SegmentNumber + ":" + client.HkkazVersion + "+" + activeAccount.AccountIban + ":" + activeAccount.AccountBic + ":" + activeAccount.AccountNumber + ":" + activeAccount.SubAccountFeature + ":280:" + activeAccount.AccountBankCode + "+N++++" + Startpoint + "'";
                 }
             }
             else
             {
                 if (string.IsNullOrEmpty(Startpoint))
                 {
-                    if (client.HIKAZS < 7)
-                        segments = "HKKAZ:" + client.SEGNUM + ":" + client.HIKAZS + "+" + activeAccount.AccountNumber + ":" + activeAccount.SubAccountFeature + ":280:" + activeAccount.AccountBankCode + "+N+" + FromDate + "+" + ToDate + "'";
+                    if (client.HkkazVersion < 7)
+                        segments = "HKKAZ:" + client.SegmentNumber + ":" + client.HkkazVersion + "+" + activeAccount.AccountNumber + ":" + activeAccount.SubAccountFeature + ":280:" + activeAccount.AccountBankCode + "+N+" + FromDate + "+" + ToDate + "'";
                     else
-                        segments = "HKKAZ:" + client.SEGNUM + ":" + client.HIKAZS + "+" + activeAccount.AccountIban + ":" + activeAccount.AccountBic + ":" + activeAccount.AccountNumber + ":" + activeAccount.SubAccountFeature + ":280:" + activeAccount.AccountBankCode + "+N+" + FromDate + "+" + ToDate + "'";
+                        segments = "HKKAZ:" + client.SegmentNumber + ":" + client.HkkazVersion + "+" + activeAccount.AccountIban + ":" + activeAccount.AccountBic + ":" + activeAccount.AccountNumber + ":" + activeAccount.SubAccountFeature + ":280:" + activeAccount.AccountBankCode + "+N+" + FromDate + "+" + ToDate + "'";
                 }
                 else
                 {
-                    if (client.HIKAZS < 7)
-                        segments = "HKKAZ:" + client.SEGNUM + ":" + client.HIKAZS + "+" + activeAccount.AccountNumber + ":" + activeAccount.SubAccountFeature + ":280:" + activeAccount.AccountBankCode + "+N+" + FromDate + "+" + ToDate + "++" + Startpoint + "'";
+                    if (client.HkkazVersion < 7)
+                        segments = "HKKAZ:" + client.SegmentNumber + ":" + client.HkkazVersion + "+" + activeAccount.AccountNumber + ":" + activeAccount.SubAccountFeature + ":280:" + activeAccount.AccountBankCode + "+N+" + FromDate + "+" + ToDate + "++" + Startpoint + "'";
                    else
-                        segments = "HKKAZ:" + client.SEGNUM + ":" + client.HIKAZS + "+" + activeAccount.AccountIban + ":" + activeAccount.AccountBic + ":" + activeAccount.AccountNumber + ":" + activeAccount.SubAccountFeature + ":280:" + activeAccount.AccountBankCode + "+N+" + FromDate + "+" + ToDate + "++" + Startpoint + "'";
+                        segments = "HKKAZ:" + client.SegmentNumber + ":" + client.HkkazVersion + "+" + activeAccount.AccountIban + ":" + activeAccount.AccountBic + ":" + activeAccount.AccountNumber + ":" + activeAccount.SubAccountFeature + ":280:" + activeAccount.AccountBankCode + "+N+" + FromDate + "+" + ToDate + "++" + Startpoint + "'";
                 }
             }
 
             if (Helper.IsTANRequired("HKKAZ"))
             {
-                client.SEGNUM = Convert.ToInt16(SEG_NUM.Seg4);
+                client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg4);
                 segments = HKTAN.Init_HKTAN(client, segments, "HKKAZ");
             }
 
-            string message = FinTSMessage.Create(client, client.HNHBS, client.HNHBK, segments, client.HIRMS);
+            string message = FinTSMessage.Create(client, client.MessageNumber, client.DialogId, segments, client.TanProcessCode);
             string response = await FinTSMessage.Send(client, message);
 
             Helper.Parse_Message(client, response);

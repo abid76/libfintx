@@ -36,22 +36,25 @@ namespace libfintx.FinTS
         public ConnectionDetails ConnectionDetails { get; }
         public AccountInformation activeAccount { get; set; }
         public string SystemId { get; internal set; }
-        public string HITAB { get; set; }
-        public string HIRMS { get; set; }
-        public int HITANS { get; set; }
 
-        internal int SEGNUM { get; set; }
-        internal string HIRMSf { get; set; }
-        internal string HNHBK { get; set; }
-        internal int HNHBS { get; set; }
-        internal int HISALS { get; set; }
-        internal int HIKAZS { get; set; }
-        internal int HICAZS => 1;
-        public string HICAZS_Camt { get; set; }
-        internal string HITAN { get; set; }
-        internal int HISPAS { get; set; }
-        internal int HISPAS_Pain { get; set; }
-        internal bool HISPAS_AccountNationalAllowed { get; set; }
+        public string TanMedium { get; set; }
+        public int? TanProcessCode { get; set; }
+        internal List<int> AllowedTanProcesses { get; set; }
+
+        public int HktanVersion { get; set; }
+
+        internal int SegmentNumber { get; set; }
+
+        internal string DialogId { get; set; }
+        internal int MessageNumber { get; set; }
+        internal int HksalVersion { get; set; }
+        internal int HkkazVersion { get; set; }
+        internal int HkcazVersion => 1;
+        public string HkcazCamtScheme { get; set; }
+        internal string HktanOrderRef { get; set; }
+        internal int HispasVersion { get; set; }
+        internal int SepaPainVersion { get; set; }
+        internal bool SepaAccountNationalAllowed { get; set; }
 
         public FinTsClient(ConnectionDetails conn, bool anon = false)
         {
@@ -173,7 +176,7 @@ namespace libfintx.FinTS
         /// Bank return codes
         /// </returns>
         public async Task<HBCIDialogResult> Rebooking(TANDialog tanDialog, string receiverName, string receiverIBAN, string receiverBIC,
-            decimal amount, string purpose, string hirms)
+            decimal amount, string purpose)
         {
             var result = await InitializeConnection();
             if (result.HasError)
@@ -184,9 +187,6 @@ namespace libfintx.FinTS
                 return result;
 
             TransactionConsole.Output = string.Empty;
-
-            if (!string.IsNullOrEmpty(hirms))
-                HIRMS = hirms;
 
             string BankCode = await Transaction.HKCUM(this, receiverName, receiverIBAN, receiverBIC, amount, purpose);
             result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
@@ -220,8 +220,7 @@ namespace libfintx.FinTS
         /// Bank return codes
         /// </returns>
         public async Task<HBCIDialogResult> Collect(TANDialog tanDialog, string payerName, string payerIBAN, string payerBIC,
-            decimal amount, string purpose, DateTime settlementDate, string mandateNumber, DateTime mandateDate, string creditorIdNumber,
-            string hirms)
+            decimal amount, string purpose, DateTime settlementDate, string mandateNumber, DateTime mandateDate, string creditorIdNumber)
         {
             var result = await InitializeConnection();
             if (result.HasError)
@@ -232,9 +231,6 @@ namespace libfintx.FinTS
                 return result;
 
             TransactionConsole.Output = string.Empty;
-
-            if (!string.IsNullOrEmpty(hirms))
-                HIRMS = hirms;
 
             string BankCode = await Transaction.HKDSE(this, payerName, payerIBAN, payerBIC, amount, purpose, settlementDate, mandateNumber, mandateDate, creditorIdNumber);
             result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
@@ -263,7 +259,7 @@ namespace libfintx.FinTS
         /// Bank return codes
         /// </returns>
         public async Task<HBCIDialogResult> CollectiveCollect(TANDialog tanDialog, DateTime settlementDate, List<Pain00800202CcData> painData,
-           string numberOfTransactions, decimal totalAmount, string hirms)
+           string numberOfTransactions, decimal totalAmount)
         {
             var result = await InitializeConnection();
             if (result.HasError)
@@ -274,9 +270,6 @@ namespace libfintx.FinTS
                 return result;
 
             TransactionConsole.Output = string.Empty;
-
-            if (!string.IsNullOrEmpty(hirms))
-                HIRMS = hirms;
 
             string BankCode = await Transaction.HKDME(this, settlementDate, painData, numberOfTransactions, totalAmount);
             result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
@@ -304,7 +297,7 @@ namespace libfintx.FinTS
         /// Bank return codes
         /// </returns>
         public async Task<HBCIDialogResult> Prepaid(TANDialog tanDialog, int mobileServiceProvider, string phoneNumber,
-            int amount, string hirms)
+            int amount)
         {
             var result = await InitializeConnection();
             if (result.HasError)
@@ -315,9 +308,6 @@ namespace libfintx.FinTS
                 return result;
 
             TransactionConsole.Output = string.Empty;
-
-            if (!string.IsNullOrEmpty(hirms))
-                HIRMS = hirms;
 
             string BankCode = await Transaction.HKPPD(this, mobileServiceProvider, phoneNumber, amount);
             result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);

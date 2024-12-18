@@ -270,8 +270,8 @@ namespace libfintx.FinTS
                         var securityMessage = result.FirstOrDefault(m => m.Code == "3920");
                         if (securityMessage != null)
                         {
-                            string TAN = string.Empty;
-                            string TANf = string.Empty;
+                            int? tanProcessCode = null;
+                            var tanProcessList = new List<int>();
 
                             List<string> procedures = securityMessage.ParamList;
 
@@ -281,26 +281,24 @@ namespace libfintx.FinTS
                                 {
                                     if (value.StartsWith("9") && i > 0)
                                     {
-                                        if (string.IsNullOrEmpty(TAN))
-                                            TAN = i.ToString();
-
-                                        if (string.IsNullOrEmpty(TANf))
-                                            TANf = i.ToString();
-                                        else
-                                            TANf += $";{i}";
+                                        if (tanProcessCode == null)
+                                        {
+                                            tanProcessCode = i;
+                                        }
+                                        tanProcessList.Add(i);
                                     }
                                 }
                             }
-                            if (string.IsNullOrEmpty(client.HIRMS))
+                            if (client.TanProcessCode == null)
                             {
-                                client.HIRMS = TAN;
+                                client.TanProcessCode = tanProcessCode;
                             }
                             else
                             {
-                                if (!TANf.Contains(client.HIRMS))
-                                    throw new Exception($"Invalid HIRMS/Tan-Mode {client.HIRMS} detected. Please choose one of the allowed modes: {TANf}");
+                                if (!tanProcessList.Contains(client.TanProcessCode.GetValueOrDefault()))
+                                    throw new Exception($"Invalid HIRMS/Tan-Mode {client.TanProcessCode} detected. Please choose one of the allowed modes: {string.Join(", ", tanProcessList)}");
                             }
-                            client.HIRMSf = TANf;
+                            client.AllowedTanProcesses = tanProcessList;
                         }
                     }
 
@@ -310,7 +308,7 @@ namespace libfintx.FinTS
                             throw new InvalidOperationException($"Expected segment '{segment}' to contain at least 3 data elements in payload.");
 
                         var dialogId = segment.DataElements[2].Value;
-                        client.HNHBK = dialogId;
+                        client.DialogId = dialogId;
                     }
 
                     if (segment.Name == "HISYN")
@@ -322,31 +320,30 @@ namespace libfintx.FinTS
                     if (segment.Name == "HNHBS")
                     {
                         if (segment.Payload == null || segment.Payload == "0")
-                            client.HNHBS = 2;
+                            client.MessageNumber = 2;
                         else
-                            client.HNHBS = Convert.ToInt32(segment.Payload) + 1;
+                            client.MessageNumber = Convert.ToInt32(segment.Payload) + 1;
                     }
 
                     if (segment.Name == "HISALS")
                     {
-                        if (client.HISALS < segment.Version)
-                            client.HISALS = segment.Version;
+                        if (client.HksalVersion < segment.Version)
+                            client.HksalVersion = segment.Version;
                     }
 
                     if (segment.Name == "HITANS")
                     {
                         var hitans = (HITANS) segment;
-                        if (client.HIRMS == null)
+                        if (client.TanProcessCode == null)
                         {
                             // Die höchste HKTAN-Version auswählen, welche in den erlaubten TAN-Verfahren (3920) enthalten ist.
-                            var tanProcessesHirms = client.HIRMSf.Split(';').Select(tp => Convert.ToInt32(tp));
-                            if (hitans.TanProcesses.Select(tp => tp.TanCode).Intersect(tanProcessesHirms).Any())
-                                client.HITANS = segment.Version;
+                            if (hitans.TanProcesses.Select(tp => tp.TanCode).Intersect(client.AllowedTanProcesses).Any())
+                                client.HktanVersion = segment.Version;
                         }
                         else
                         {
-                            if (hitans.TanProcesses.Any(tp => tp.TanCode == Convert.ToInt32(client.HIRMS)))
-                                client.HITANS = segment.Version;
+                            if (hitans.TanProcesses.Any(tp => tp.TanCode == Convert.ToInt32(client.TanProcessCode)))
+                                client.HktanVersion = segment.Version;
                         }
 
                         TanProcesses.Items = hitans.TanProcesses.Select(ht => new TanProcess() { ProcessName = ht.Name, ProcessNumber = ht.TanCode.ToString() }).ToList();
@@ -358,57 +355,57 @@ namespace libfintx.FinTS
                         // HITAN:5:7:4+4++8578-06-23-13.22.43.709351+Bitte Auftrag in Ihrer App freigeben.
                         if (segment.DataElements.Count < 3)
                             throw new InvalidOperationException($"Invalid HITAN segment '{segment}'. Payload must have at least 3 data elements.");
-                        client.HITAN = segment.DataElements[2].Value;
+                        client.HktanOrderRef = segment.DataElements[2].Value;
                     }
 
                     if (segment.Name == "HIKAZS")
                     {
-                        if (client.HIKAZS == 0)
+                        if (client.HkkazVersion == 0)
                         {
-                            client.HIKAZS = segment.Version;
+                            client.HkkazVersion = segment.Version;
                         }
                         else
                         {
-                            if (segment.Version > client.HIKAZS)
-                                client.HIKAZS = segment.Version;
+                            if (segment.Version > client.HkkazVersion)
+                                client.HkkazVersion = segment.Version;
                         }
                     }
 
                     if (segment.Name == "HICAZS")
                     {
                         if (segment.Payload.Contains("camt.052.001.02"))
-                            client.HICAZS_Camt = CamtScheme.Camt052_001_02;
+                            client.HkcazCamtScheme = CamtScheme.Camt052_001_02;
                         else if (segment.Payload.Contains("camt.052.001.08"))
-                            client.HICAZS_Camt = CamtScheme.Camt052_001_08;
+                            client.HkcazCamtScheme = CamtScheme.Camt052_001_08;
                         else // Fallback
-                            client.HICAZS_Camt = CamtScheme.Camt052_001_02;
+                            client.HkcazCamtScheme = CamtScheme.Camt052_001_02;
                     }
 
                     if (segment.Name == "HISPAS")
                     {
                         var hispas = segment as HISPAS;
-                        if (client.HISPAS < segment.Version)
+                        if (client.HispasVersion < segment.Version)
                         {
-                            client.HISPAS = segment.Version;
+                            client.HispasVersion = segment.Version;
 
                             if (hispas.Payload.Contains("pain.001.001.03"))
-                                client.HISPAS_Pain = 1;
+                                client.SepaPainVersion = 1;
                             else if (hispas.Payload.Contains("pain.001.002.03"))
-                                client.HISPAS_Pain = 2;
+                                client.SepaPainVersion = 2;
                             else if (hispas.Payload.Contains("pain.001.003.03"))
-                                client.HISPAS_Pain = 3;
+                                client.SepaPainVersion = 3;
 
-                            if (client.HISPAS_Pain == 0)
-                                client.HISPAS_Pain = 3; // -> Fallback. Most banks accept the newest pain version
+                            if (client.SepaPainVersion == 0)
+                                client.SepaPainVersion = 3; // -> Fallback. Most banks accept the newest pain version
 
-                            client.HISPAS_AccountNationalAllowed = hispas.IsAccountNationalAllowed;
+                            client.SepaAccountNationalAllowed = hispas.IsAccountNationalAllowed;
                         }
                     }
                 }
 
                 // Fallback if HIKAZS is not delivered by BPD (eg. Postbank)
-                if (client.HIKAZS == 0)
-                    client.HIKAZS = 0;
+                if (client.HkkazVersion == 0)
+                    client.HkkazVersion = 0;
 
                 return result;
             }
@@ -442,9 +439,9 @@ namespace libfintx.FinTS
                 if (segment.Name == "HNHBS")
                 {
                     if (segment.Payload == null || segment.Payload == "0")
-                        client.HNHBS = 2;
+                        client.MessageNumber = 2;
                     else
-                        client.HNHBS = Convert.ToInt32(segment.Payload) + 1;
+                        client.MessageNumber = Convert.ToInt32(segment.Payload) + 1;
                 }
 
                 if (segment.Name == "HITAN")
@@ -454,7 +451,7 @@ namespace libfintx.FinTS
                     // HITAN:5:6:4+4++76ma3j/MKH0BAABsRcJNhG?+owAQA+Eine neue TAN steht zur Abholung bereit.  Die TAN wurde reserviert am  16.11.2021 um 13?:54?:59 Uhr. Eine Push-Nachricht wurde versandt.  Bitte geben Sie die TAN ein.'
                     if (segment.DataElements.Count < 3)
                         throw new InvalidOperationException($"Invalid HITAN segment '{segment}'. Payload must have at least 3 data elements.");
-                    client.HITAN = segment.DataElements[2].Value;
+                    client.HktanOrderRef = segment.DataElements[2].Value;
                 }
             }
 

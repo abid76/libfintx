@@ -54,20 +54,20 @@ namespace libfintx.FinTS
 
             string segments = string.Empty;
 
-            client.SEGNUM = Convert.ToInt16(SEG_NUM.Seg3);
+            client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
 
-            if (client.HISALS >= 7)
-                segments = "HKSAL:" + client.SEGNUM + ":" + client.HISALS + "+" + activeAccount.AccountIban + ":" + activeAccount.AccountBic + "+N'";
+            if (client.HksalVersion >= 7)
+                segments = "HKSAL:" + client.SegmentNumber + ":" + client.HksalVersion + "+" + activeAccount.AccountIban + ":" + activeAccount.AccountBic + "+N'";
             else
-                segments = "HKSAL:" + client.SEGNUM + ":" + client.HISALS + "+" + activeAccount.AccountNumber + ":" + activeAccount.SubAccountFeature + ":280:" + activeAccount.AccountBankCode + "+N'";
+                segments = "HKSAL:" + client.SegmentNumber + ":" + client.HksalVersion + "+" + activeAccount.AccountNumber + ":" + activeAccount.SubAccountFeature + ":280:" + activeAccount.AccountBankCode + "+N'";
 
             if (Helper.IsTANRequired("HKSAL"))
             {
-                client.SEGNUM = Convert.ToInt16(SEG_NUM.Seg4);
+                client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg4);
                 segments = HKTAN.Init_HKTAN(client, segments, "HKSAL");
             }
 
-            string message = FinTSMessage.Create(client, client.HNHBS, client.HNHBK, segments, client.HIRMS);
+            string message = FinTSMessage.Create(client, client.MessageNumber, client.DialogId, segments, client.TanProcessCode);
             string response = await FinTSMessage.Send(client, message);
 
             Helper.Parse_Message(client, response);

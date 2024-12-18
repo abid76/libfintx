@@ -37,10 +37,10 @@ namespace libfintx.FinTS
         {
             Log.Write("Starting job HKCDE: Submit bankers order");
 
-            client.SEGNUM = Convert.ToInt16(SEG_NUM.Seg3);
+            client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
 
             var connectionDetails = client.ConnectionDetails;
-            string segments = "HKCDE:" + client.SEGNUM + ":1+" + connectionDetails.Iban + ":" + connectionDetails.Bic + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03+@@";
+            string segments = "HKCDE:" + client.SegmentNumber + ":1+" + connectionDetails.Iban + ":" + connectionDetails.Bic + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03+@@";
 
             var sepaMessage = pain00100103.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, Receiver, ReceiverIBAN, ReceiverBIC, Amount, Usage, new DateTime(1999, 1, 1)).Replace("'", "");
             segments = segments.Replace("@@", "@" + sepaMessage.Length + "@") + sepaMessage;
@@ -53,11 +53,11 @@ namespace libfintx.FinTS
 
             if (Helper.IsTANRequired("HKCDE"))
             {
-                client.SEGNUM = Convert.ToInt16(SEG_NUM.Seg4);
+                client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg4);
                 segments = HKTAN.Init_HKTAN(client, segments, "HKCDE");
             }
 
-            string message = FinTSMessage.Create(client, client.HNHBS, client.HNHBK, segments, client.HIRMS);
+            string message = FinTSMessage.Create(client, client.MessageNumber, client.DialogId, segments, client.TanProcessCode);
             var response = await FinTSMessage.Send(client, message);
 
             Helper.Parse_Message(client, response);

@@ -177,12 +177,12 @@ namespace libfintx.Tests
 
             if (result.IsSuccess)
             {
-                string hirms = "921"; // -> pushTAN
+                client.TanProcessCode = 921; // -> pushTAN
 
                 var tanmediumname = await client.RequestTANMediumName();
-                client.HITAB = tanmediumname.Data.FirstOrDefault();
+                client.TanMedium = tanmediumname.Data.FirstOrDefault();
 
-                Console.WriteLine(client.Transfer(new TANDialog(WaitForTanAsync), receiver, receiverIBAN, receiverBIC, amount, usage, hirms));
+                Console.WriteLine(client.Transfer(new TANDialog(WaitForTanAsync), receiver, receiverIBAN, receiverBIC, amount, usage));
             }
         }
 

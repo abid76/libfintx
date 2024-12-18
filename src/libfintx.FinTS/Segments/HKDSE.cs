@@ -38,10 +38,10 @@ namespace libfintx.FinTS
         {
             Log.Write("Starting job HKDSE: Collect money");
 
-            client.SEGNUM = Convert.ToInt16(SEG_NUM.Seg4);
+            client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg4);
 
             var connectionDetails = client.ConnectionDetails;
-            string segments = "HKDSE:" + client.SEGNUM + ":1+" + connectionDetails.Iban + ":" + connectionDetails.Bic + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.008.002.02+@@";
+            string segments = "HKDSE:" + client.SegmentNumber + ":1+" + connectionDetails.Iban + ":" + connectionDetails.Bic + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.008.002.02+@@";
 
             var message = pain00800202.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, Payer, PayerIBAN, PayerBIC, Amount, Usage, SettlementDate, MandateNumber, MandateDate, CreditorIDNumber);
 
@@ -49,11 +49,11 @@ namespace libfintx.FinTS
 
             if (Helper.IsTANRequired("HKDSE"))
             {
-                client.SEGNUM = Convert.ToInt16(SEG_NUM.Seg4);
+                client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg4);
                 segments = HKTAN.Init_HKTAN(client, segments, "HKDSE");
             }
 
-            var response = await FinTSMessage.Send(client, FinTSMessage.Create(client, client.HNHBS, client.HNHBK, segments, client.HIRMS));
+            var response = await FinTSMessage.Send(client, FinTSMessage.Create(client, client.MessageNumber, client.DialogId, segments, client.TanProcessCode));
 
             Helper.Parse_Message(client, response);
 

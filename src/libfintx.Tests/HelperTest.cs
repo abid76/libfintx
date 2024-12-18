@@ -77,8 +77,8 @@ HNHBS:7:1+3'".Replace(Environment.NewLine, string.Empty);
             var client = new FinTsClient(new ConnectionDetails());
             Helper.Parse_Message(client, message);
 
-            Assert.Equal(4, client.HNHBS);
-            Assert.Equal("8578-06-23-13.22.43.709351", client.HITAN);
+            Assert.Equal(4, client.MessageNumber);
+            Assert.Equal("8578-06-23-13.22.43.709351", client.HktanOrderRef);
         }
 
         [Fact]
@@ -98,8 +98,8 @@ HNHBS:7:1+2'".Replace(Environment.NewLine, string.Empty);
             var client = new FinTsClient(new ConnectionDetails());
             Helper.Parse_Message(client, message);
 
-            Assert.Equal(3, client.HNHBS);
-            Assert.Equal("76ma3j/MKH0BAABsRcJNhG?+owAQA", client.HITAN);
+            Assert.Equal(3, client.MessageNumber);
+            Assert.Equal("76ma3j/MKH0BAABsRcJNhG?+owAQA", client.HktanOrderRef);
         }
 
         [Fact]
@@ -118,7 +118,7 @@ HNHBS:7:1+2'".Replace(Environment.NewLine, string.Empty);
             FinTsClient client = new FinTsClient(null);
             Helper.Parse_Segments(client, message);
 
-            Assert.Equal("eBYcsEe0unsBAAAXXkX5hG?+owAQA", client.HITAN);
+            Assert.Equal("eBYcsEe0unsBAAAXXkX5hG?+owAQA", client.HktanOrderRef);
         }
 
         [Fact]
@@ -131,7 +131,7 @@ HNHBS:7:1+2'".Replace(Environment.NewLine, string.Empty);
             FinTsClient client = new FinTsClient(conn);
             Helper.Parse_Segments(client, message);
 
-            Assert.Equal("eNmo9/2dEocBAACRO?+gjhW?+owAQA", client.HITAN);
+            Assert.Equal("eNmo9/2dEocBAACRO?+gjhW?+owAQA", client.HktanOrderRef);
         }
 
         [Fact]
@@ -145,7 +145,7 @@ HNHBS:7:1+2'".Replace(Environment.NewLine, string.Empty);
             FinTsClient client = new FinTsClient(conn);
             Helper.Parse_Segments(client, message);
 
-            Assert.Equal(7, client.HISALS);
+            Assert.Equal(7, client.HksalVersion);
         }
 
         [Fact]
@@ -159,7 +159,7 @@ HNHBS:7:1+2'".Replace(Environment.NewLine, string.Empty);
             FinTsClient client = new FinTsClient(conn);
             Helper.Parse_Segments(client, message);
 
-            Assert.Equal("#3xufqdASFyM12120221127131048%", client.HNHBK);
+            Assert.Equal("#3xufqdASFyM12120221127131048%", client.DialogId);
         }
 
         [Fact]

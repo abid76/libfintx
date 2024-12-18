@@ -45,7 +45,7 @@ namespace libfintx.FinTS.Message
 
         public static string CreateSync(FinTsClient client, string Segments)
         {
-            return Create(client, 1, "0", Segments, null, "0");
+            return Create(client, 1, "0", Segments, null, null, "0");
         }
         /// <summary>
         /// Create FinTS message
@@ -66,14 +66,13 @@ namespace libfintx.FinTS.Message
         /// Mostly it will be TLS12 but who knows.
         /// I'm pretty sure the method can be simplified even more. 
         /// 
-        public static string Create(FinTsClient client, int MsgNum, string DialogID, string Segments, string HIRMS_TAN, string SystemID = null)
+        public static string Create(FinTsClient client, int MsgNum, string DialogID, string Segments, int? tanProcessCode, string tan = null, string SystemID = null)
         {
-
             int Version = client.ConnectionDetails.HbciVersion;
             int BLZ = client.ConnectionDetails.BlzPrimary;
             string UserID = client.ConnectionDetails.UserIdEscaped;
             string PIN = client.ConnectionDetails.Pin;
-            int SegmentNum = client.SEGNUM;
+            int SegmentNum = client.SegmentNumber;
 
             if (SystemID == null)
                 SystemID = client.SystemId; 
@@ -100,19 +99,6 @@ namespace libfintx.FinTS.Message
 
             string TAN_ = string.Empty;
 
-            if (HIRMS_TAN != null)
-            {
-                if (HIRMS_TAN.Length >= 10)
-                {
-                    var split = HIRMS_TAN.Split(':');
-                    if (split.Length == 2)
-                    {
-                        HIRMS_TAN = split[0];
-                        TAN_ = ":" + split[1];
-                    }
-                }
-            }
-
             if (Version == Convert.ToInt16(HBCI.v220))
             {
                 encHead = "HNVSK:" + Enc.SECFUNC_ENC_PLAIN + ":2+" + Enc.SECFUNC_ENC_PLAIN + "+1+1::" + SystemID + "+1:" + date + ":" + time + "+2:2:13:@8@00000000:5:1+" + SEG_Country.Germany + ":" + BLZ + ":" + UserID + ":V:0:0+0'";
@@ -121,21 +107,20 @@ namespace libfintx.FinTS.Message
 
                 sigHead = string.Empty;
 
-                if (HIRMS_TAN == null)
+                if (tanProcessCode == null)
                 {
                     sigHead = "HNSHK:2:3+" + Sig.SECFUNC_SIG_PT_2STEP_MIN + "+" + secRef + "+1+1+1::" + SystemID + "+1+1:" + date + ":" + time + "+1:" + Sig.SIGMODE_RETAIL_MAC + ":1 +6:10:16+" + SEG_Country.Germany + ":" + BLZ + ":" + UserID + ":S:0:0'";
 
                     Log.Write(sigHead.Replace(UserID, "XXXXXX"));
                 }
-
                 else
                 {
-                    sigHead = "HNSHK:2:3+" + HIRMS_TAN + "+" + secRef + "+1+1+1::" + SystemID + "+1+1:" + date + ":" + time + "+1:" + Sig.SIGMODE_RETAIL_MAC + ":1+6:10:16+" + SEG_Country.Germany + ":" + BLZ + ":" + UserID + ":S:0:0'";
+                    sigHead = "HNSHK:2:3+" + tanProcessCode + "+" + secRef + "+1+1+1::" + SystemID + "+1+1:" + date + ":" + time + "+1:" + Sig.SIGMODE_RETAIL_MAC + ":1+6:10:16+" + SEG_Country.Germany + ":" + BLZ + ":" + UserID + ":S:0:0'";
 
                     Log.Write(sigHead.Replace(UserID, "XXXXXX"));
                 }
 
-                if (String.IsNullOrEmpty(TAN_))
+                if (string.IsNullOrEmpty(TAN_))
                 {
                     sigTrail = "HNSHA:" + Convert.ToString(SegmentNum + 1) + ":1+" + secRef + "++" + PIN + "'";
 
@@ -151,14 +136,11 @@ namespace libfintx.FinTS.Message
             }
             else if (Version == Convert.ToInt16(HBCI.v300))
             {
-                if (HIRMS_TAN == null)
-                    encHead = "HNVSK:" + Enc.SECFUNC_ENC_PLAIN + ":3+PIN:1+" + Enc.SECFUNC_ENC_PLAIN + "+1+1::" + SystemID + "+1:" + date + ":" + time + "+2:2:13:@8@00000000:5:1+" + SEG_Country.Germany + ":" + BLZ + ":" + UserID + ":V:0:0+0'";
-                else
-                    encHead = "HNVSK:" + Enc.SECFUNC_ENC_PLAIN + ":3+PIN:2+" + Enc.SECFUNC_ENC_PLAIN + "+1+1::" + SystemID + "+1:" + date + ":" + time + "+2:2:13:@8@00000000:5:1+" + SEG_Country.Germany + ":" + BLZ + ":" + UserID + ":V:0:0+0'";
+                encHead = "HNVSK:" + Enc.SECFUNC_ENC_PLAIN + ":3+PIN:1+" + Enc.SECFUNC_ENC_PLAIN + "+1+1::" + SystemID + "+1:" + date + ":" + time + "+2:2:13:@8@00000000:5:1+" + SEG_Country.Germany + ":" + BLZ + ":" + UserID + ":V:0:0+0'";
 
                 Log.Write(encHead.Replace(UserID, "XXXXXX"));
 
-                if (HIRMS_TAN == null)
+                if (tanProcessCode == null)
                 {
                     sigHead = "HNSHK:2:4+PIN:1+" + Sig.SECFUNC_SIG_PT_1STEP + "+" + secRef + "+1+1+1::" + SystemID + "+1+1:" + date + ":" + time + "+1:" + Sig.SIGMODE_RETAIL_MAC + ":1+6:10:16+" + SEG_Country.Germany + ":" + BLZ + ":" + UserID + ":S:0:0'";
 
@@ -166,14 +148,14 @@ namespace libfintx.FinTS.Message
                 }
                 else
                 {
-                    var SECFUNC = HIRMS_TAN.Equals("999") ? "1" : "2";
+                    var SECFUNC = tanProcessCode == 999 ? "1" : "2";
 
-                    sigHead = "HNSHK:2:4+PIN:" + SECFUNC + "+" + HIRMS_TAN + "+" + secRef + "+1+1+1::" + SystemID + "+1+1:" + date + ":" + time + "+1:" + Sig.SIGMODE_RETAIL_MAC + ":1+6:10:16+" + SEG_Country.Germany + ":" + BLZ + ":" + UserID + ":S:0:0'";
+                    sigHead = "HNSHK:2:4+PIN:" + SECFUNC + "+" + tanProcessCode + "+" + secRef + "+1+1+1::" + SystemID + "+1+1:" + date + ":" + time + "+1:" + Sig.SIGMODE_RETAIL_MAC + ":1+6:10:16+" + SEG_Country.Germany + ":" + BLZ + ":" + UserID + ":S:0:0'";
 
                     Log.Write(sigHead.Replace(UserID, "XXXXXX"));
                 }
 
-                if (String.IsNullOrEmpty(TAN_))
+                if (string.IsNullOrEmpty(TAN_))
                 {
                     sigTrail = "HNSHA:" + Convert.ToString(SegmentNum + 1) + ":2+" + secRef + "++" + PIN + "'";
 
@@ -198,10 +180,14 @@ namespace libfintx.FinTS.Message
 
             var payload = Helper.Encrypt(Segments);
 
-            if (HIRMS_TAN == null)
+            if (tanProcessCode == null)
+            {
                 Log.Write(payload.Replace(UserID, "XXXXXX").Replace(PIN, "XXXXXX"));
-            else if (!String.IsNullOrEmpty(TAN_))
+            }
+            else if (!string.IsNullOrEmpty(TAN_))
+            {
                 Log.Write(payload.Replace(UserID, "XXXXXX").Replace(PIN, "XXXXXX").Replace(TAN_, "XXXXXX"));
+            }
 
             var msgLen = HEAD_LEN + TRAIL_LEN + ($"{MsgNum}".Length * 2) + DialogID.Length + payload.Length + encHead.Length;
 

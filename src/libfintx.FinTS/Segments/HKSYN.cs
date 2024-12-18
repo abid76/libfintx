@@ -68,7 +68,7 @@ namespace libfintx.FinTS
                 throw new Exception("HBCI version not supported");
             }
 
-            client.SEGNUM = Convert.ToInt16(SEG_NUM.Seg5);
+            client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg5);
 
             string message = FinTSMessage.CreateSync(client, segments);
             string response = await FinTSMessage.Send(client, message);

@@ -30,11 +30,11 @@ namespace libfintx.FinTS
     {
         public string RawData { get; internal set; }
 
-        public bool IsSuccess => messages.Any(m => m.IsSuccess);
-        public bool HasInfo => messages.Any(m => m.IsInfo);
-        public bool HasWarning => messages.Any(m => m.IsWarning);
-        public bool HasError => messages.Any(m => m.IsError);
-        public bool HasUnknown => messages.Any(m => m.IsUnknown);
+        public bool IsSuccess => _messages.Any(m => m.IsSuccess);
+        public bool HasInfo => _messages.Any(m => m.IsInfo);
+        public bool HasWarning => _messages.Any(m => m.IsWarning);
+        public bool HasError => _messages.Any(m => m.IsError);
+        public bool HasUnknown => _messages.Any(m => m.IsUnknown);
 
         /// <summary>
         /// Returns true if there is any message with code <i>0030</i>.
@@ -53,18 +53,18 @@ namespace libfintx.FinTS
         /// </summary>
         public bool IsWaitingForApproval => GetMessage("3956") != null;
 
-        private readonly List<HBCIBankMessage> messages;
-        public IEnumerable<HBCIBankMessage> Messages => messages;
+        private readonly List<HBCIBankMessage> _messages;
+        public IEnumerable<HBCIBankMessage> Messages => _messages;
 
         public HBCIDialogResult(IEnumerable<HBCIBankMessage> messages, string rawData)
         {
-            this.messages = messages.ToList();
+            this._messages = messages.ToList();
             RawData = rawData;
         }
 
         public string GetMessage(string code)
         {
-            return messages.FirstOrDefault(m => m.Code == code)?.Message;
+            return _messages.FirstOrDefault(m => m.Code == code)?.Message;
         }
 
         public HBCIDialogResult<T> TypedResult<T>()
@@ -79,7 +79,7 @@ namespace libfintx.FinTS
 
         public override string ToString()
         {
-            return string.Join(", ", messages);
+            return string.Join(", ", _messages);
         }
     }
 

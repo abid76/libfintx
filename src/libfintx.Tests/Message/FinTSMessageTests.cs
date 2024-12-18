@@ -31,7 +31,7 @@ namespace libfintx.Tests.Message
             int MsgNum = 0;
             string DialogID = null;
             string Segments = null;
-            string HIRMS_TAN = null;
+            int? TanProcessCode = null;
             string SystemID = null;
 
             // Act
@@ -40,7 +40,7 @@ namespace libfintx.Tests.Message
                 MsgNum,
                 DialogID,
                 Segments,
-                HIRMS_TAN,
+                TanProcessCode,
                 SystemID);
 
             // Assert

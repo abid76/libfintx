@@ -119,7 +119,7 @@ namespace libfintx.FinTS
         }
 
         public async Task<HBCIDialogResult> DeleteBankersOrder(TANDialog tanDialog, string orderId, string receiverName, string receiverIBAN,
-                string receiverBIC, decimal amount, string purpose, DateTime firstTimeExecutionDay, TimeUnit timeUnit, string rota, int executionDay, DateTime? lastExecutionDay, string hirms)
+                string receiverBIC, decimal amount, string purpose, DateTime firstTimeExecutionDay, TimeUnit timeUnit, string rota, int executionDay, DateTime? lastExecutionDay)
         {
             var result = await InitializeConnection();
             if (result.HasError)
@@ -130,9 +130,6 @@ namespace libfintx.FinTS
                 return result;
 
             TransactionConsole.Output = string.Empty;
-
-            if (!string.IsNullOrEmpty(hirms))
-                HIRMS = hirms;
 
             string BankCode = await Transaction.HKCDL(this, orderId, receiverName, receiverIBAN, receiverBIC, amount, purpose, firstTimeExecutionDay, timeUnit, rota, executionDay, lastExecutionDay);
             result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
@@ -167,7 +164,7 @@ namespace libfintx.FinTS
         /// </returns>
         public async Task<HBCIDialogResult> SubmitBankersOrder(TANDialog tanDialog, string receiverName, string receiverIBAN,
            string receiverBIC, decimal amount, string purpose, DateTime firstTimeExecutionDay, TimeUnit timeUnit, string rota,
-           int executionDay, DateTime? lastExecutionDay, string hirms)
+           int executionDay, DateTime? lastExecutionDay)
         {
             var result = await InitializeConnection();
             if (result.HasError)
@@ -178,9 +175,6 @@ namespace libfintx.FinTS
                 return result;
 
             TransactionConsole.Output = string.Empty;
-
-            if (!string.IsNullOrEmpty(hirms))
-                HIRMS = hirms;
 
             string BankCode = await Transaction.HKCDE(this, receiverName, receiverIBAN, receiverBIC, amount, purpose, firstTimeExecutionDay, timeUnit, rota, executionDay, lastExecutionDay);
             result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
@@ -194,7 +188,7 @@ namespace libfintx.FinTS
 
         public async Task<HBCIDialogResult> ModifyBankersOrder(TANDialog tanDialog, string OrderId, string receiverName, string receiverIBAN,
            string receiverBIC, decimal amount, string purpose, DateTime firstTimeExecutionDay, TimeUnit timeUnit, string rota,
-           int executionDay, DateTime? lastExecutionDay, string hirms)
+           int executionDay, DateTime? lastExecutionDay)
         {
             var result = await InitializeConnection();
             if (result.HasError)
@@ -205,9 +199,6 @@ namespace libfintx.FinTS
                 return result;
 
             TransactionConsole.Output = string.Empty;
-
-            if (!string.IsNullOrEmpty(hirms))
-                HIRMS = hirms;
 
             string BankCode = await Transaction.HKCDN(this, OrderId, receiverName, receiverIBAN, receiverBIC, amount, purpose, firstTimeExecutionDay, timeUnit, rota, executionDay, lastExecutionDay);
             result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);

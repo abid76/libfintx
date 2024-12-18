@@ -44,9 +44,9 @@ namespace libfintx.FinTS
 
             segments = "HKEND:" + SEG_NUM.Seg3 + "1'";
 
-            client.SEGNUM = Convert.ToInt16(SEG_NUM.Seg3);
+            client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
 
-            return await FinTSMessage.Send(client, FinTSMessage.Create(client, client.HNHBS, client.HNHBK, segments, client.HIRMS));
+            return await FinTSMessage.Send(client, FinTSMessage.Create(client, client.MessageNumber, client.DialogId, segments, client.TanProcessCode));
         }
     }
 }

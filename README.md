@@ -108,6 +108,7 @@ The verification process is done by using the default [**WebRequest**](https://m
 
 # Limitations
 
+* Only PIN/TAN security procedure is supported when using HBCI
 * Usage with certificates has been prepared but not completely implemented yet. It works with private/public keys.
 * Only version A005 for signatures can be used. A006 uses PSS padding, which is currently not supported by .NET Core 2.x. Bouncy Castle is only used for PEM file and certificate management.
 * Only version E002 for encryption can be used.

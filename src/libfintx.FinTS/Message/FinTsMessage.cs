@@ -97,7 +97,7 @@ namespace libfintx.FinTS.Message
             string date = Convert.ToString(DateTime.Now.Year) + DateTime.Now.ToString("MM") + DateTime.Now.ToString("dd");
             string time = Convert.ToString(DateTime.Now.TimeOfDay).Substring(0, 8).Replace(":", "");
 
-            string TAN_ = string.Empty;
+            string TAN_ = tan ?? string.Empty;
 
             if (Version == Convert.ToInt16(HBCI.v220))
             {
@@ -164,9 +164,9 @@ namespace libfintx.FinTS.Message
 
                 else
                 {
-                    sigTrail = "HNSHA:" + Convert.ToString(SegmentNum + 1) + ":2+" + secRef + "++" + PIN + TAN_ + "'";
+                    sigTrail = "HNSHA:" + Convert.ToString(SegmentNum + 1) + ":2+" + secRef + "++" + PIN + ":" + TAN_ + "'";
 
-                    Log.Write("HNSHA:" + Convert.ToString(SegmentNum + 1) + ":2+" + secRef + "++" + "XXXXXX" + "XXXXXX" + "'");
+                    Log.Write("HNSHA:" + Convert.ToString(SegmentNum + 1) + ":2+" + secRef + "++" + "XXXXXX" + ":" + "XXXXXX" + "'");
                 }
             }
             else

@@ -373,18 +373,20 @@ namespace libfintx.FinTS
 
                     if (segment.Name == "HICAZS")
                     {
+                        var scheme = CamtScheme.Camt052_001_02; // Fallback
+
                         if (segment.Payload.Contains("camt.052.001.02"))
                         {
-                            client.HkcazCamtScheme = CamtScheme.Camt052_001_02;
+                            scheme = CamtScheme.Camt052_001_02;
                         }
                         else if (segment.Payload.Contains("camt.052.001.08"))
                         {
-                            client.HkcazCamtScheme += CamtScheme.Camt052_001_08;
+                            scheme = CamtScheme.Camt052_001_08;
                         }
-                        else
+
+                        if (client.HkcazCamtScheme == null || !client.HkcazCamtScheme.Contains(scheme))
                         {
-                            // Fallback
-                            client.HkcazCamtScheme = CamtScheme.Camt052_001_02;
+                            client.HkcazCamtScheme += (client.HkcazCamtScheme != null ? ":" : "") + scheme;
                         }
                     }
 

@@ -712,7 +712,7 @@ namespace libfintx.Sample.Ui
         private TANDialog CreateTANDialog(FinTsClient client)
         {
             var dialog = new TANDialog(WaitForTanAsync);
-            if (client.TanProcessCode == 922 || client.TanProcessCode == 923 || client.TanProcessCode == 922 || client.TanProcessCode == 946)
+            if (client.TanProcessCode == 921 || client.TanProcessCode == 922 || client.TanProcessCode == 923 || client.TanProcessCode == 922 || client.TanProcessCode == 946)
                 dialog.IsDecoupled = true;
 
             return dialog;

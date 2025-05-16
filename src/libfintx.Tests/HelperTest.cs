@@ -249,5 +249,16 @@ HNHBS:7:1+2'".Replace(Environment.NewLine, string.Empty);
             var result = Helper.Parse_TANMedium(message);
             Assert.Equal(2, result.Count);
         }
+
+        [Fact]
+        public void Test_Parse_TanProcesses_Targobank()
+        {
+            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"Resources\BankMessage_6.txt");
+            var message = File.ReadAllText(path);
+            var result = Helper.Parse_Segments(new FinTsClient(new ConnectionDetails()), message);
+
+            Assert.Single(TanProcesses.Items);
+            Assert.Equal("921", TanProcesses.Items[0].ProcessNumber);
+        }
     }
 }

@@ -346,7 +346,15 @@ namespace libfintx.FinTS
                                 client.HktanVersion = segment.Version;
                         }
 
-                        TanProcesses.Items = hitans.TanProcesses.Select(ht => new TanProcess() { ProcessName = ht.Name, ProcessNumber = ht.TanCode.ToString() }).ToList();
+                        if (TanProcesses.Items == null)
+                            TanProcesses.Items = new List<TanProcess>();
+                        // Nur solche TAN-Verfahren berücksichtigen, die den erlaubten TAN-Verfahren entsprechen
+                        if (client.HktanVersion == 0 || client.HktanVersion == segment.Version)
+                        {
+                            TanProcesses.Items.AddRange(hitans.TanProcesses
+                                .Where(ht => client.AllowedTanProcesses.Exists(t => t == Convert.ToInt16(ht.TanCode)))
+                                .Select(ht => new TanProcess() { ProcessName = ht.Name, ProcessNumber = ht.TanCode.ToString() }));
+                        }
                     }
 
                     if (segment.Name == "HITAN")
@@ -730,7 +738,8 @@ namespace libfintx.FinTS
             Log.Write($"Saving UPD to '{file}' ...");
             if (!File.Exists(file))
             {
-                using (File.Create(file)) { };
+                using (File.Create(file)) { }
+                ;
             }
             File.WriteAllText(file, upd);
         }
@@ -752,7 +761,8 @@ namespace libfintx.FinTS
             Log.Write($"Saving BPD to '{file}' ...");
             if (!File.Exists(file))
             {
-                using (File.Create(file)) { };
+                using (File.Create(file)) { }
+                ;
             }
             File.WriteAllText(file, upd);
         }

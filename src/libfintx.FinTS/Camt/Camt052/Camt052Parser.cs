@@ -233,7 +233,7 @@ namespace libfintx.FinTS.Camt.Camt052
                     foreach (Camt052_002.ReportEntry2 entry in entries)
                     {
                         bool pending = entry.Sts == Camt052_002.EntryStatus2Code.PDNG;
-                        if (!pending && entry.Amt.Ccy != stmt.Currency)
+                        if (!pending && (!string.IsNullOrEmpty(entry.Amt.Ccy) && !string.IsNullOrEmpty(stmt.Currency) && entry.Amt.Ccy != stmt.Currency))
                         {
                             throw new Exception($"Transaction currency '{entry.Amt.Ccy}' does not match the bank statement currency '{stmt.Currency}'.");
                         }
@@ -456,7 +456,7 @@ namespace libfintx.FinTS.Camt.Camt052
                     foreach (Camt052_008.ReportEntry10 entry in entries)
                     {
                         bool pending = entry.Sts.Item == "PDNG";
-                        if (!pending && entry.Amt.Ccy != stmt.Currency)
+                        if (!pending && (!string.IsNullOrEmpty(entry.Amt.Ccy) && !string.IsNullOrEmpty(stmt.Currency) && entry.Amt.Ccy != stmt.Currency))
                         {
                             throw new Exception($"Transaction currency '{entry.Amt.Ccy}' does not match the bank statement currency '{stmt.Currency}'.");
                         }

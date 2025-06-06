@@ -10,14 +10,14 @@ namespace libfintx.FinTS
         public int MaxCountOrders { get; set; }
         public int MaxCountSignatures { get; set; }
         public string SecCode { get; set; }
-        public HivppsParam HivppsParam { get; set; }
+        public ParamNameComparisonCheckOrder ParamCheckOrder { get; set; }
 
         public HIVPPS(Segment segment) : base(segment)
         {
         }
     }
 
-    internal class HivppsParam
+    internal class ParamNameComparisonCheckOrder
     {
         public int MaxCountCTTIOptIn { get; set; }
         public bool DescriptionStructured { get; set; }

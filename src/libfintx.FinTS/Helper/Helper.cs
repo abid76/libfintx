@@ -418,6 +418,15 @@ namespace libfintx.FinTS
                             client.SepaAccountNationalAllowed = hispas.IsAccountNationalAllowed;
                         }
                     }
+
+                    if (segment.Name == "HIVPPS" || segment.Name == "HIVPAS" || segment.Name == "HIVOOS")
+                    {
+                        client.Vop = true;
+                        if (segment.Name == "HIVPPS")
+                        {
+                            client.VopGvList = segment.DataElements.Select(d => d.Value).ToList();
+                        }
+                    }
                 }
 
                 // Fallback if HIKAZS is not delivered by BPD (eg. Postbank)
@@ -469,6 +478,12 @@ namespace libfintx.FinTS
                     if (segment.DataElements.Count < 3)
                         throw new InvalidOperationException($"Invalid HITAN segment '{segment}'. Payload must have at least 3 data elements.");
                     client.HktanOrderRef = segment.DataElements[2].Value;
+                }
+
+                if (segment.Name == "HIVPP")
+                {
+                    HIVPP hivpp = segment as HIVPP;
+                    client.VopPollingId = hivpp.PollingId;
                 }
             }
 

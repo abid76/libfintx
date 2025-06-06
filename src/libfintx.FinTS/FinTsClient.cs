@@ -56,6 +56,16 @@ namespace libfintx.FinTS
         internal int SepaPainVersion { get; set; }
         internal bool SepaAccountNationalAllowed { get; set; }
 
+        /// <summary>
+        /// Verification of Payee
+        /// </summary>
+        internal bool Vop { get; set; }
+        public string VopPollingId { get; internal set; }
+        public string VopRefPoint { get; internal set; }
+        public string VopId { get; internal set; }
+
+        internal List<string> VopGvList = new List<string>();
+
         public FinTsClient(ConnectionDetails conn, bool anon = false)
         {
             ConnectionDetails = conn;

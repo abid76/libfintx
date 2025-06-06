@@ -44,6 +44,12 @@ namespace libfintx.FinTS
 
             client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
 
+            if (client.VopGvList.Contains("HKCCS"))
+            {
+                HKVPP.Init_HKVPP(client, segments);
+                client.SegmentNumber++;
+            }
+
             if (client.SepaPainVersion == 1)
             {
                 segments = "HKCCS:" + client.SegmentNumber + ":1+" + connectionDetails.Iban + ":" + connectionDetails.Bic + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03+@@";
@@ -64,7 +70,7 @@ namespace libfintx.FinTS
 
             if (Helper.IsTANRequired("HKCCS"))
             {
-                client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg4);
+                client.SegmentNumber++;
                 segments = HKTAN.Init_HKTAN(client, segments, "HKCCS");
             }
 

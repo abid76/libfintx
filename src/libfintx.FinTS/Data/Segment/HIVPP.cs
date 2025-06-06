@@ -4,7 +4,7 @@ using System.Text;
 
 namespace libfintx.FinTS.Data.Segment
 {
-    internal class HIVPP : SegmentBase
+    public class HIVPP : SegmentBase
     {
         public string VopId { get; set; }
 

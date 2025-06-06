@@ -15,15 +15,15 @@ namespace libfintx.FinTS.Data.Segment
             result.SecCode = segment.DataElements[2].Value;
             if (segment.DataElements.Count > 3 && segment.DataElements[3].DataElements != null && segment.DataElements[3].DataElements.Count > 0)
             {
-                result.HivppsParam = ParseHivppsParam(segment.DataElements[3]);
+                result.ParamCheckOrder = ParseHivppsParam(segment.DataElements[3]);
             }
 
             return result;
         }
 
-        private HivppsParam ParseHivppsParam(DataElement dataElement)
+        private ParamNameComparisonCheckOrder ParseHivppsParam(DataElement dataElement)
         {
-            return new HivppsParam
+            return new ParamNameComparisonCheckOrder
             {
                 MaxCountCTTIOptIn = Convert.ToInt32(dataElement.DataElements[0].Value),
                 DescriptionStructured = dataElement.DataElements[1].Value == "J",

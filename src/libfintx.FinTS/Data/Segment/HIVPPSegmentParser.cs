@@ -37,7 +37,7 @@ namespace libfintx.FinTS.Data.Segment
         }
     }
 
-    internal class VopCheckResult
+    public class VopCheckResult
     {
         public string Iban { get; set; }
         public string IbanAdditionalInfo { get; set; }

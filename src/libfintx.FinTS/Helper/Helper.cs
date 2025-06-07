@@ -480,10 +480,17 @@ namespace libfintx.FinTS
                     client.HktanOrderRef = segment.DataElements[2].Value;
                 }
 
+                if (segment.Name == "HIRMS")
+                {
+                    client.VopNeeded = segment.DataElements.Select(d => Parse_BankCode_Message(d)).FirstOrDefault(m => m.Code == "3091") == null;
+                }
+
                 if (segment.Name == "HIVPP")
                 {
                     HIVPP hivpp = segment as HIVPP;
                     client.VopPollingId = hivpp.PollingId;
+                    client.VopId = hivpp.VopId;
+                    client.VopStatusReport = hivpp.PaymentStatusReport;
                 }
             }
 
@@ -709,6 +716,27 @@ namespace libfintx.FinTS
             }
 
             return result;
+        }
+
+        public static HIVPP Parse_Vop(string BankCode)
+        {
+            var rawSegments = SplitEncryptedSegments(BankCode);
+            List<Segment> segments = new List<Segment>();
+            foreach (var item in rawSegments)
+            {
+                Segment segment = Parse_Segment(item);
+                if (segment != null)
+                    segments.Add(segment);
+            }
+
+            var hivpp = segments.FirstOrDefault(s => s.Name == "HIVPP");
+            if (hivpp != null)
+            {
+                var hivppSegment = hivpp as HIVPP;
+                return hivppSegment;
+            }
+
+            return null;
         }
 
         /// <summary>

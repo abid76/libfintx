@@ -59,6 +59,15 @@ namespace libfintx.FinTS
             TransactionConsole.Output = string.Empty;
 
             string BankCode = await Transaction.HKCCS(this, receiverName, receiverIBAN, receiverBIC, amount, purpose);
+            if (VopNeeded)
+            {
+                //if (!vopDialog.ConfirmVop(VopStatusReport))
+                //{
+                //    var dontKnow = await HKEND.Init_HKEND(this);
+                //    return null;
+                //}
+            }
+
             result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
             if (result.HasError)
                 return result;

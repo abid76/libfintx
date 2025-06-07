@@ -63,6 +63,8 @@ namespace libfintx.FinTS
         public string VopPollingId { get; internal set; }
         public string VopRefPoint { get; internal set; }
         public string VopId { get; internal set; }
+        public string VopStatusReport { get; internal set; }
+        public bool VopNeeded { get; internal set; }
 
         internal List<string> VopGvList = new List<string>();
 
@@ -71,6 +73,15 @@ namespace libfintx.FinTS
             ConnectionDetails = conn;
             Anonymous = anon;
             activeAccount = null;
+        }
+
+        internal bool IsVopGv(string gv)
+        {
+            if (string.IsNullOrEmpty(gv))
+                return false;
+            if (VopGvList.Count == 0)
+                return false;
+            return VopGvList.Contains(gv);
         }
 
         internal async Task<HBCIDialogResult> InitializeConnection(string hkTanSegmentId = "HKIDN")

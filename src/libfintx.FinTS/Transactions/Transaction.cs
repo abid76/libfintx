@@ -60,9 +60,9 @@ namespace libfintx.FinTS
             return await Init_INI(client, hkTanSegmentId);
         }
 
-        public static async Task<String> HKEND(FinTsClient client, string dialogId)
+        public static async Task<String> HKEND(FinTsClient client)
         {
-            return await Init_HKEND(client, dialogId);
+            return await Init_HKEND(client);
         }
 
         public static async Task<String> HKSYN(FinTsClient client)

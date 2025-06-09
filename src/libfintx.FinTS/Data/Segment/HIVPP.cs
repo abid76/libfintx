@@ -12,7 +12,7 @@ namespace libfintx.FinTS.Data.Segment
 
         public string PollingId { get; set; }
 
-        public string PaymentStatusReportDesc { get; set; }
+        public string PaymentStatusReportDescriptor { get; set; }
 
         public string PaymentStatusReport { get; set; }
 

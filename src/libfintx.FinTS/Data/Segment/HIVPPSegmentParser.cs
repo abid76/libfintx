@@ -13,7 +13,7 @@ namespace libfintx.FinTS.Data.Segment
             result.VopId = segment.DataElements[0].Value;
             result.VopIdValidUntil = segment.DataElements[1].Value;
             result.PollingId = segment.DataElements[2].Value;
-            result.PaymentStatusReportDesc = segment.DataElements[3].Value;
+            result.PaymentStatusReportDescriptor = segment.DataElements[3].Value;
             result.PaymentStatusReport = segment.DataElements[4].Value;
             result.VopCheckResult = ParseVopCheckResult(segment.DataElements[5]);
             result.AdditionalInfo = segment.DataElements[6].Value;

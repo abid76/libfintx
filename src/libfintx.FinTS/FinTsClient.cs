@@ -21,12 +21,16 @@
  * 	
  */
 
-using libfintx.FinTS.Data;
-using libfintx.Logger.Log;
-using libfintx.Sepa;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using libfintx.FinTS.Data;
+using libfintx.FinTS.Data.Segment;
+using libfintx.FinTS.Vop;
+using libfintx.Logger.Log;
+using libfintx.Sepa;
 
 namespace libfintx.FinTS
 {
@@ -63,7 +67,6 @@ namespace libfintx.FinTS
         public string VopPollingId { get; internal set; }
         public string VopRefPoint { get; internal set; }
         public string VopId { get; internal set; }
-        public string VopStatusReport { get; internal set; }
         public bool VopNeeded { get; internal set; }
 
         internal List<string> VopGvList = new List<string>();
@@ -75,13 +78,14 @@ namespace libfintx.FinTS
             activeAccount = null;
         }
 
-        internal bool IsVopGv(string gv)
+        internal void ResetVop()
         {
-            if (string.IsNullOrEmpty(gv))
-                return false;
-            if (VopGvList.Count == 0)
-                return false;
-            return VopGvList.Contains(gv);
+            Vop = false;
+            VopPollingId = null;
+            VopRefPoint = null;
+            VopId = null;
+            VopNeeded = false;
+            VopGvList.Clear();
         }
 
         internal async Task<HBCIDialogResult> InitializeConnection(string hkTanSegmentId = "HKIDN")
@@ -381,6 +385,76 @@ namespace libfintx.FinTS
             }
 
             return result;
+        }
+
+        public async Task<HBCIDialogResult<VopResult>> ProcessVop(TANDialog tanDialog, VopDialog vopDialog, Func<Task<string>> finTsCall)
+        {
+            StringBuilder paymentStatusReport = new StringBuilder();
+            string paymentStatusReportDescriptor = string.Empty;
+
+            string BankCode = await finTsCall();
+            var rawSegments = Helper.SplitEncryptedSegments(BankCode);
+            foreach (var item in rawSegments)
+            {
+                var segment = Helper.Parse_Segment(item);
+                if (segment.Name == "HIVPP")
+                {
+                    var hivpp = segment as HIVPP;
+                    paymentStatusReport.Append(hivpp.PaymentStatusReport);
+                    paymentStatusReportDescriptor = hivpp.PaymentStatusReportDescriptor;
+                }
+            }
+
+            var result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
+            if (result.HasError)
+            {
+                return result.TypedResult<VopResult>();
+            }
+            result = await ProcessSCA(result, tanDialog);
+            if (result.HasError)
+            {
+                return result.TypedResult<VopResult>();
+            }
+
+            while (BankCode.Contains("+3040::"))
+            {
+                string startPoint = Helper.Parse_Transactions_Startpoint(BankCode);
+                BankCode = await finTsCall();
+                result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
+                if (result.HasError)
+                {
+                    return result.TypedResult<VopResult>();
+                }
+
+                rawSegments = Helper.SplitEncryptedSegments(BankCode);
+                foreach (var item in rawSegments)
+                {
+                    var segment = Helper.Parse_Segment(item);
+                    if (segment.Name == "HIVPP")
+                    {
+                        var hivpp = segment as HIVPP;
+                        paymentStatusReport.Append(hivpp.PaymentStatusReport);
+                        if (hivpp.PaymentStatusReportDescriptor != null)
+                        {
+                            paymentStatusReportDescriptor = hivpp.PaymentStatusReportDescriptor;
+                        }
+                    }
+                }
+            }
+            if (!vopDialog.ConfirmVop(paymentStatusReport.ToString()))
+            {
+                BankCode = await HKEND.Init_HKEND(this);
+                result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
+                return result.TypedResult<VopResult>();
+            }
+
+            var vopResult = new VopResult
+            {
+                PaymentStatusReport = paymentStatusReport.ToString(),
+                PaymentStatusReportDescriptor = paymentStatusReportDescriptor
+            };
+
+            return result.TypedResult(vopResult);
         }
     }
 }

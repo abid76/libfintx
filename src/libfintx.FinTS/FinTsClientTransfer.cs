@@ -28,6 +28,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using libfintx.FinTS.Data;
+using libfintx.FinTS.Data.Segment;
+using libfintx.FinTS.Swift;
+using libfintx.FinTS.Vop;
 using libfintx.Sepa;
 
 namespace libfintx.FinTS
@@ -45,7 +48,7 @@ namespace libfintx.FinTS
         /// <returns>
         /// Bank return codes
         /// </returns>
-        public async Task<HBCIDialogResult> Transfer(TANDialog tanDialog, string receiverName, string receiverIBAN, string receiverBIC,
+        public async Task<HBCIDialogResult> Transfer(TANDialog tanDialog, VopDialog vopDialog, string receiverName, string receiverIBAN, string receiverBIC,
             decimal amount, string purpose)
         {
             var result = await InitializeConnection();
@@ -58,21 +61,25 @@ namespace libfintx.FinTS
 
             TransactionConsole.Output = string.Empty;
 
-            string BankCode = await Transaction.HKCCS(this, receiverName, receiverIBAN, receiverBIC, amount, purpose);
-            if (VopNeeded)
+            if (VopGvList.Contains("HKCCS"))
             {
-                //if (!vopDialog.ConfirmVop(VopStatusReport))
-                //{
-                //    var dontKnow = await HKEND.Init_HKEND(this);
-                //    return null;
-                //}
+                result = await ProcessVop(tanDialog, vopDialog, () => Transaction.HKCCS(this, receiverName, receiverIBAN, receiverBIC, amount, purpose));
+                if (result.HasError)
+                {
+                    return result;
+                }
+                ResetVop();
             }
-
-            result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
-            if (result.HasError)
-                return result;
-
-            result = await ProcessSCA(result, tanDialog);
+            else
+            {
+                string BankCode = await Transaction.HKCCS(this, receiverName, receiverIBAN, receiverBIC, amount, purpose);
+                result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
+                if (result.HasError)
+                {
+                    return result;
+                }
+                result = await ProcessSCA(result, tanDialog);
+            }
 
             return result;
         }
@@ -89,7 +96,7 @@ namespace libfintx.FinTS
         /// <returns>
         /// Bank return codes
         /// </returns>
-        public async Task<HBCIDialogResult> Transfer_Terminated(TANDialog tanDialog, string receiverName, string receiverIBAN, string receiverBIC,
+        public async Task<HBCIDialogResult> Transfer_Terminated(TANDialog tanDialog, VopDialog vopDialog, string receiverName, string receiverIBAN, string receiverBIC,
             decimal amount, string purpose, DateTime executionDay)
         {
             var result = await InitializeConnection();
@@ -102,12 +109,25 @@ namespace libfintx.FinTS
 
             TransactionConsole.Output = string.Empty;
 
-            string BankCode = await Transaction.HKCSE(this, receiverName, receiverIBAN, receiverBIC, amount, purpose, executionDay);
-            result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
-            if (result.HasError)
-                return result;
-
-            result = await ProcessSCA(result, tanDialog);
+            if (VopGvList.Contains("HKCSE"))
+            {
+                result = await ProcessVop(tanDialog, vopDialog, () => Transaction.HKCSE(this, receiverName, receiverIBAN, receiverBIC, amount, purpose, executionDay));
+                if (result.HasError)
+                {
+                    return result;
+                }
+                ResetVop();
+            }
+            else
+            {
+                string BankCode = await Transaction.HKCSE(this, receiverName, receiverIBAN, receiverBIC, amount, purpose, executionDay);
+                result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
+                if (result.HasError)
+                {
+                    return result;
+                }
+                result = await ProcessSCA(result, tanDialog);
+            }
 
             return result;
         }
@@ -122,7 +142,7 @@ namespace libfintx.FinTS
         /// <returns>
         /// Bank return codes
         /// </returns>
-        public async Task<HBCIDialogResult> CollectiveTransfer(TANDialog tanDialog, List<Pain00100203CtData> painData,
+        public async Task<HBCIDialogResult> CollectiveTransfer(TANDialog tanDialog, VopDialog vopDialog, List<Pain00100203CtData> painData,
             string numberOfTransactions, decimal totalAmount)
         {
             var result = await InitializeConnection();
@@ -135,12 +155,25 @@ namespace libfintx.FinTS
 
             TransactionConsole.Output = string.Empty;
 
-            string BankCode = await Transaction.HKCCM(this, painData, numberOfTransactions, totalAmount);
-            result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
-            if (result.HasError)
-                return result;
-
-            result = await ProcessSCA(result, tanDialog);
+            if (VopGvList.Contains("HKCCM"))
+            {
+                result = await ProcessVop(tanDialog, vopDialog, () => Transaction.HKCCM(this, painData, numberOfTransactions, totalAmount));
+                if (result.HasError)
+                {
+                    return result;
+                }
+                ResetVop();
+            }
+            else
+            {
+                string BankCode = await Transaction.HKCCM(this, painData, numberOfTransactions, totalAmount);
+                result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
+                if (result.HasError)
+                {
+                    return result;
+                }
+                result = await ProcessSCA(result, tanDialog);
+            }
 
             return result;
         }
@@ -155,7 +188,7 @@ namespace libfintx.FinTS
         /// <returns>
         /// Bank return codes
         /// </returns>
-        public async Task<HBCIDialogResult> CollectiveTransfer_Terminated(TANDialog tanDialog, List<Pain00100203CtData> painData,
+        public async Task<HBCIDialogResult> CollectiveTransfer_Terminated(TANDialog tanDialog, VopDialog vopDialog, List<Pain00100203CtData> painData,
             string numberOfTransactions, decimal totalAmount, DateTime executionDay)
         {
             var result = await InitializeConnection();
@@ -168,12 +201,25 @@ namespace libfintx.FinTS
 
             TransactionConsole.Output = string.Empty;
 
-            string BankCode = await Transaction.HKCME(this, painData, numberOfTransactions, totalAmount, executionDay);
-            result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
-            if (result.HasError)
-                return result;
-
-            result = await ProcessSCA(result, tanDialog);
+            if (VopGvList.Contains("HKCME"))
+            {
+                result = await ProcessVop(tanDialog, vopDialog, () => Transaction.HKCME(this, painData, numberOfTransactions, totalAmount, executionDay));
+                if (result.HasError)
+                {
+                    return result;
+                }
+                ResetVop();
+            }
+            else
+            {
+                string BankCode = await Transaction.HKCME(this, painData, numberOfTransactions, totalAmount, executionDay);
+                result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
+                if (result.HasError)
+                {
+                    return result;
+                }
+                result = await ProcessSCA(result, tanDialog);
+            }
 
             return result;
         }
@@ -251,7 +297,7 @@ namespace libfintx.FinTS
             return result.TypedResult(data);
         }
 
-        public async Task<HBCIDialogResult> ModifyTerminatedTransfer(TANDialog tanDialog, string orderId, string receiverName, string receiverIBAN,
+        public async Task<HBCIDialogResult> ModifyTerminatedTransfer(TANDialog tanDialog, VopDialog vopDialog, string orderId, string receiverName, string receiverIBAN,
                 string receiverBIC, decimal amount, string usage, DateTime executionDay)
         {
             var result = await InitializeConnection();
@@ -264,12 +310,25 @@ namespace libfintx.FinTS
 
             TransactionConsole.Output = string.Empty;
 
-            string BankCode = await Transaction.HKCSA(this, orderId, receiverName, receiverIBAN, receiverBIC, amount, usage, executionDay);
-            result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
-            if (result.HasError)
-                return result;
-
-            result = await ProcessSCA(result, tanDialog);
+            if (VopGvList.Contains("HKCSA"))
+            {
+                result = await ProcessVop(tanDialog, vopDialog, () => Transaction.HKCSA(this, orderId, receiverName, receiverIBAN, receiverBIC, amount, usage, executionDay));
+                if (result.HasError)
+                {
+                    return result;
+                }
+                ResetVop();
+            }
+            else
+            {
+                string BankCode = await Transaction.HKCSA(this, orderId, receiverName, receiverIBAN, receiverBIC, amount, usage, executionDay);
+                result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
+                if (result.HasError)
+                {
+                    return result;
+                }
+                result = await ProcessSCA(result, tanDialog);
+            }
 
             return result;
         }

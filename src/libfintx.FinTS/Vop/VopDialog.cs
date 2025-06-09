@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace libfintx.FinTS
+namespace libfintx.FinTS.Vop
 {
-    internal class VopDialog
+    public class VopDialog
     {
         private Func<string, bool> _confirmVop;
 
@@ -13,7 +13,7 @@ namespace libfintx.FinTS
             _confirmVop = confirmVop;
         }
 
-        internal bool ConfirmVop(string vopText)
+        public bool ConfirmVop(string vopText)
         {
             return _confirmVop(vopText);
         }

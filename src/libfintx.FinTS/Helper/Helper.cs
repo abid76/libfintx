@@ -490,7 +490,6 @@ namespace libfintx.FinTS
                     HIVPP hivpp = segment as HIVPP;
                     client.VopPollingId = hivpp.PollingId;
                     client.VopId = hivpp.VopId;
-                    client.VopStatusReport = hivpp.PaymentStatusReport;
                 }
             }
 

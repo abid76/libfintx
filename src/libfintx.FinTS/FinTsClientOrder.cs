@@ -28,6 +28,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using libfintx.FinTS.Data;
+using libfintx.FinTS.Vop;
 using libfintx.Sepa;
 using static libfintx.FinTS.HKCDE;
 
@@ -156,7 +157,7 @@ namespace libfintx.FinTS
         /// <returns>
         /// Bank return codes
         /// </returns>
-        public async Task<HBCIDialogResult> SubmitBankersOrder(TANDialog tanDialog, string receiverName, string receiverIBAN,
+        public async Task<HBCIDialogResult> SubmitBankersOrder(TANDialog tanDialog, VopDialog vopDialog, string receiverName, string receiverIBAN,
            string receiverBIC, decimal amount, string purpose, DateTime firstTimeExecutionDay, TimeUnit timeUnit, string rota,
            int executionDay, DateTime? lastExecutionDay)
         {
@@ -170,17 +171,32 @@ namespace libfintx.FinTS
 
             TransactionConsole.Output = string.Empty;
 
-            string BankCode = await Transaction.HKCDE(this, receiverName, receiverIBAN, receiverBIC, amount, purpose, firstTimeExecutionDay, timeUnit, rota, executionDay, lastExecutionDay);
-            result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
-            if (result.HasError)
-                return result;
+            if (VopGvList.Contains("HKCDE"))
+            {
+                result = await ProcessVop(tanDialog, vopDialog, () => Transaction.HKCDE(this, receiverName, receiverIBAN, receiverBIC, amount, purpose, firstTimeExecutionDay, timeUnit, rota, executionDay, lastExecutionDay));
+                if (result.HasError)
+                {
+                    return result;
+                }
+                ResetVop();
+            }
+            else
+            {
+                string BankCode = await Transaction.HKCDE(this, receiverName, receiverIBAN, receiverBIC, amount, purpose, firstTimeExecutionDay, timeUnit, rota, executionDay, lastExecutionDay);
+                result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
+                if (result.HasError)
+                {
+                    return result;
+                }
+                result = await ProcessSCA(result, tanDialog);
+            }
 
             result = await ProcessSCA(result, tanDialog);
 
             return result;
         }
 
-        public async Task<HBCIDialogResult> ModifyBankersOrder(TANDialog tanDialog, string OrderId, string receiverName, string receiverIBAN,
+        public async Task<HBCIDialogResult> ModifyBankersOrder(TANDialog tanDialog, VopDialog vopDialog, string OrderId, string receiverName, string receiverIBAN,
            string receiverBIC, decimal amount, string purpose, DateTime firstTimeExecutionDay, TimeUnit timeUnit, string rota,
            int executionDay, DateTime? lastExecutionDay)
         {
@@ -194,10 +210,25 @@ namespace libfintx.FinTS
 
             TransactionConsole.Output = string.Empty;
 
-            string BankCode = await Transaction.HKCDN(this, OrderId, receiverName, receiverIBAN, receiverBIC, amount, purpose, firstTimeExecutionDay, timeUnit, rota, executionDay, lastExecutionDay);
-            result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
-            if (result.HasError)
-                return result;
+            if (VopGvList.Contains("HKCDN"))
+            {
+                result = await ProcessVop(tanDialog, vopDialog, () => Transaction.HKCDN(this, OrderId, receiverName, receiverIBAN, receiverBIC, amount, purpose, firstTimeExecutionDay, timeUnit, rota, executionDay, lastExecutionDay));
+                if (result.HasError)
+                {
+                    return result;
+                }
+                ResetVop();
+            }
+            else
+            {
+                string BankCode = await Transaction.HKCDN(this, OrderId, receiverName, receiverIBAN, receiverBIC, amount, purpose, firstTimeExecutionDay, timeUnit, rota, executionDay, lastExecutionDay);
+                result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
+                if (result.HasError)
+                {
+                    return result;
+                }
+                result = await ProcessSCA(result, tanDialog);
+            }
 
             result = await ProcessSCA(result, tanDialog);
 

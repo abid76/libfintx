@@ -34,35 +34,42 @@ namespace libfintx.FinTS
         /// <summary>
         /// Transfer
         /// </summary>
-        public static async Task<String> Init_HKCCS(FinTsClient client, string ReceiverName, string ReceiverIBAN, string ReceiverBIC, decimal Amount, string Usage)
+        public static async Task<string> Init_HKCCS(FinTsClient client, string ReceiverName, string ReceiverIBAN, string ReceiverBIC, decimal Amount, string Usage)
         {
             Log.Write("Starting job HKCCS: Transfer money");
             var connectionDetails = client.ConnectionDetails;
-            string segments = string.Empty;
 
             string sepaMessage = string.Empty;
-
+            string segments = string.Empty;
             client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
 
             if (client.VopGvList.Contains("HKCCS"))
             {
-                HKVPP.Init_HKVPP(client, segments);
-                client.SegmentNumber++;
+                if (client.Vop)
+                {
+                    segments = HKVPP.Init_HKVPP(client, segments);
+                    client.SegmentNumber++;
+                }
+                else
+                {
+                    segments = HKVPA.Init_HKVPA(client, segments);
+                    client.SegmentNumber++;
+                }
             }
 
             if (client.SepaPainVersion == 1)
             {
-                segments = "HKCCS:" + client.SegmentNumber + ":1+" + connectionDetails.Iban + ":" + connectionDetails.Bic + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03+@@";
+                segments += "HKCCS:" + client.SegmentNumber + ":1+" + connectionDetails.Iban + ":" + connectionDetails.Bic + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03+@@";
                 sepaMessage = pain00100103.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, ReceiverName, ReceiverIBAN, ReceiverBIC, Amount, Usage, new DateTime(1999, 1, 1));
             }
             else if (client.SepaPainVersion == 2)
             {
-                segments = "HKCCS:" + client.SegmentNumber + ":1+" + connectionDetails.Iban + ":" + connectionDetails.Bic + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.002.03+@@";
+                segments += "HKCCS:" + client.SegmentNumber + ":1+" + connectionDetails.Iban + ":" + connectionDetails.Bic + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.002.03+@@";
                 sepaMessage = pain00100203.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, ReceiverName, ReceiverIBAN, ReceiverBIC, Amount, Usage, new DateTime(1999, 1, 1));
             }
             else if (client.SepaPainVersion == 3)
             {
-                segments = "HKCCS:" + client.SegmentNumber + ":1+" + connectionDetails.Iban + ":" + connectionDetails.Bic + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.003.03+@@";
+                segments += "HKCCS:" + client.SegmentNumber + ":1+" + connectionDetails.Iban + ":" + connectionDetails.Bic + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.003.03+@@";
                 sepaMessage = pain00100303.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, ReceiverName, ReceiverIBAN, ReceiverBIC, Amount, Usage, new DateTime(1999, 1, 1));
             }
 
@@ -71,7 +78,7 @@ namespace libfintx.FinTS
             if (Helper.IsTANRequired("HKCCS"))
             {
                 client.SegmentNumber++;
-                segments = HKTAN.Init_HKTAN(client, segments, "HKCCS");
+                segments += HKTAN.Init_HKTAN(client, segments, "HKCCS");
             }
 
             var message = FinTSMessage.Create(client, client.MessageNumber, client.DialogId, segments, client.TanProcessCode);

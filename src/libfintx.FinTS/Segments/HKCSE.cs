@@ -38,25 +38,39 @@ namespace libfintx.FinTS
         {
             Log.Write("Starting job HKCSE: Transfer money terminated");
             var connectionDetails = client.ConnectionDetails;
-            string segments = string.Empty;
 
             string sepaMessage = string.Empty;
+            string segments = string.Empty;
 
             client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
 
+            if (client.VopGvList.Contains("HKCSE"))
+            {
+                if (client.Vop)
+                {
+                    segments = HKVPP.Init_HKVPP(client, segments);
+                    client.SegmentNumber++;
+                }
+                else
+                {
+                    segments = HKVPA.Init_HKVPA(client, segments);
+                    client.SegmentNumber++;
+                }
+            }
+
             if (client.SepaPainVersion == 1)
             {
-                segments = "HKCSE:" + client.SegmentNumber + ":1+" + connectionDetails.Iban + ":" + connectionDetails.Bic + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03+@@";
+                segments += "HKCSE:" + client.SegmentNumber + ":1+" + connectionDetails.Iban + ":" + connectionDetails.Bic + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03+@@";
                 sepaMessage = pain00100103.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, ReceiverName, ReceiverIBAN, ReceiverBIC, Amount, Usage, ExecutionDay);
             }
             else if (client.SepaPainVersion == 2)
             {
-                segments = "HKCSE:" + client.SegmentNumber + ":1+" + connectionDetails.Iban + ":" + connectionDetails.Bic + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.002.03+@@";
+                segments += "HKCSE:" + client.SegmentNumber + ":1+" + connectionDetails.Iban + ":" + connectionDetails.Bic + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.002.03+@@";
                 sepaMessage = pain00100203.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, ReceiverName, ReceiverIBAN, ReceiverBIC, Amount, Usage, ExecutionDay);
             }
             else if (client.SepaPainVersion == 3)
             {
-                segments = "HKCSE:" + client.SegmentNumber + ":1+" + connectionDetails.Iban + ":" + connectionDetails.Bic + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.003.03+@@";
+                segments += "HKCSE:" + client.SegmentNumber + ":1+" + connectionDetails.Iban + ":" + connectionDetails.Bic + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.003.03+@@";
                 sepaMessage = pain00100303.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, ReceiverName, ReceiverIBAN, ReceiverBIC, Amount, Usage, ExecutionDay);
             }
 

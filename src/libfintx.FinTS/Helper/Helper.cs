@@ -421,7 +421,6 @@ namespace libfintx.FinTS
 
                     if (segment.Name == "HIVPPS" || segment.Name == "HIVPAS" || segment.Name == "HIVOOS")
                     {
-                        client.Vop = true;
                         if (segment.Name == "HIVPPS")
                         {
                             var hivpps = segment as HIVPPS;

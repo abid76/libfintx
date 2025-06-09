@@ -39,11 +39,27 @@ namespace libfintx.FinTS
         {
             Log.Write("Starting job HKCCM: Collective transfer money");
             var connectionDetails = client.ConnectionDetails;
+
+            string segments = string.Empty;
             client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
+
+            if (client.VopGvList.Contains("HKCCM"))
+            {
+                if (client.Vop)
+                {
+                    segments = HKVPP.Init_HKVPP(client, segments);
+                    client.SegmentNumber++;
+                }
+                else
+                {
+                    segments = HKVPA.Init_HKVPA(client, segments);
+                    client.SegmentNumber++;
+                }
+            }
 
             //var TotalAmount_ = TotalAmount.ToString().Replace(",", ".");
 
-            string segments = "HKCCM:" + client.SegmentNumber + ":1+" + connectionDetails.Iban + ":" + connectionDetails.Bic + "+++" + "urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.002.03+@@";
+            segments += "HKCCM:" + client.SegmentNumber + ":1+" + connectionDetails.Iban + ":" + connectionDetails.Bic + "+++" + "urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.002.03+@@";
 
             var painMessage = pain00100203.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, PainData, NumberofTransactions, TotalAmount, new DateTime(1999, 1, 1));
 

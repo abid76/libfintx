@@ -388,13 +388,14 @@ namespace libfintx.FinTS
             return result;
         }
 
-        public async Task<HBCIDialogResult<VopResult>> ProcessVop(TANDialog tanDialog, VopDialog vopDialog, Func<Task<string>> finTsCall)
+        public async Task<HBCIDialogResult> ProcessVop(TANDialog tanDialog, VopDialog vopDialog, Func<Task<string>> finTsCall)
         {
             StringBuilder paymentStatusReport = new StringBuilder();
             string paymentStatusReportDescriptor = string.Empty;
             VopCheckResult resultVopCheckSingle = null;
             string additionalInfo = string.Empty;
 
+            Vop = true;
             string BankCode = await finTsCall();
             var rawSegments = Helper.SplitEncryptedSegments(BankCode);
             foreach (var item in rawSegments)
@@ -413,12 +414,12 @@ namespace libfintx.FinTS
             var result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
             if (result.HasError)
             {
-                return result.TypedResult<VopResult>();
+                return result;
             }
             result = await ProcessSCA(result, tanDialog);
             if (result.HasError)
             {
-                return result.TypedResult<VopResult>();
+                return result;
             }
 
             while (BankCode.Contains("+3040::"))
@@ -428,7 +429,7 @@ namespace libfintx.FinTS
                 result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
                 if (result.HasError)
                 {
-                    return result.TypedResult<VopResult>();
+                    return result;
                 }
 
                 rawSegments = Helper.SplitEncryptedSegments(BankCode);
@@ -454,7 +455,15 @@ namespace libfintx.FinTS
             {
                 BankCode = await HKEND.Init_HKEND(this);
                 result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
-                return result.TypedResult<VopResult>();
+                return result;
+            }
+
+            Vop = false;
+            BankCode = await finTsCall();
+            result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
+            if (result.HasError)
+            {
+                return result;
             }
 
             var vopResult = new VopResult
@@ -463,7 +472,7 @@ namespace libfintx.FinTS
                 PaymentStatusReportDescriptor = paymentStatusReportDescriptor
             };
 
-            return result.TypedResult(vopResult);
+            return result;
         }
     }
 }

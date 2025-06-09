@@ -16,12 +16,12 @@ namespace libfintx.FinTS.Vop
             _confirmVopWithResult = confirmVopWithResult;
         }
 
-        public bool ConfirmVop(string vopText)
+        public bool ConfirmVop(string vopText, string vopAdditionalInfo)
         {
             return _confirmVop(vopText);
         }
 
-        public bool ConfirmVop(VopCheckResult result)
+        public bool ConfirmVop(VopCheckResult result, string vopAdditionalInfo)
         {
             return _confirmVopWithResult(result);
         }

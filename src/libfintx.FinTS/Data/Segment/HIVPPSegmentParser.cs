@@ -45,7 +45,7 @@ namespace libfintx.FinTS.Data.Segment
                     break;
             }
 
-            VopCheckResult vopCheckResult = new VopCheckResult
+            var vopCheckResult = new VopCheckResult
             {
                 Iban = dataElement.DataElements[0].Value,
                 IbanAdditionalInfo = dataElement.DataElements[1].Value,

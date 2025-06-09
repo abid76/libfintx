@@ -68,6 +68,7 @@ namespace libfintx.FinTS
         public string VopRefPoint { get; internal set; }
         public string VopId { get; internal set; }
         public bool VopNeeded { get; internal set; }
+        public bool VopDescriptionStructured { get; internal set; }
 
         internal List<string> VopGvList = new List<string>();
 
@@ -392,6 +393,7 @@ namespace libfintx.FinTS
             StringBuilder paymentStatusReport = new StringBuilder();
             string paymentStatusReportDescriptor = string.Empty;
             VopCheckResult resultVopCheckSingle = null;
+            string additionalInfo = string.Empty;
 
             string BankCode = await finTsCall();
             var rawSegments = Helper.SplitEncryptedSegments(BankCode);
@@ -404,6 +406,7 @@ namespace libfintx.FinTS
                     paymentStatusReport.Append(hivpp.PaymentStatusReport);
                     paymentStatusReportDescriptor = hivpp.PaymentStatusReportDescriptor;
                     resultVopCheckSingle = hivpp.VopCheckResultSingleTransaction;
+                    additionalInfo = hivpp.AdditionalInfo ?? string.Empty;
                 }
             }
 
@@ -440,10 +443,14 @@ namespace libfintx.FinTS
                         {
                             paymentStatusReportDescriptor = hivpp.PaymentStatusReportDescriptor;
                         }
+                        if (hivpp.AdditionalInfo != null)
+                        {
+                            additionalInfo = hivpp.AdditionalInfo;
+                        }   
                     }
                 }
             }
-            if (resultVopCheckSingle != null ? !vopDialog.ConfirmVop(resultVopCheckSingle) : !vopDialog.ConfirmVop(paymentStatusReport.ToString()))
+            if (resultVopCheckSingle != null ? !vopDialog.ConfirmVop(resultVopCheckSingle, additionalInfo) : !vopDialog.ConfirmVop(paymentStatusReport.ToString(), additionalInfo))
             {
                 BankCode = await HKEND.Init_HKEND(this);
                 result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);

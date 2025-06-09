@@ -16,7 +16,7 @@ namespace libfintx.FinTS.Data.Segment
 
         public string PaymentStatusReport { get; set; }
 
-        public VopCheckResult VopCheckResult { get; set; }
+        public VopCheckResult VopCheckResultSingleTransaction { get; set; }
 
         public string AdditionalInfo { get; set; }
 

@@ -391,6 +391,7 @@ namespace libfintx.FinTS
         {
             StringBuilder paymentStatusReport = new StringBuilder();
             string paymentStatusReportDescriptor = string.Empty;
+            VopCheckResult resultVopCheckSingle = null;
 
             string BankCode = await finTsCall();
             var rawSegments = Helper.SplitEncryptedSegments(BankCode);
@@ -402,6 +403,7 @@ namespace libfintx.FinTS
                     var hivpp = segment as HIVPP;
                     paymentStatusReport.Append(hivpp.PaymentStatusReport);
                     paymentStatusReportDescriptor = hivpp.PaymentStatusReportDescriptor;
+                    resultVopCheckSingle = hivpp.VopCheckResultSingleTransaction;
                 }
             }
 
@@ -441,7 +443,7 @@ namespace libfintx.FinTS
                     }
                 }
             }
-            if (!vopDialog.ConfirmVop(paymentStatusReport.ToString()))
+            if (resultVopCheckSingle != null ? !vopDialog.ConfirmVop(resultVopCheckSingle) : !vopDialog.ConfirmVop(paymentStatusReport.ToString()))
             {
                 BankCode = await HKEND.Init_HKEND(this);
                 result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);

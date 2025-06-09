@@ -15,7 +15,7 @@ namespace libfintx.FinTS.Data.Segment
             result.PollingId = segment.DataElements[2].Value;
             result.PaymentStatusReportDescriptor = segment.DataElements[3].Value;
             result.PaymentStatusReport = segment.DataElements[4].Value;
-            result.VopCheckResult = ParseVopCheckResult(segment.DataElements[5]);
+            result.VopCheckResultSingleTransaction = ParseVopCheckResult(segment.DataElements[5]);
             result.AdditionalInfo = segment.DataElements[6].Value;
             result.WaitUntilNextPolling = segment.DataElements[7].Value != null ? Convert.ToInt32(segment.DataElements[7].Value) : (int?) null;
 

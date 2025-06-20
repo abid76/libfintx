@@ -37,7 +37,9 @@ namespace libfintx.FinTS
     {
         private static string ProcessSegmentBegin(string message, StringBuilder currentSegment)
         {
-            var match = Regex.Match(message, @"^[A-Z]+:\d+:\d+(:\d+)?\+");
+            // Es kann vorkommen, dass ein Segment keine Nutzdaten enthält (z.B. Norisbank: HITAB:4:4:3')
+            // Deswegen ist das Plus-Zeichen nach dem Segmentkopf optional
+            var match = Regex.Match(message, @"^[A-Z]+:\d+:\d+(:\d+)?(\+)?");
             if (!match.Success)
                 throw new ArgumentException($"Invalid segment. Expected segment begin. Message is: {Truncate(message)}");
 

@@ -39,6 +39,7 @@ namespace libfintx.FinTS
 
         public string TanMedium { get; set; }
         public int? TanProcessCode { get; set; }
+        public int? TanMediumRequired { get; set; }
         internal List<int> AllowedTanProcesses { get; set; }
 
         public int HktanVersion { get; set; }

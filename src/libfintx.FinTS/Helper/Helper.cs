@@ -342,8 +342,12 @@ namespace libfintx.FinTS
                         }
                         else
                         {
-                            if (hitans.TanProcesses.Any(tp => tp.TanCode == Convert.ToInt32(client.TanProcessCode)))
+                            var tanProcess = hitans.TanProcesses.FirstOrDefault(tp => tp.TanCode == Convert.ToInt32(client.TanProcessCode));
+                            if (tanProcess != null)
+                            {
                                 client.HktanVersion = segment.Version;
+                                client.TanMediumRequired = tanProcess.TanMediumRequired;
+                            }
                         }
 
                         if (TanProcesses.Items == null)
@@ -353,7 +357,7 @@ namespace libfintx.FinTS
                         {
                             TanProcesses.Items.AddRange(hitans.TanProcesses
                                 .Where(ht => client.AllowedTanProcesses.Exists(t => t == Convert.ToInt16(ht.TanCode)))
-                                .Select(ht => new TanProcess() { ProcessName = ht.Name, ProcessNumber = ht.TanCode.ToString() }));
+                                .Select(ht => new TanProcess() { ProcessName = ht.Name, ProcessNumber = ht.TanCode, TanMediumRequired = ht.TanMediumRequired }));
                         }
                     }
 

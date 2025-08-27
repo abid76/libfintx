@@ -38,24 +38,10 @@ namespace libfintx.FinTS
         {
             string segments = string.Empty;
             var connectionDetails = client.ConnectionDetails;
-            AccountInformation activeAccount;
-            if (client.activeAccount != null)
-            {
-                activeAccount = client.activeAccount;
-            }
-            else
-            {
-                activeAccount = new AccountInformation()
-                {
-                    AccountNumber = connectionDetails.Account,
-                    AccountBankCode = connectionDetails.Blz.ToString(),
-                    SubAccountFeature = connectionDetails.SubAccount,
-                    AccountIban = connectionDetails.Iban,
-                    AccountBic = connectionDetails.Bic,
-                };
-            }
 
             client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
+
+            var account = Helper.CreateAccountInfo(client);
 
             switch (camtVers)
             {
@@ -66,22 +52,22 @@ namespace libfintx.FinTS
                     {
                         if (string.IsNullOrEmpty(Startpoint))
                         {
-                            segments = "HKCAZ:" + client.SegmentNumber + ":" + client.HkcazVersion + "+" + activeAccount.AccountIban + ":" + activeAccount.AccountBic + ":" + activeAccount.AccountNumber + ":" + activeAccount.SubAccountFeature + ":280:" + activeAccount.AccountBankCode + "+" + client.HkcazCamtScheme + "+N'";
+                            segments = "HKCAZ:" + client.SegmentNumber + ":" + client.HkcazVersion + "+" + account + "+" + client.HkcazCamtScheme + "+N'";
                         }
                         else
                         {
-                            segments = "HKCAZ:" + client.SegmentNumber + ":" + client.HkcazVersion + "+" + activeAccount.AccountIban + ":" + activeAccount.AccountBic + ":" + activeAccount.AccountNumber + ":" + activeAccount.SubAccountFeature + ":280:" + activeAccount.AccountBankCode + "+" + client.HkcazCamtScheme + "+N++++" + Startpoint + "'";
+                            segments = "HKCAZ:" + client.SegmentNumber + ":" + client.HkcazVersion + "+" + account + "+N++++" + Startpoint + "'";
                         }
                     }
                     else
                     {
                         if (string.IsNullOrEmpty(Startpoint))
                         {
-                            segments = "HKCAZ:" + client.SegmentNumber + ":" + client.HkcazVersion + "+" + activeAccount.AccountIban + ":" + activeAccount.AccountBic + ":" + activeAccount.AccountNumber + ":" + activeAccount.SubAccountFeature + ":280:" + activeAccount.AccountBankCode + "+" + client.HkcazCamtScheme + "+N+" + FromDate + "+" + ToDate + "'";
+                            segments = "HKCAZ:" + client.SegmentNumber + ":" + client.HkcazVersion + "+" + account + "+" + client.HkcazCamtScheme + "+N+" + FromDate + "+" + ToDate + "'";
                         }
                         else
                         {
-                            segments = "HKCAZ:" + client.SegmentNumber + ":" + client.HkcazVersion + "+" + activeAccount.AccountIban + ":" + activeAccount.AccountBic + ":" + activeAccount.AccountNumber + ":" + activeAccount.SubAccountFeature + ":280:" + activeAccount.AccountBankCode + "+" + client.HkcazCamtScheme + "+N+" + FromDate + "+" + ToDate + "++" + Startpoint + "'";
+                            segments = "HKCAZ:" + client.SegmentNumber + ":" + client.HkcazVersion + "+" + account + "+" + client.HkcazCamtScheme + "+N+" + FromDate + "+" + ToDate + "++" + Startpoint + "'";
                         }
                     }
 
@@ -95,22 +81,22 @@ namespace libfintx.FinTS
                     {
                         if (string.IsNullOrEmpty(Startpoint))
                         {
-                            segments = "HKCAZ:" + client.SegmentNumber + ":" + client.HkcazVersion + "+" + activeAccount.AccountIban + ":" + activeAccount.AccountBic + ":" + activeAccount.AccountNumber + ":" + activeAccount.SubAccountFeature + ":280:" + activeAccount.AccountBankCode + "+" + CamtScheme.Camt053 + "+N'";
+                            segments = "HKCAZ:" + client.SegmentNumber + ":" + client.HkcazVersion + "+" + account + "+N'";
                         }
                         else
                         {
-                            segments = "HKCAZ:" + client.SegmentNumber + ":" + client.HkcazVersion + "+" + activeAccount.AccountIban + ":" + activeAccount.AccountBic + ":" + activeAccount.AccountNumber + ":" + activeAccount.SubAccountFeature + ":280:" + activeAccount.AccountBankCode + "+" + CamtScheme.Camt053 + "+N++++" + Startpoint + "'";
+                            segments = "HKCAZ:" + client.SegmentNumber + ":" + client.HkcazVersion + "+" + account + "+N++++" + Startpoint + "'";
                         }
                     }
                     else
                     {
                         if (string.IsNullOrEmpty(Startpoint))
                         {
-                            segments = "HKCAZ:" + client.SegmentNumber + ":" + client.HkcazVersion + "+" + activeAccount.AccountIban + ":" + activeAccount.AccountBic + ":" + activeAccount.AccountNumber + ":" + activeAccount.SubAccountFeature + ":280:" + activeAccount.AccountBankCode + "+" + CamtScheme.Camt053 + "+N+" + FromDate + "+" + ToDate + "'";
+                            segments = "HKCAZ:" + client.SegmentNumber + ":" + client.HkcazVersion + "+" + account + "+" + CamtScheme.Camt053 + "+N+" + FromDate + "+" + ToDate + "'";
                         }
                         else
-                        {
-                            segments = "HKCAZ:" + client.SegmentNumber + ":" + client.HkcazVersion + "+" + activeAccount.AccountIban + ":" + activeAccount.AccountBic + ":" + activeAccount.AccountNumber + ":" + activeAccount.SubAccountFeature + ":280:" + activeAccount.AccountBankCode + "+" + CamtScheme.Camt053 + "+N+" + FromDate + "+" + ToDate + "++" + Startpoint + "'";
+                        {   
+                            segments = "HKCAZ:" + client.SegmentNumber + ":" + client.HkcazVersion + "+" + account + "+" + CamtScheme.Camt053 + "+N+" + FromDate + "+" + ToDate + "++" + Startpoint + "'";
                         }
                     }
 

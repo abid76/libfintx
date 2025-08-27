@@ -30,6 +30,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using libfintx.FinTS.Camt;
+using libfintx.FinTS.Data;
 using libfintx.FinTS.Data.Segment;
 using libfintx.Globals;
 using libfintx.Logger.Log;
@@ -786,6 +787,11 @@ namespace libfintx.FinTS
             return HIPINS != null && HIPINS.IsTanRequired(gvName);
         }
 
+        public static string CreateAccountInfo(FinTsClient client)
+        {
+            var conn = client.ConnectionDetails;
+            return conn.Iban + ":" + conn.Bic + (client.SepaAccountNationalAllowed ? ":" + conn.Account + ":" + conn.SubAccount + ":280:" + conn.Blz : string.Empty);
+        }
     }
 }
 

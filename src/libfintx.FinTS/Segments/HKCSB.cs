@@ -39,8 +39,10 @@ namespace libfintx.FinTS
 
             client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
 
+            var account = Helper.CreateAccountInfo(client);
+
             var connectionDetails = client.ConnectionDetails;
-            string segments = "HKCSB:" + client.SegmentNumber + ":1+" + connectionDetails.Iban + ":" + connectionDetails.Bic + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03'";
+            string segments = "HKCSB:" + client.SegmentNumber + ":1+" + account + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03'";
 
             if (Helper.IsTANRequired("HKCSB"))
             {

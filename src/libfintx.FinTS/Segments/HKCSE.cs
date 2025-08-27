@@ -44,19 +44,21 @@ namespace libfintx.FinTS
 
             client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
 
+            var account = Helper.CreateAccountInfo(client);
+
             if (client.SepaPainVersion == 1)
             {
-                segments = "HKCSE:" + client.SegmentNumber + ":1+" + connectionDetails.Iban + ":" + connectionDetails.Bic + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03+@@";
+                segments = "HKCSE:" + client.SegmentNumber + ":1+" + account + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03+@@";
                 sepaMessage = pain00100103.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, ReceiverName, ReceiverIBAN, ReceiverBIC, Amount, Usage, ExecutionDay);
             }
             else if (client.SepaPainVersion == 2)
             {
-                segments = "HKCSE:" + client.SegmentNumber + ":1+" + connectionDetails.Iban + ":" + connectionDetails.Bic + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.002.03+@@";
+                segments = "HKCSE:" + client.SegmentNumber + ":1+" + account + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.002.03+@@";
                 sepaMessage = pain00100203.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, ReceiverName, ReceiverIBAN, ReceiverBIC, Amount, Usage, ExecutionDay);
             }
             else if (client.SepaPainVersion == 3)
             {
-                segments = "HKCSE:" + client.SegmentNumber + ":1+" + connectionDetails.Iban + ":" + connectionDetails.Bic + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.003.03+@@";
+                segments = "HKCSE:" + client.SegmentNumber + ":1+" + account + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.003.03+@@";
                 sepaMessage = pain00100303.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, ReceiverName, ReceiverIBAN, ReceiverBIC, Amount, Usage, ExecutionDay);
             }
 

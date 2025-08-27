@@ -39,8 +39,10 @@ namespace libfintx.FinTS
 
             client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
 
+            var account = Helper.CreateAccountInfo(client);
+
             var connectionDetails = client.ConnectionDetails;
-            string segments = "HKCDE:" + client.SegmentNumber + ":1+" + connectionDetails.Iban + ":" + connectionDetails.Bic + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03+@@";
+            string segments = "HKCDE:" + client.SegmentNumber + ":1+" + account + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03+@@";
 
             var sepaMessage = pain00100103.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, Receiver, ReceiverIBAN, ReceiverBIC, Amount, Usage, new DateTime(1999, 1, 1)).Replace("'", "");
             segments = segments.Replace("@@", "@" + sepaMessage.Length + "@") + sepaMessage;

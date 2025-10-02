@@ -26,11 +26,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using System.Xml.Serialization;
 using libfintx.FinTS.Data;
 using libfintx.FinTS.Data.Segment;
 using libfintx.FinTS.Vop;
 using libfintx.Logger.Log;
 using libfintx.Sepa;
+using libfintx.Sepa.pain_002_001_10;
 
 namespace libfintx.FinTS
 {
@@ -451,6 +454,16 @@ namespace libfintx.FinTS
                     }
                 }
             }
+
+            if (paymentStatusReport.Length > 0)
+            {
+                var document = Pain00200110.Create(paymentStatusReport.ToString());
+                var originalPaymentInstruction32 = document.CstmrPmtStsRpt.OrgnlPmtInfAndSts.FirstOrDefault();
+                var pmtInfSts = originalPaymentInstruction32?.PmtInfSts;
+
+                resultVopCheckSingle = resultVopCheckSingle ?? VopCheckResult.FromValue(pmtInfSts);
+            }
+
             if (resultVopCheckSingle != null ? !vopDialog.ConfirmVop(resultVopCheckSingle, additionalInfo) : !vopDialog.ConfirmVop(paymentStatusReport.ToString(), additionalInfo))
             {
                 BankCode = await HKEND.Init_HKEND(this);

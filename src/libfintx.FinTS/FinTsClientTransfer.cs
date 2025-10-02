@@ -72,7 +72,7 @@ namespace libfintx.FinTS
             }
             else
             {
-                string BankCode = await Transaction.HKCCS(this, false, receiverName, receiverIBAN, receiverBIC, amount, purpose);
+                string BankCode = await Transaction.HKCCS(this, receiverName, receiverIBAN, receiverBIC, amount, purpose);
                 result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
                 if (result.HasError)
                 {

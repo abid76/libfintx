@@ -25,36 +25,14 @@ namespace libfintx.FinTS.Data.Segment
 
         private VopCheckResult ParseVopCheckResult(DataElement dataElement)
         {
-            var result = (VopCheckResultCode?) null;
-            switch (dataElement.DataElements[4].Value)
-            {
-                case "RCVC":
-                    result = VopCheckResultCode.RCVC;
-                    break;
-                case "RVNM":
-                    result = VopCheckResultCode.RVNM;
-                    break;
-                case "RVMC":
-                    result = VopCheckResultCode.RVMC;
-                    break;
-                case "RVNA":
-                    result = VopCheckResultCode.RVNA;
-                    break;
-                case "PDNG":
-                    result = VopCheckResultCode.PDNG;
-                    break;
-            }
+            var result = VopCheckResult.FromValue(dataElement.DataElements[4].Value);
+            result.Iban = dataElement.DataElements[0].Value;
+            result.IbanAdditionalInfo = dataElement.DataElements[1].Value;
+            result.DiffReceiverName = dataElement.DataElements[2].Value;
+            result.OtherIdentification = dataElement.DataElements[3].Value;
+            result.ReasonRvna = dataElement.DataElements[5].Value;
 
-            var vopCheckResult = new VopCheckResult
-            {
-                Iban = dataElement.DataElements[0].Value,
-                IbanAdditionalInfo = dataElement.DataElements[1].Value,
-                DiffReceiverName = dataElement.DataElements[2].Value,
-                OtherIdentification = dataElement.DataElements[3].Value,
-                Result = result,
-                ReasonRvna = dataElement.DataElements[5].Value
-            };
-            return vopCheckResult;
+            return result;
         }
     }
 
@@ -67,6 +45,37 @@ namespace libfintx.FinTS.Data.Segment
             RVMC,
             RVNA,
             PDNG
+        }
+
+        public static VopCheckResult FromValue(string value)
+        {
+            VopCheckResultCode? code = null;
+            switch (value)
+            {
+
+                case "RCVC":
+                    code = VopCheckResultCode.RCVC;
+                    break;
+                case "RVNM":
+                    code = VopCheckResultCode.RVNM;
+                    break;
+                case "RVMC":
+                    code = VopCheckResultCode.RVMC;
+                    break;
+                case "RVNA":
+                    code = VopCheckResultCode.RVNA;
+                    break;
+                case "PDNG":
+                    code = VopCheckResultCode.PDNG;
+                    break;
+                default:
+                    break;
+            }
+
+            if (code != null)
+                return new VopCheckResult { Result = code.Value };
+            else
+                return null;
         }
 
         public bool IsMatch => Result == VopCheckResultCode.RCVC;

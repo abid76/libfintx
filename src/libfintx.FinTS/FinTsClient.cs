@@ -460,9 +460,15 @@ namespace libfintx.FinTS
             {
                 var document = Pain00200110.Create(paymentStatusReport.ToString());
                 var originalPaymentInstruction32 = document.CstmrPmtStsRpt.OrgnlPmtInfAndSts.FirstOrDefault();
-                var pmtInfSts = originalPaymentInstruction32?.PmtInfSts;
-
-                resultVopCheckSingle = resultVopCheckSingle ?? VopCheckResult.FromValue(pmtInfSts);
+                var txInfAndSts = originalPaymentInstruction32?.TxInfAndSts?.FirstOrDefault();
+                var txSts = txInfAndSts?.TxSts;
+                resultVopCheckSingle = resultVopCheckSingle ?? VopCheckResult.FromValue(txSts);
+                if (resultVopCheckSingle.IsCloseMatch)
+                {
+                    resultVopCheckSingle.DiffReceiverName = txInfAndSts?.StsRsnInf?.FirstOrDefault()?.AddtlInf?.FirstOrDefault();
+                }
+                resultVopCheckSingle.IbanAdditionalInfo = txInfAndSts?.AcctSvcrRef;
+                resultVopCheckSingle.ReasonRvna = txInfAndSts.StsRsnInf?.FirstOrDefault()?.AddtlInf?.FirstOrDefault();
             }
 
             if (resultVopCheckSingle != null ? !vopDialog.ConfirmVop(resultVopCheckSingle, additionalInfo) : !vopDialog.ConfirmVop(paymentStatusReport.ToString(), additionalInfo))

@@ -57,9 +57,11 @@ namespace libfintx.FinTS
                 }
             }
 
+            var account = Helper.CreateAccountInfo(client);
+
             //var TotalAmount_ = TotalAmount.ToString().Replace(",", ".");
 
-            segments += "HKCCM:" + client.SegmentNumber + ":1+" + connectionDetails.Iban + ":" + connectionDetails.Bic + "+++" + "urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.002.03+@@";
+            segments += "HKCCM:" + client.SegmentNumber + ":1+" + account + "+++" + "urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.002.03+@@";
 
             var painMessage = pain00100203.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, PainData, NumberofTransactions, TotalAmount, new DateTime(1999, 1, 1));
 

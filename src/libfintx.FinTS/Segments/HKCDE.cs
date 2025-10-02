@@ -54,8 +54,11 @@ namespace libfintx.FinTS
                 }
             }
 
+            var account = Helper.CreateAccountInfo(client);
+
+            segments += "HKCDE:" + client.SegmentNumber + ":1+" + account + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03+@@";
+
             var connectionDetails = client.ConnectionDetails;
-            segments += "HKCDE:" + client.SegmentNumber + ":1+" + connectionDetails.Iban + ":" + connectionDetails.Bic + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03+@@";
 
             var sepaMessage = pain00100103.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, Receiver, ReceiverIBAN, ReceiverBIC, Amount, Usage, new DateTime(1999, 1, 1)).Replace("'", "");
             segments += segments.Replace("@@", "@" + sepaMessage.Length + "@") + sepaMessage;

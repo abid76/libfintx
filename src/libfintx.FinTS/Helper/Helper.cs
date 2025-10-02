@@ -30,6 +30,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using libfintx.FinTS.Camt;
+using libfintx.FinTS.Data;
 using libfintx.FinTS.Data.Segment;
 using libfintx.Globals;
 using libfintx.Logger.Log;
@@ -342,8 +343,12 @@ namespace libfintx.FinTS
                         }
                         else
                         {
-                            if (hitans.TanProcesses.Any(tp => tp.TanCode == Convert.ToInt32(client.TanProcessCode)))
+                            var tanProcess = hitans.TanProcesses.FirstOrDefault(tp => tp.TanCode == Convert.ToInt32(client.TanProcessCode));
+                            if (tanProcess != null)
+                            {
                                 client.HktanVersion = segment.Version;
+                                client.TanMediumRequired = tanProcess.TanMediumRequired;
+                            }
                         }
 
                         if (TanProcesses.Items == null)
@@ -353,7 +358,7 @@ namespace libfintx.FinTS
                         {
                             TanProcesses.Items.AddRange(hitans.TanProcesses
                                 .Where(ht => client.AllowedTanProcesses.Exists(t => t == Convert.ToInt16(ht.TanCode)))
-                                .Select(ht => new TanProcess() { ProcessName = ht.Name, ProcessNumber = ht.TanCode.ToString() }));
+                                .Select(ht => new TanProcess() { ProcessName = ht.Name, ProcessNumber = ht.TanCode, TanMediumRequired = ht.TanMediumRequired }));
                         }
                     }
 
@@ -825,6 +830,11 @@ namespace libfintx.FinTS
             return HIPINS != null && HIPINS.IsTanRequired(gvName);
         }
 
+        public static string CreateAccountInfo(FinTsClient client)
+        {
+            var conn = client.ConnectionDetails;
+            return conn.Iban + ":" + conn.Bic + (client.SepaAccountNationalAllowed ? ":" + conn.Account + ":" + conn.SubAccount + ":280:" + conn.Blz : string.Empty);
+        }
     }
 }
 

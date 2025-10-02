@@ -260,5 +260,14 @@ HNHBS:7:1+2'".Replace(Environment.NewLine, string.Empty);
             Assert.Single(TanProcesses.Items);
             Assert.Equal("921", TanProcesses.Items[0].ProcessNumber);
         }
+
+        [Fact]
+        public void Test_Parse_Message_Empty_HITAB_Norisbank()
+        {
+            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"Resources\BankMessage_7.txt");
+            var message = File.ReadAllText(path);
+            var result = Helper.Parse_Segments(new FinTsClient(new ConnectionDetails()), message);
+            Assert.Equal(3, result.Count);
+        }
     }
 }

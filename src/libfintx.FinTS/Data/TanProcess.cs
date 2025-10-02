@@ -25,7 +25,8 @@ namespace libfintx.FinTS
 {
     public class TanProcess
     {
-        public string ProcessNumber { get; set; }
+        public int ProcessNumber { get; set; }
         public string ProcessName { get; set; }
+        public int TanMediumRequired { get; set; }
     }
 }

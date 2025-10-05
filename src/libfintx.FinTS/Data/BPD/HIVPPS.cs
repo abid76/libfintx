@@ -25,6 +25,6 @@ namespace libfintx.FinTS
         public bool BatchOrdersSupported { get; set; }
         public bool CountEntriesSupported { get; set; }
         public string SupportedPaymentStatusReportFormats { get; set; }
-        public string VopOrderMandatory { get; set; }
+        public List<string> VopOrderMandatory { get; set; }
     }
 }

@@ -23,7 +23,7 @@ namespace libfintx.FinTS.Data.Segment
 
         private ParamNameComparisonCheckOrder ParseHivppsParam(DataElement dataElement)
         {
-            return new ParamNameComparisonCheckOrder
+            var result = new ParamNameComparisonCheckOrder
             {
                 MaxCountCTTIOptIn = Convert.ToInt32(dataElement.DataElements[0].Value),
                 DescriptionStructured = dataElement.DataElements[1].Value == "J",
@@ -31,8 +31,19 @@ namespace libfintx.FinTS.Data.Segment
                 BatchOrdersSupported = dataElement.DataElements[3].Value == "J",
                 CountEntriesSupported = dataElement.DataElements[4].Value == "J",
                 SupportedPaymentStatusReportFormats = dataElement.DataElements[5].Value,
-                VopOrderMandatory = dataElement.DataElements[6].Value
+                VopOrderMandatory = new List<string>()
             };
+            if (dataElement.DataElements.Count > 6)
+            {
+                for (int i = 6; i < dataElement.DataElements.Count; i++)
+                {
+                    var de = dataElement.DataElements[i];
+                    if (string.IsNullOrEmpty(de.Value))
+                        continue;
+                    result.VopOrderMandatory.Add(de.Value);
+                }
+            }
+            return result;
         }
     }
 }

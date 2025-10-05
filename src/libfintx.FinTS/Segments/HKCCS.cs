@@ -80,7 +80,7 @@ namespace libfintx.FinTS
             if (Helper.IsTANRequired("HKCCS"))
             {
                 client.SegmentNumber++;
-                segments += HKTAN.Init_HKTAN(client, segments, "HKCCS");
+                segments = HKTAN.Init_HKTAN(client, segments, "HKCCS");
             }
 
             var message = FinTSMessage.Create(client, client.MessageNumber, client.DialogId, segments, client.TanProcessCode);

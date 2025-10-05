@@ -1,6 +1,8 @@
 ﻿using libfintx.FinTS;
 using libfintx.FinTS.Camt;
 using libfintx.FinTS.Data;
+using libfintx.FinTS.Data.Segment;
+using libfintx.FinTS.Vop;
 using libfintx.FinTSConfig;
 using libfintx.Globals;
 using libfintx.Sepa;
@@ -463,7 +465,7 @@ namespace libfintx.Sample.Ui
 
                 await InitTANMedium(client);
 
-                var transfer = await client.Transfer(CreateTANDialog(client), txt_empfängername.Text, Regex.Replace(txt_empfängeriban.Text, @"\s+", ""), txt_empfängerbic.Text,
+                var transfer = await client.Transfer(CreateTANDialog(client), CreateVopDialog(client), txt_empfängername.Text, Regex.Replace(txt_empfängeriban.Text, @"\s+", ""), txt_empfängerbic.Text,
                     decimal.Parse(txt_betrag.Text), txt_verwendungszweck.Text);
 
                 // Out image is needed e. g. for photoTAN
@@ -715,6 +717,60 @@ namespace libfintx.Sample.Ui
             if (client.TanProcessCode == 921 || client.TanProcessCode == 922 || client.TanProcessCode == 923 || client.TanProcessCode == 922 || client.TanProcessCode == 946)
                 dialog.IsDecoupled = true;
 
+            return dialog;
+        }
+
+        private VopDialog CreateVopDialog(FinTsClient client)
+        {
+            Func<string, bool> confirmVop = (vopText) =>
+            {
+                var text = string.IsNullOrWhiteSpace(vopText)
+                    ? "Verifizierung des Zahlungsempfängers erforderlich.\nFortfahren?"
+                    : vopText + "\nFortfahren?";
+                var dr = MessageBox.Show(
+                    this,
+                    text,
+                    "VOP Prüfung",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question,
+                    MessageBoxDefaultButton.Button1);
+                return dr == DialogResult.Yes;
+            };
+
+            Func<VopCheckResult, bool> confirmVopWithResult = (vopResult) =>
+            {
+                if (vopResult == null)
+                    return confirmVop(null);
+
+                string status;
+                if (vopResult.IsMatch) status = "Empfänger stimmt überein.";
+                else if (vopResult.IsCloseMatch) status = "Empfänger ähnlich (Close Match).";
+                else if (vopResult.IsNoMatch) status = "Empfänger stimmt NICHT überein!";
+                else if (vopResult.IsNotApplicable) status = "Prüfung nicht anwendbar.";
+                else if (vopResult.IsPending) status = "Prüfung noch ausstehend.";
+                else status = "Unbekanntes Ergebnis.";
+
+                if (vopResult.ReasonRvna != null)
+                    status += "\nGrund: " + vopResult.ReasonRvna;
+                if (vopResult.DiffReceiverName != null)
+                    status += "\nAbweichender Name: " + vopResult.DiffReceiverName;
+                if (vopResult.OtherIdentification != null)
+                    status += "\nWeitere Identifikation: " + vopResult.OtherIdentification;
+                if (vopResult.IbanAdditionalInfo != null)
+                    status += "\nIBAN Info: " + vopResult.IbanAdditionalInfo;
+
+                var msg = "Ergebnis VOP-Prüfung:\n" + status + "\nFortfahren?";
+                var dr = MessageBox.Show(
+                    this,
+                    msg,
+                    "VOP Ergebnis",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question,
+                    MessageBoxDefaultButton.Button2);
+                return dr == DialogResult.Yes;
+            };
+
+            var dialog = new VopDialog(confirmVop, confirmVopWithResult);
             return dialog;
         }
 

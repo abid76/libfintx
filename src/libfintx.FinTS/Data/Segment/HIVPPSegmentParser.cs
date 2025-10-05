@@ -34,7 +34,10 @@ namespace libfintx.FinTS.Data.Segment
             result.IbanAdditionalInfo = dataElement.DataElements[1].Value;
             result.DiffReceiverName = dataElement.DataElements[2].Value;
             result.OtherIdentification = dataElement.DataElements[3].Value;
-            result.ReasonRvna = dataElement.DataElements[5].Value;
+            if (dataElement.DataElements.Count > 5)
+            {
+                result.ReasonRvna = dataElement.DataElements[5].Value;
+            }
 
             return result;
         }

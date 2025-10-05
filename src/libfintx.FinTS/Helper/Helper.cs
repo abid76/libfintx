@@ -429,7 +429,7 @@ namespace libfintx.FinTS
                         if (segment.Name == "HIVPPS")
                         {
                             var hivpps = segment as HIVPPS;
-                            client.VopGvList = hivpps.DataElements.Select(d => d.Value).ToList();
+                            client.VopGvList = hivpps.ParamCheckOrder.VopOrderMandatory;
                             client.VopDescriptionStructured = hivpps.ParamCheckOrder.DescriptionStructured;
                         }
                     }

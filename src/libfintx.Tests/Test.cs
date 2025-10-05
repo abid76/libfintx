@@ -32,6 +32,8 @@ using Xunit.Abstractions;
 using System.Threading.Tasks;
 using libfintx.FinTS;
 using SixLabors.ImageSharp.PixelFormats;
+using libfintx.FinTS.Data.Segment;
+
 
 
 #if (DEBUG && WINDOWS)
@@ -184,7 +186,10 @@ namespace libfintx.Tests
                 var tanmediumname = await client.RequestTANMediumName();
                 client.TanMedium = tanmediumname.Data.FirstOrDefault();
 
-                Console.WriteLine(client.Transfer(new TANDialog(WaitForTanAsync), receiver, receiverIBAN, receiverBIC, amount, usage));
+                Func<string, bool> confirmVop = (s) => false;
+                Func<VopCheckResult, bool> confirmVopWithResult = (r) => true;
+
+                Console.WriteLine(client.Transfer(new TANDialog(WaitForTanAsync), new libfintx.FinTS.Vop.VopDialog(confirmVop, confirmVopWithResult), receiver, receiverIBAN, receiverBIC, amount, usage));
             }
         }
 

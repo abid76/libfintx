@@ -401,6 +401,18 @@ namespace libfintx.FinTS
 
             Vop = true;
             string BankCode = await finTsCall();
+            var result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
+            if (result.HasError)
+            {
+                return result;
+            }
+            if (result.IsSkipVop)
+            {
+                Vop = false;
+                result = await ProcessSCA(result, tanDialog);
+                return result;
+            }
+
             var rawSegments = Helper.SplitEncryptedSegments(BankCode);
             foreach (var item in rawSegments)
             {
@@ -415,11 +427,6 @@ namespace libfintx.FinTS
                 }
             }
 
-            var result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
-            if (result.HasError)
-            {
-                return result;
-            }
             result = await ProcessSCA(result, tanDialog);
             if (result.HasError)
             {

@@ -73,6 +73,8 @@ namespace libfintx.FinTS
         public string VopId { get; internal set; }
         public bool VopNeeded { get; internal set; }
         public bool VopDescriptionStructured { get; internal set; }
+        // Needed for repeated call of GV, when confirming VOP
+        internal string LastSepaMessage { get; set; }
 
         internal List<string> VopGvList = new List<string>();
 
@@ -91,6 +93,7 @@ namespace libfintx.FinTS
             VopId = null;
             VopNeeded = false;
             VopGvList.Clear();
+            LastSepaMessage = null;
         }
 
         internal async Task<HBCIDialogResult> InitializeConnection(string hkTanSegmentId = "HKIDN")
@@ -492,13 +495,7 @@ namespace libfintx.FinTS
             {
                 return result;
             }
-
-            var vopResult = new VopResult
-            {
-                PaymentStatusReport = paymentStatusReport.ToString(),
-                PaymentStatusReportDescriptor = paymentStatusReportDescriptor
-            };
-
+            result = await ProcessSCA(result, tanDialog);
             return result;
         }
     }

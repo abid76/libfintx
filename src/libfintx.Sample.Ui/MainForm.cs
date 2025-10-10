@@ -722,25 +722,25 @@ namespace libfintx.Sample.Ui
 
         private VopDialog CreateVopDialog(FinTsClient client)
         {
-            Func<string, bool> confirmVop = (vopText) =>
+            Func<string, string, bool> confirmVop = (vopText, additionalInfo) =>
             {
-                var text = string.IsNullOrWhiteSpace(vopText)
+                var text = string.IsNullOrEmpty(vopText)
                     ? "Verifizierung des Zahlungsempfängers erforderlich.\nFortfahren?"
-                    : vopText + "\nFortfahren?";
+                    : vopText + (string.IsNullOrEmpty(additionalInfo) ? "" : $"\n\n{additionalInfo}") + "\n\nFortfahren?";
                 var dr = MessageBox.Show(
                     this,
                     text,
-                    "VOP Prüfung",
+                    "Empfänger-Verifikation",
                     MessageBoxButtons.YesNo,
                     MessageBoxIcon.Question,
                     MessageBoxDefaultButton.Button1);
                 return dr == DialogResult.Yes;
             };
 
-            Func<VopCheckResult, bool> confirmVopWithResult = (vopResult) =>
+            Func<VopCheckResult, string, bool> confirmVopWithResult = (vopResult, additionalInfo) =>
             {
                 if (vopResult == null)
-                    return confirmVop(null);
+                    return confirmVop(null, additionalInfo);
 
                 string status;
                 if (vopResult.IsMatch) status = "Empfänger stimmt überein.";
@@ -759,11 +759,16 @@ namespace libfintx.Sample.Ui
                 if (vopResult.IbanAdditionalInfo != null)
                     status += "\nIBAN Info: " + vopResult.IbanAdditionalInfo;
 
-                var msg = "Ergebnis VOP-Prüfung:\n" + status + "\nFortfahren?";
+                if (!string.IsNullOrEmpty(additionalInfo))
+                {
+                    status += "\n\n" + additionalInfo;
+                }
+
+                var msg = status + "\n\nFortfahren?";
                 var dr = MessageBox.Show(
                     this,
                     msg,
-                    "VOP Ergebnis",
+                    "Empfänger-Verifikation",
                     MessageBoxButtons.YesNo,
                     MessageBoxIcon.Question,
                     MessageBoxDefaultButton.Button2);

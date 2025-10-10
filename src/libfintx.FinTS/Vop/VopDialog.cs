@@ -7,10 +7,10 @@ namespace libfintx.FinTS.Vop
 {
     public class VopDialog
     {
-        private Func<string, bool> _confirmVop;
-        private Func<VopCheckResult, bool> _confirmVopWithResult;
+        private Func<string, string, bool> _confirmVop;
+        private Func<VopCheckResult, string, bool> _confirmVopWithResult;
 
-        public VopDialog(Func<string, bool> confirmVop, Func<VopCheckResult, bool> confirmVopWithResult)
+        public VopDialog(Func<string, string, bool> confirmVop, Func<VopCheckResult, string, bool> confirmVopWithResult)
         {
             _confirmVop = confirmVop;
             _confirmVopWithResult = confirmVopWithResult;
@@ -18,12 +18,12 @@ namespace libfintx.FinTS.Vop
 
         public bool ConfirmVop(string vopText, string vopAdditionalInfo)
         {
-            return _confirmVop(vopText);
+            return _confirmVop(vopText, vopAdditionalInfo);
         }
 
         public bool ConfirmVop(VopCheckResult result, string vopAdditionalInfo)
         {
-            return _confirmVopWithResult(result);
+            return _confirmVopWithResult(result, vopAdditionalInfo);
         }
     }
 }

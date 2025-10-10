@@ -60,7 +60,9 @@ namespace libfintx.FinTS
 
             var connectionDetails = client.ConnectionDetails;
 
-            var sepaMessage = pain00100103.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, Receiver, ReceiverIBAN, ReceiverBIC, Amount, Usage, new DateTime(1999, 1, 1)).Replace("'", "");
+            var sepaMessage = client.LastSepaMessage ?? pain00100103.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, Receiver, ReceiverIBAN, ReceiverBIC, Amount, Usage, new DateTime(1999, 1, 1)).Replace("'", "");
+            client.LastSepaMessage = sepaMessage;
+
             segments += segments.Replace("@@", "@" + sepaMessage.Length + "@") + sepaMessage;
 
             segments += "+" + FirstTimeExecutionDay.ToString("yyyyMMdd") + ":" + (char) timeUnit + ":" + Rota + ":" + ExecutionDay;

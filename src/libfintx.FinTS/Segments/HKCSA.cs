@@ -60,7 +60,9 @@ namespace libfintx.FinTS
             var connectionDetails = client.ConnectionDetails;
             segments += "HKCSA:" + client.SegmentNumber + ":1+" + account + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03+@@";
 
-            var sepaMessage = pain00100103.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, Receiver, ReceiverIBAN, ReceiverBIC, Amount, Usage, ExecutionDay).Replace("'", "");
+            var sepaMessage = client.LastSepaMessage ?? pain00100103.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, Receiver, ReceiverIBAN, ReceiverBIC, Amount, Usage, ExecutionDay).Replace("'", "");
+            client.LastSepaMessage = sepaMessage;
+
             segments = segments.Replace("@@", "@" + sepaMessage.Length + "@") + sepaMessage;
 
             segments += "+" + OrderId;

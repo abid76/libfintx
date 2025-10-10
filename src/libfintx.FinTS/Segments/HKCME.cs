@@ -63,7 +63,8 @@ namespace libfintx.FinTS
             var connectionDetails = client.ConnectionDetails;
             segments += "HKCME:" + client.SegmentNumber + ":1+" + account + TotalAmount_ + ":EUR++" + " + urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.002.03+@@";
 
-            var painMessage = pain00100203.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, PainData, NumberofTransactions, TotalAmount, ExecutionDay);
+            var painMessage = client.LastSepaMessage ?? pain00100203.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, PainData, NumberofTransactions, TotalAmount, ExecutionDay);
+            client.LastSepaMessage = painMessage;
 
             segments += segments.Replace("@@", "@" + (painMessage.Length - 1) + "@") + painMessage;
 

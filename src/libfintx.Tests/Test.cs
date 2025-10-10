@@ -186,8 +186,8 @@ namespace libfintx.Tests
                 var tanmediumname = await client.RequestTANMediumName();
                 client.TanMedium = tanmediumname.Data.FirstOrDefault();
 
-                Func<string, bool> confirmVop = (s) => false;
-                Func<VopCheckResult, bool> confirmVopWithResult = (r) => true;
+                Func<string, string, bool> confirmVop = (s1, s2) => false;
+                Func<VopCheckResult, string, bool> confirmVopWithResult = (r, s) => true;
 
                 Console.WriteLine(client.Transfer(new TANDialog(WaitForTanAsync), new libfintx.FinTS.Vop.VopDialog(confirmVop, confirmVopWithResult), receiver, receiverIBAN, receiverBIC, amount, usage));
             }

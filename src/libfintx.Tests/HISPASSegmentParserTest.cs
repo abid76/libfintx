@@ -26,5 +26,20 @@ namespace libfintx.Tests
             Assert.False(hispas.IsStructuredTransferPurposeAllowed);
             Assert.Equal(8, hispas.SupportedPainSchemas.Count);
         }
+
+        [Fact]
+        public void Test_HISPAS_2()
+        {
+            var rawData = @"HISPAS:138:2:4+1+1+0+J:N:N:N:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.09:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.008.001.02:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.008.001.08";
+            var segment = new Segment(rawData);
+            segment = new GenericSegmentParser().ParseSegment(segment);
+            var parser = new HISPASSegmentParser();
+            var hispas = (HISPAS) parser.ParseSegment(segment);
+            Assert.NotNull(hispas);
+            Assert.True(hispas.IsSingleAccountRetrievalAllowed);
+            Assert.False(hispas.IsAccountNationalAllowed);
+            Assert.False(hispas.IsStructuredTransferPurposeAllowed);
+            Assert.Equal(4, hispas.SupportedPainSchemas.Count);
+        }
     }
 }

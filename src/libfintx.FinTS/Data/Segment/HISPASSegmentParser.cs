@@ -13,22 +13,38 @@ namespace libfintx.FinTS.Data.Segment
 
             var result = new HISPAS(segment);
 
-            if (segment.DataElements.Count < 4)
+            if (result.Version == 1)
             {
-                throw new InvalidOperationException("HISPAS must contain at least 4 data elements.");
+                if (segment.DataElements.Count < 4)
+                {
+                    throw new InvalidOperationException("HISPAS must contain at least 4 data elements.");
+                }
+                if (segment.DataElements[3].DataElements.Count < 4)
+                {
+                    throw new InvalidOperationException("HISPAS Params SEPA must contain at least 4 data elements.");
+                }
             }
-            if (segment.DataElements[3].DataElements.Count < 4)
+            else if (result.Version == 2)
             {
-                throw new InvalidOperationException("HISPAS Params SEPA must contain at least 4 data elements.");
+                if (segment.DataElements.Count < 4)
+                {
+                    throw new InvalidOperationException("HISPAS must contain at least 4 data elements.");
+                }
+                if (segment.DataElements[3].DataElements.Count < 5)
+                {
+                    throw new InvalidOperationException("HISPAS Params SEPA must contain at least 5 data elements.");
+                }
             }
 
-            result.IsSingleAccountRetrievalAllowed = segment.DataElements[3].DataElements[0].Value == "J";
-            result.IsAccountNationalAllowed = segment.DataElements[3].DataElements[1].Value == "J";
-            result.IsStructuredTransferPurposeAllowed = segment.DataElements[3].DataElements[2].Value == "J";
+            var paramsSepaAccount = segment.DataElements[3];
 
-            for (int i = 3; i < segment.DataElements[3].DataElements.Count; i++)
+            result.IsSingleAccountRetrievalAllowed = paramsSepaAccount.DataElements[0].Value == "J";
+            result.IsAccountNationalAllowed = paramsSepaAccount.DataElements[1].Value == "J";
+            result.IsStructuredTransferPurposeAllowed = paramsSepaAccount.DataElements[2].Value == "J";
+            int startIdx = result.Version == 1 ? 3 : 4;
+            for (int i = startIdx; i < paramsSepaAccount.DataElements.Count; i++)
             {
-                result.SupportedPainSchemas.Add(segment.DataElements[3].DataElements[i].Value);
+                result.SupportedPainSchemas.Add(paramsSepaAccount.DataElements[i].Value);
             }
 
             return result;

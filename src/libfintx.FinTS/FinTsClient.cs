@@ -62,7 +62,9 @@ namespace libfintx.FinTS
         internal string HktanOrderRef { get; set; }
         internal int HispasVersion { get; set; }
         internal int SepaPainVersion { get; set; }
+        internal string SepaPainSchema { get; set; }
         internal bool SepaAccountNationalAllowed { get; set; }
+        public List<string> SupportedSepaPainSchemas { get; internal set; } = new List<string>();
 
         /// <summary>
         /// Verification of Payee

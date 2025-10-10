@@ -770,7 +770,7 @@ namespace libfintx.Sample.Ui
                     msg,
                     "Empfänger-Verifikation",
                     MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question,
+                    vopResult.IsNoMatch ? MessageBoxIcon.Warning : MessageBoxIcon.Question,
                     MessageBoxDefaultButton.Button2);
                 return dr == DialogResult.Yes;
             };

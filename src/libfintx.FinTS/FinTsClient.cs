@@ -438,15 +438,18 @@ namespace libfintx.FinTS
                 return result;
             }
 
-            while (BankCode.Contains("+3040::"))
+            var refMessage = result.Messages.FirstOrDefault(m => m.Code == "3040");
+            while (refMessage != null && refMessage.ParamList.Count > 0)
             {
-                string startPoint = Helper.Parse_Transactions_Startpoint(BankCode);
-                BankCode = await finTsCall();
+                this.VopRefPoint = refMessage.ParamList[0];
+
+                BankCode = await HKVPP.Init_HKVPP_Poll(this);
                 result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
                 if (result.HasError)
                 {
                     return result;
                 }
+                refMessage = result.Messages.FirstOrDefault(m => m.Code == "3040");
 
                 rawSegments = Helper.SplitEncryptedSegments(BankCode);
                 foreach (var item in rawSegments)
@@ -456,14 +459,9 @@ namespace libfintx.FinTS
                     {
                         var hivpp = segment as HIVPP;
                         paymentStatusReport.Append(hivpp.PaymentStatusReport);
-                        if (hivpp.PaymentStatusReportDescriptor != null)
-                        {
-                            paymentStatusReportDescriptor = hivpp.PaymentStatusReportDescriptor;
-                        }
-                        if (hivpp.AdditionalInfo != null)
-                        {
-                            additionalInfo = hivpp.AdditionalInfo;
-                        }   
+                        paymentStatusReportDescriptor = hivpp.PaymentStatusReportDescriptor;
+                        resultVopCheckSingle = hivpp.VopCheckResultSingleTransaction;
+                        additionalInfo = hivpp.AdditionalInfo ?? string.Empty;
                     }
                 }
             }

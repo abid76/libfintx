@@ -74,6 +74,11 @@ namespace libfintx.FinTS
                 segments += "HKCCS:" + client.SegmentNumber + ":1+" + account + "+" + client.SepaPainSchema + "+@@";
                 sepaMessage = client.LastSepaMessage ?? pain00100303.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, ReceiverName, ReceiverIBAN, ReceiverBIC, Amount, Usage, new DateTime(1999, 1, 1));
             }
+            else if (client.SepaPainVersion == 9)
+            {
+                segments += "HKCCS:" + client.SegmentNumber + ":1+" + account + "+" + client.SepaPainSchema + "+@@";
+                sepaMessage = client.LastSepaMessage ?? pain00100109.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, ReceiverName, ReceiverIBAN, ReceiverBIC, Amount, Usage, new DateTime(1999, 1, 1));
+            }
             client.LastSepaMessage = sepaMessage;
 
             segments = segments.Replace("@@", "@" + (sepaMessage.Length - 1) + "@") + sepaMessage;

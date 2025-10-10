@@ -41,16 +41,32 @@ namespace libfintx.FinTS
 
             var TotalAmount_ = TotalAmount.ToString().Replace(",", ".");
 
+            string segments = string.Empty;
             client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
+
+            if (client.VopGvList.Contains("HKCME"))
+            {
+                if (client.Vop)
+                {
+                    segments = HKVPP.Init_HKVPP(client, segments);
+                    client.SegmentNumber++;
+                }
+                else
+                {
+                    segments = HKVPA.Init_HKVPA(client, segments);
+                    client.SegmentNumber++;
+                }
+            }
 
             var account = Helper.CreateAccountInfo(client);
 
             var connectionDetails = client.ConnectionDetails;
-            string segments = "HKCME:" + client.SegmentNumber + ":1+" + account + "+" + TotalAmount_ + ":EUR++" + " + urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.002.03+@@";
+            segments += "HKCME:" + client.SegmentNumber + ":1+" + account + TotalAmount_ + ":EUR++" + " + urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.002.03+@@";
 
-            var painMessage = pain00100203.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, PainData, NumberofTransactions, TotalAmount, ExecutionDay);
+            var painMessage = client.LastSepaMessage ?? pain00100203.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, PainData, NumberofTransactions, TotalAmount, ExecutionDay);
+            client.LastSepaMessage = painMessage;
 
-            segments = segments.Replace("@@", "@" + (painMessage.Length - 1) + "@") + painMessage;
+            segments += segments.Replace("@@", "@" + (painMessage.Length - 1) + "@") + painMessage;
 
             if (Helper.IsTANRequired("HKCME"))
             {

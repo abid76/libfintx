@@ -258,7 +258,7 @@ HNHBS:7:1+2'".Replace(Environment.NewLine, string.Empty);
             var result = Helper.Parse_Segments(new FinTsClient(new ConnectionDetails()), message);
 
             Assert.Single(TanProcesses.Items);
-            Assert.Equal("921", TanProcesses.Items[0].ProcessNumber);
+            Assert.Equal(921, TanProcesses.Items[0].ProcessNumber);
         }
 
         [Fact]

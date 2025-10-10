@@ -48,6 +48,8 @@ namespace libfintx.FinTS
 
         public bool IsSCARequired => IsTanRequired || IsApprovalRequired;
 
+        public bool IsSkipVop => GetMessage("3091") != null;
+
         /// <summary>
         /// Returns true if there is any message with code <i>3955</i>.
         /// </summary>

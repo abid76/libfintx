@@ -38,14 +38,31 @@ namespace libfintx.FinTS
         {
             Log.Write("Starting job HKCSA: Modify terminated transfer");
 
+            string segments = string.Empty;
             client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
+
+            if (client.VopGvList.Contains("HKCME"))
+            {
+                if (client.Vop)
+                {
+                    segments = HKVPP.Init_HKVPP(client, segments);
+                    client.SegmentNumber++;
+                }
+                else
+                {
+                    segments = HKVPA.Init_HKVPA(client, segments);
+                    client.SegmentNumber++;
+                }
+            }
 
             var account = Helper.CreateAccountInfo(client);
 
             var connectionDetails = client.ConnectionDetails;
-            string segments = "HKCSA:" + client.SegmentNumber + ":1+" + account + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03+@@";
+            segments += "HKCSA:" + client.SegmentNumber + ":1+" + account + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03+@@";
 
-            var sepaMessage = pain00100103.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, Receiver, ReceiverIBAN, ReceiverBIC, Amount, Usage, ExecutionDay).Replace("'", "");
+            var sepaMessage = client.LastSepaMessage ?? pain00100103.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, Receiver, ReceiverIBAN, ReceiverBIC, Amount, Usage, ExecutionDay).Replace("'", "");
+            client.LastSepaMessage = sepaMessage;
+
             segments = segments.Replace("@@", "@" + sepaMessage.Length + "@") + sepaMessage;
 
             segments += "+" + OrderId;

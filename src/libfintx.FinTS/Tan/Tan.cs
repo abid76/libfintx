@@ -89,6 +89,12 @@ namespace libfintx.FinTS
             }
 
             client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
+            if (client.VopId != null)
+            {
+                // If there is a VOP-ID, approve VOP via HKVPA
+                client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg4);
+                segments = HKVPA.Init_HKVPA(client, segments);
+            }
 
             string message = FinTSMessage.Create(client, client.MessageNumber, client.DialogId, segments, client.TanProcessCode, TAN);
             string response = await FinTSMessage.Send(client, message);

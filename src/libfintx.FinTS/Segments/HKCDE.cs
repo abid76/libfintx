@@ -37,15 +37,33 @@ namespace libfintx.FinTS
         {
             Log.Write("Starting job HKCDE: Submit bankers order");
 
+            string segments = string.Empty;
             client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
+
+            if (client.VopGvList.Contains("HKCDE"))
+            {
+                if (client.Vop)
+                {
+                    segments = HKVPP.Init_HKVPP(client, segments);
+                    client.SegmentNumber++;
+                }
+                else
+                {
+                    segments = HKVPA.Init_HKVPA(client, segments);
+                    client.SegmentNumber++;
+                }
+            }
 
             var account = Helper.CreateAccountInfo(client);
 
-            var connectionDetails = client.ConnectionDetails;
-            string segments = "HKCDE:" + client.SegmentNumber + ":1+" + account + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03+@@";
+            segments += "HKCDE:" + client.SegmentNumber + ":1+" + account + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03+@@";
 
-            var sepaMessage = pain00100103.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, Receiver, ReceiverIBAN, ReceiverBIC, Amount, Usage, new DateTime(1999, 1, 1)).Replace("'", "");
-            segments = segments.Replace("@@", "@" + sepaMessage.Length + "@") + sepaMessage;
+            var connectionDetails = client.ConnectionDetails;
+
+            var sepaMessage = client.LastSepaMessage ?? pain00100103.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, Receiver, ReceiverIBAN, ReceiverBIC, Amount, Usage, new DateTime(1999, 1, 1)).Replace("'", "");
+            client.LastSepaMessage = sepaMessage;
+
+            segments += segments.Replace("@@", "@" + sepaMessage.Length + "@") + sepaMessage;
 
             segments += "+" + FirstTimeExecutionDay.ToString("yyyyMMdd") + ":" + (char) timeUnit + ":" + Rota + ":" + ExecutionDay;
             if (LastExecutionDay != null)

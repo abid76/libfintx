@@ -21,12 +21,19 @@
  * 	
  */
 
-using libfintx.FinTS.Data;
-using libfintx.Logger.Log;
-using libfintx.Sepa;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using System.Xml.Serialization;
+using libfintx.FinTS.Data;
+using libfintx.FinTS.Data.Segment;
+using libfintx.FinTS.Vop;
+using libfintx.Logger.Log;
+using libfintx.Sepa;
+using libfintx.Sepa.pain_002_001_10;
 
 namespace libfintx.FinTS
 {
@@ -55,13 +62,40 @@ namespace libfintx.FinTS
         internal string HktanOrderRef { get; set; }
         internal int HispasVersion { get; set; }
         internal int SepaPainVersion { get; set; }
+        internal string SepaPainSchema { get; set; }
         internal bool SepaAccountNationalAllowed { get; set; }
+        public List<string> SupportedSepaPainSchemas { get; internal set; } = new List<string>();
+
+        /// <summary>
+        /// Verification of Payee
+        /// </summary>
+        internal bool Vop { get; set; }
+        public string VopPollingId { get; internal set; }
+        public string VopRefPoint { get; internal set; }
+        public string VopId { get; internal set; }
+        public bool VopNeeded { get; internal set; }
+        public bool VopDescriptionStructured { get; internal set; }
+        // Needed for repeated call of GV, when confirming VOP
+        internal string LastSepaMessage { get; set; }
+
+        internal List<string> VopGvList = new List<string>();
 
         public FinTsClient(ConnectionDetails conn, bool anon = false)
         {
             ConnectionDetails = conn;
             Anonymous = anon;
             activeAccount = null;
+        }
+
+        internal void ResetVop()
+        {
+            Vop = false;
+            VopPollingId = null;
+            VopRefPoint = null;
+            VopId = null;
+            VopNeeded = false;
+            VopGvList.Clear();
+            LastSepaMessage = null;
         }
 
         internal async Task<HBCIDialogResult> InitializeConnection(string hkTanSegmentId = "HKIDN")
@@ -360,6 +394,108 @@ namespace libfintx.FinTS
                 Helper.Parse_Segments(this, result.RawData);
             }
 
+            return result;
+        }
+
+        public async Task<HBCIDialogResult> ProcessVop(TANDialog tanDialog, VopDialog vopDialog, Func<Task<string>> finTsCall)
+        {
+            StringBuilder paymentStatusReport = new StringBuilder();
+            string paymentStatusReportDescriptor = string.Empty;
+            VopCheckResult resultVopCheckSingle = null;
+            string additionalInfo = string.Empty;
+
+            Vop = true;
+            string BankCode = await finTsCall();
+            var result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
+            if (result.HasError)
+            {
+                return result;
+            }
+            if (result.IsSkipVop)
+            {
+                Vop = false;
+                result = await ProcessSCA(result, tanDialog);
+                return result;
+            }
+
+            var rawSegments = Helper.SplitEncryptedSegments(BankCode);
+            foreach (var item in rawSegments)
+            {
+                var segment = Helper.Parse_Segment(item);
+                if (segment.Name == "HIVPP")
+                {
+                    var hivpp = segment as HIVPP;
+                    paymentStatusReport.Append(hivpp.PaymentStatusReport);
+                    paymentStatusReportDescriptor = hivpp.PaymentStatusReportDescriptor;
+                    resultVopCheckSingle = hivpp.VopCheckResultSingleTransaction;
+                    additionalInfo = hivpp.AdditionalInfo ?? string.Empty;
+                }
+            }
+
+            result = await ProcessSCA(result, tanDialog);
+            if (result.HasError)
+            {
+                return result;
+            }
+
+            var refMessage = result.Messages.FirstOrDefault(m => m.Code == "3040");
+            while (refMessage != null && refMessage.ParamList.Count > 0)
+            {
+                this.VopRefPoint = refMessage.ParamList[0];
+
+                BankCode = await HKVPP.Init_HKVPP_Poll(this);
+                result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
+                if (result.HasError)
+                {
+                    return result;
+                }
+                refMessage = result.Messages.FirstOrDefault(m => m.Code == "3040");
+
+                rawSegments = Helper.SplitEncryptedSegments(BankCode);
+                foreach (var item in rawSegments)
+                {
+                    var segment = Helper.Parse_Segment(item);
+                    if (segment.Name == "HIVPP")
+                    {
+                        var hivpp = segment as HIVPP;
+                        paymentStatusReport.Append(hivpp.PaymentStatusReport);
+                        paymentStatusReportDescriptor = hivpp.PaymentStatusReportDescriptor;
+                        resultVopCheckSingle = hivpp.VopCheckResultSingleTransaction;
+                        additionalInfo = hivpp.AdditionalInfo ?? string.Empty;
+                    }
+                }
+            }
+
+            if (paymentStatusReport.Length > 0)
+            {
+                var document = Pain00200110.Create(paymentStatusReport.ToString());
+                var originalPaymentInstruction32 = document.CstmrPmtStsRpt.OrgnlPmtInfAndSts.FirstOrDefault();
+                var txInfAndSts = originalPaymentInstruction32?.TxInfAndSts?.FirstOrDefault();
+                var txSts = txInfAndSts?.TxSts;
+                resultVopCheckSingle = resultVopCheckSingle ?? VopCheckResult.FromValue(txSts);
+                if (resultVopCheckSingle.IsCloseMatch)
+                {
+                    resultVopCheckSingle.DiffReceiverName = txInfAndSts?.StsRsnInf?.FirstOrDefault()?.AddtlInf?.FirstOrDefault();
+                }
+                resultVopCheckSingle.IbanAdditionalInfo = txInfAndSts?.AcctSvcrRef;
+                resultVopCheckSingle.ReasonRvna = txInfAndSts.StsRsnInf?.FirstOrDefault()?.AddtlInf?.FirstOrDefault();
+            }
+
+            if (resultVopCheckSingle != null ? !vopDialog.ConfirmVop(resultVopCheckSingle, additionalInfo) : !vopDialog.ConfirmVop(paymentStatusReport.ToString(), additionalInfo))
+            {
+                BankCode = await HKEND.Init_HKEND(this);
+                result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
+                return result;
+            }
+
+            Vop = false;
+            BankCode = await finTsCall();
+            result = new HBCIDialogResult(Helper.Parse_BankCode(BankCode), BankCode);
+            if (result.HasError)
+            {
+                return result;
+            }
+            result = await ProcessSCA(result, tanDialog);
             return result;
         }
     }

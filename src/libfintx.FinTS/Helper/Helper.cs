@@ -410,17 +410,37 @@ namespace libfintx.FinTS
                         {
                             client.HispasVersion = segment.Version;
 
+                            client.SepaAccountNationalAllowed = hispas.IsAccountNationalAllowed;
+                            client.SupportedSepaPainSchemas.AddRange(hispas.SupportedPainSchemas);
+
                             if (hispas.Payload.Contains("pain.001.001.03"))
+                            {
                                 client.SepaPainVersion = 1;
+                                client.SepaPainSchema = hispas.SupportedPainSchemas.FirstOrDefault(s => s.Contains("pain.001.001.03"));
+                            }
                             else if (hispas.Payload.Contains("pain.001.002.03"))
+                            {
                                 client.SepaPainVersion = 2;
+                                client.SepaPainSchema = hispas.SupportedPainSchemas.FirstOrDefault(s => s.Contains("pain.001.002.03"));
+                            }
                             else if (hispas.Payload.Contains("pain.001.003.03"))
+                            {
                                 client.SepaPainVersion = 3;
+                                client.SepaPainSchema = hispas.SupportedPainSchemas.FirstOrDefault(s => s.Contains("pain.001.003.03"));
+                            }
 
                             if (client.SepaPainVersion == 0)
                                 client.SepaPainVersion = 3; // -> Fallback. Most banks accept the newest pain version
+                        }
+                    }
 
-                            client.SepaAccountNationalAllowed = hispas.IsAccountNationalAllowed;
+                    if (segment.Name == "HIVPPS" || segment.Name == "HIVPAS" || segment.Name == "HIVOOS")
+                    {
+                        if (segment.Name == "HIVPPS")
+                        {
+                            var hivpps = segment as HIVPPS;
+                            client.VopGvList = hivpps.ParamCheckOrder.VopOrderMandatory;
+                            client.VopDescriptionStructured = hivpps.ParamCheckOrder.DescriptionStructured;
                         }
                     }
                 }
@@ -474,6 +494,18 @@ namespace libfintx.FinTS
                     if (segment.DataElements.Count < 3)
                         throw new InvalidOperationException($"Invalid HITAN segment '{segment}'. Payload must have at least 3 data elements.");
                     client.HktanOrderRef = segment.DataElements[2].Value;
+                }
+
+                if (segment.Name == "HIRMS")
+                {
+                    client.VopNeeded = segment.DataElements.Select(d => Parse_BankCode_Message(d)).FirstOrDefault(m => m.Code == "3091") == null;
+                }
+
+                if (segment.Name == "HIVPP")
+                {
+                    HIVPP hivpp = segment as HIVPP;
+                    client.VopPollingId = hivpp.PollingId;
+                    client.VopId = hivpp.VopId;
                 }
             }
 
@@ -699,6 +731,27 @@ namespace libfintx.FinTS
             }
 
             return result;
+        }
+
+        public static HIVPP Parse_Vop(string BankCode)
+        {
+            var rawSegments = SplitEncryptedSegments(BankCode);
+            List<Segment> segments = new List<Segment>();
+            foreach (var item in rawSegments)
+            {
+                Segment segment = Parse_Segment(item);
+                if (segment != null)
+                    segments.Add(segment);
+            }
+
+            var hivpp = segments.FirstOrDefault(s => s.Name == "HIVPP");
+            if (hivpp != null)
+            {
+                var hivppSegment = hivpp as HIVPP;
+                return hivppSegment;
+            }
+
+            return null;
         }
 
         /// <summary>

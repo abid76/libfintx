@@ -35,14 +35,14 @@ namespace libfintx.FinTS
         /// </summary>
         /// <param name="connectionDetails"></param>
         /// <param name="dialogID"></param>
-        public static async Task<String> Init_HKEND(FinTsClient client, string dialogID)
+        public static async Task<String> Init_HKEND(FinTsClient client)
         {
             Log.Write("Starting job HKEND: End of dialog");
 
             var connectionDetails = client.ConnectionDetails;
             string segments = string.Empty;
 
-            segments = "HKEND:" + SEG_NUM.Seg3 + "1+" + dialogID + "'";
+            segments = "HKEND:" + SEG_NUM.Seg3 + ":1+" + client.DialogId + "'";
 
             client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
 

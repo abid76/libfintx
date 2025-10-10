@@ -42,7 +42,7 @@ namespace libfintx.FinTS
             var connectionDetails = client.ConnectionDetails;
             string segments = string.Empty;
 
-            segments = "HKEND:" + SEG_NUM.Seg3 + "+1+" + client.DialogId + "'";
+            segments = "HKEND:" + SEG_NUM.Seg3 + ":1+" + client.DialogId + "'";
 
             client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
 

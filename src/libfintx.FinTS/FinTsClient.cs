@@ -372,7 +372,7 @@ namespace libfintx.FinTS
                 const int Delay = 2000; // Der minimale Zeitraum zwischen zwei Statusabfragen steht in HITANS, wir nehmen einfach 2 Sek
                 await Task.Delay(Delay);
                 result = await TAN(null);
-                while (!result.IsSuccess && !result.HasError && result.IsWaitingForApproval) // Freigabe wurde noch nicht erteilt
+                while (!result.HasError && result.IsWaitingForApproval) // Freigabe wurde noch nicht erteilt
                 {
                     await Task.Delay(Delay);
                     if (tanDialog.IsCancelWaitForApproval)

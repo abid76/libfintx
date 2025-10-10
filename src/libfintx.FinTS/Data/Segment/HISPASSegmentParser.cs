@@ -9,19 +9,27 @@ namespace libfintx.FinTS.Data.Segment
     {
         public Segment ParseSegment(Segment segment)
         {
+            // HISPAS:147:1:4+1+1+0+J:N:N:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.008.001.02
+
             var result = new HISPAS(segment);
 
-            // HISPAS:147:1:4+1+1+0+J:N:N:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.008.001.02
-            var match = Regex.Match(segment.Payload, @"(?<2>\d{1,3})\+(?<3>\d)\+(?<4>\d)\+(?<5>.+)");
-            if (!match.Success)
-                throw new ArgumentException($"Could not parse segment '{segment.Name}':{Environment.NewLine}{segment.Payload}");
+            if (segment.DataElements.Count < 4)
+            {
+                throw new InvalidOperationException("HISPAS must contain at least 4 data elements.");
+            }
+            if (segment.DataElements[3].DataElements.Count < 4)
+            {
+                throw new InvalidOperationException("HISPAS Params SEPA must contain at least 4 data elements.");
+            }
 
-            var paramSepaAccount = match.Groups["5"].Value;
-            match = Regex.Match(paramSepaAccount, @"(?<1>J|N):(?<2>J|N)");
-            if (!match.Success)
-                throw new ArgumentException($"Could not parse SEPA account info in segment '{segment.Name}':{Environment.NewLine}{paramSepaAccount}");
+            result.IsSingleAccountRetrievalAllowed = segment.DataElements[3].DataElements[0].Value == "J";
+            result.IsAccountNationalAllowed = segment.DataElements[3].DataElements[1].Value == "J";
+            result.IsStructuredTransferPurposeAllowed = segment.DataElements[3].DataElements[2].Value == "J";
 
-            result.IsAccountNationalAllowed = "J".Equals(match.Groups["2"].Value);
+            for (int i = 3; i < segment.DataElements[3].DataElements.Count; i++)
+            {
+                result.SupportedPainSchemas.Add(segment.DataElements[3].DataElements[i].Value);
+            }
 
             return result;
         }

@@ -434,6 +434,14 @@ namespace libfintx.FinTS
                         }
                     }
 
+                    if (segment.Name == "HICDBS")
+                    {
+                        if (client.HkcdbVersion < segment.Version)
+                        {
+                            client.HkcdbVersion = segment.Version;
+                        }
+                    }
+
                     if (segment.Name == "HIVPPS" || segment.Name == "HIVPAS" || segment.Name == "HIVOOS")
                     {
                         if (segment.Name == "HIVPPS")

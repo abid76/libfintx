@@ -50,6 +50,7 @@ namespace libfintx.FinTS
         internal List<int> AllowedTanProcesses { get; set; }
 
         public int HktanVersion { get; set; }
+        public int HkcdbVersion { get; set; }
 
         internal int SegmentNumber { get; set; }
 

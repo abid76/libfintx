@@ -42,7 +42,7 @@ namespace libfintx.FinTS
             var account = Helper.CreateAccountInfo(client);
 
             var connectionDetails = client.ConnectionDetails;
-            string segments = "HKCDB:" + client.SegmentNumber + ":1+" + account + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03'";
+            string segments = "HKCDB:" + client.SegmentNumber + ":" + client.HkcdbVersion + "+" + account + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03'";
 
             if (Helper.IsTANRequired("HKCDB"))
             {

@@ -66,7 +66,7 @@ namespace libfintx.FinTS
             var painMessage = client.LastSepaMessage ?? pain00100203.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, PainData, NumberofTransactions, TotalAmount, ExecutionDay);
             client.LastSepaMessage = painMessage;
 
-            segments += segments.Replace("@@", "@" + (painMessage.Length - 1) + "@") + painMessage;
+            segments = segments.Replace("@@", "@" + (painMessage.Length - 1) + "@") + painMessage;
 
             if (Helper.IsTANRequired("HKCME"))
             {

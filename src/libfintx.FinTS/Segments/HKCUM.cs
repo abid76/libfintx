@@ -51,7 +51,7 @@ namespace libfintx.FinTS
 
             if (Helper.IsTANRequired("HKCUM"))
             {
-                client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg4);
+                client.SegmentNumber++;
                 segments = HKTAN.Init_HKTAN(client, segments, "HKCUM");
             }
 

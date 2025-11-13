@@ -38,7 +38,7 @@ namespace libfintx.FinTS
         {
             Log.Write("Starting job HKDSE: Collect money");
 
-            client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg4);
+            client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
 
             var connectionDetails = client.ConnectionDetails;
             string segments = "HKDSE:" + client.SegmentNumber + ":1+" + connectionDetails.Iban + ":" + connectionDetails.Bic + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.008.002.02+@@";
@@ -49,7 +49,7 @@ namespace libfintx.FinTS
 
             if (Helper.IsTANRequired("HKDSE"))
             {
-                client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg4);
+                client.SegmentNumber++;
                 segments = HKTAN.Init_HKTAN(client, segments, "HKDSE");
             }
 

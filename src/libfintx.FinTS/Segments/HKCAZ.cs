@@ -71,7 +71,6 @@ namespace libfintx.FinTS
                         }
                     }
 
-                    client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
                     break;
 
                 case CamtVersion.Camt053:
@@ -108,7 +107,7 @@ namespace libfintx.FinTS
 
             if (Helper.IsTANRequired("HKCAZ"))
             {
-                client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg4);
+                client.SegmentNumber++;
                 segments = HKTAN.Init_HKTAN(client, segments, "HKCAZ");
             }
 

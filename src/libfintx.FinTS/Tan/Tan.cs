@@ -38,61 +38,61 @@ namespace libfintx.FinTS
         {
             Log.Write("Starting TAN process");
             string segments = string.Empty;
+            client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
 
             if (string.IsNullOrEmpty(client.TanMedium)) // TAN Medium Name not set
             {
                 // Version 2
                 if (client.HktanVersion == 2)
-                    segments = "HKTAN:" + SEG_NUM.Seg3 + ":" + client.HktanVersion + "+2++" + client.HktanOrderRef + "++N'";
+                    segments = "HKTAN:" + client.SegmentNumber + ":" + client.HktanVersion + "+2++" + client.HktanOrderRef + "++N'";
                 // Version 3
                 else if (client.HktanVersion == 3)
-                    segments = "HKTAN:" + SEG_NUM.Seg3 + ":" + client.HktanVersion + "+2++" + client.HktanOrderRef + "++N'";
+                    segments = "HKTAN:" + client.SegmentNumber + ":" + client.HktanVersion + "+2++" + client.HktanOrderRef + "++N'";
                 // Version 4
                 else if (client.HktanVersion == 4)
-                    segments = "HKTAN:" + SEG_NUM.Seg3 + ":" + client.HktanVersion + "+2++" + client.HktanOrderRef + "++N'";
+                    segments = "HKTAN:" + client.SegmentNumber + ":" + client.HktanVersion + "+2++" + client.HktanOrderRef + "++N'";
                 // Version 5
                 else if (client.HktanVersion == 5)
-                    segments = "HKTAN:" + SEG_NUM.Seg3 + ":" + client.HktanVersion + "+2++++" + client.HktanOrderRef + "++N'";
+                    segments = "HKTAN:" + client.SegmentNumber + ":" + client.HktanVersion + "+2++++" + client.HktanOrderRef + "++N'";
                 // Version 6
                 else if (client.HktanVersion == 6)
-                    segments = "HKTAN:" + SEG_NUM.Seg3 + ":" + client.HktanVersion + "+2++++" + client.HktanOrderRef + "+N'";
+                    segments = "HKTAN:" + client.SegmentNumber + ":" + client.HktanVersion + "+2++++" + client.HktanOrderRef + "+N'";
                 // Version 7 -> decoupled
                 // FinTS_3.0_Security_Sicherheitsverfahren_PINTAN_2020-07-10_final_version.pdf Seite 64 - 65
                 else if (client.HktanVersion == 7)
-                    segments = "HKTAN:" + SEG_NUM.Seg3 + ":" + client.HktanVersion + "+S++++" + client.HktanOrderRef + "+N'";
+                    segments = "HKTAN:" + client.SegmentNumber + ":" + client.HktanVersion + "+S++++" + client.HktanOrderRef + "+N'";
                 else // default
-                    segments = "HKTAN:" + SEG_NUM.Seg3 + ":" + client.HktanVersion + "+2++++" + client.HktanOrderRef + "++N'";
+                    segments = "HKTAN:" + client.SegmentNumber + ":" + client.HktanVersion + "+2++++" + client.HktanOrderRef + "++N'";
             }
             else
             {
                 // Version 2
                 if (client.HktanVersion == 2)
-                    segments = "HKTAN:" + SEG_NUM.Seg3 + ":" + client.HktanVersion + "+2++" + client.HktanOrderRef + "++N++++" + client.TanMedium + "'";
+                    segments = "HKTAN:" + client.SegmentNumber + ":" + client.HktanVersion + "+2++" + client.HktanOrderRef + "++N++++" + client.TanMedium + "'";
                 // Version 3
                 else if (client.HktanVersion == 3)
-                    segments = "HKTAN:" + SEG_NUM.Seg3 + ":" + client.HktanVersion + "+2++" + client.HktanOrderRef + "++N++++" + client.TanMedium + "'";
+                    segments = "HKTAN:" + client.SegmentNumber + ":" + client.HktanVersion + "+2++" + client.HktanOrderRef + "++N++++" + client.TanMedium + "'";
                 // Version 4
                 else if (client.HktanVersion == 4)
-                    segments = "HKTAN:" + SEG_NUM.Seg3 + ":" + client.HktanVersion + "+2++" + client.HktanOrderRef + "++N++++" + client.TanMedium + "'";
+                    segments = "HKTAN:" + client.SegmentNumber + ":" + client.HktanVersion + "+2++" + client.HktanOrderRef + "++N++++" + client.TanMedium + "'";
                 // Version 5
                 else if (client.HktanVersion == 5)
-                    segments = "HKTAN:" + SEG_NUM.Seg3 + ":" + client.HktanVersion + "+2++++" + client.HktanOrderRef + "++N++++" + client.TanMedium + "'";
+                    segments = "HKTAN:" + client.SegmentNumber + ":" + client.HktanVersion + "+2++++" + client.HktanOrderRef + "++N++++" + client.TanMedium + "'";
                 // Version 6
                 else if (client.HktanVersion == 6)
-                    segments = "HKTAN:" + SEG_NUM.Seg3 + ":" + client.HktanVersion + "+2++++" + client.HktanOrderRef + "+N++++" + client.TanMedium + "'";
+                    segments = "HKTAN:" + client.SegmentNumber + ":" + client.HktanVersion + "+2++++" + client.HktanOrderRef + "+N++++" + client.TanMedium + "'";
                 // Version 7 -> decoupled
                 // FinTS_3.0_Security_Sicherheitsverfahren_PINTAN_2020-07-10_final_version.pdf Seite 64 - 65
                 else if (client.HktanVersion == 7)
-                    segments = "HKTAN:" + SEG_NUM.Seg3 + ":" + client.HktanVersion + "+S++++" + client.HktanOrderRef + "+N++++" + client.TanMedium + "'";
+                    segments = "HKTAN:" + client.SegmentNumber + ":" + client.HktanVersion + "+S++++" + client.HktanOrderRef + "+N++++" + client.TanMedium + "'";
                 else // default
-                    segments = "HKTAN:" + SEG_NUM.Seg3 + ":" + client.HktanVersion + "+2++" + client.HktanOrderRef + "++N++++" + client.TanMedium + "'";
+                    segments = "HKTAN:" + client.SegmentNumber + ":" + client.HktanVersion + "+2++" + client.HktanOrderRef + "++N++++" + client.TanMedium + "'";
             }
 
-            client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
             if (client.VopId != null)
             {
                 // If there is a VOP-ID, approve VOP via HKVPA
-                client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg4);
+                client.SegmentNumber++;
                 segments = HKVPA.Init_HKVPA(client, segments);
             }
 

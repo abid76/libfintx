@@ -63,7 +63,7 @@ namespace libfintx.FinTS
 
             if (Helper.IsTANRequired("HKSAL"))
             {
-                client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg4);
+                client.SegmentNumber++;
                 segments = HKTAN.Init_HKTAN(client, segments, "HKSAL");
             }
 

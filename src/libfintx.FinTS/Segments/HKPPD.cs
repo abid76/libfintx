@@ -44,7 +44,7 @@ namespace libfintx.FinTS
 
             if (Helper.IsTANRequired("HKPPD"))
             {
-                client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg4);
+                client.SegmentNumber++;
                 segments = HKTAN.Init_HKTAN(client, segments, "HKPPD");
             }
 

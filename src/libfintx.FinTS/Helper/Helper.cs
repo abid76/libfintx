@@ -443,6 +443,14 @@ namespace libfintx.FinTS
                         }
                     }
 
+                    if (segment.Name == "HICDLS")
+                    {
+                        if (client.HkcdlVersion < segment.Version)
+                        {
+                            client.HkcdlVersion = segment.Version;
+                        }
+                    }
+
                     if (segment.Name == "HIVPPS" || segment.Name == "HIVPAS" || segment.Name == "HIVOOS")
                     {
                         if (segment.Name == "HIVPPS")

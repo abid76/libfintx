@@ -51,6 +51,7 @@ namespace libfintx.FinTS
 
         public int HktanVersion { get; set; }
         public int HkcdbVersion { get; set; }
+        public int HkcdlVersion { get; set; }
 
         internal int SegmentNumber { get; set; }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -59,6 +60,29 @@ HNHBS:5:1+2'".Replace(Environment.NewLine, string.Empty);
 
             var segments = Helper.Parse_Segments(new FinTsClient(new ConnectionDetails()), message);
             Assert.Equal("HIBPA:6:3:4+15+280:10010010+Postbank Dortmund+0+1+300+9999'HIKOM:7:4:4+280:10010010+1+3:https?://hbci.postbank.de/banking/hbci.do::MIM:1'HIPINS:8:1:4+1+1+0+5:50:6:::HKCCS:J:HKKAZ:N:HKKAU:N:HKTAN:N:HKCDL:J:HKCSL:J:HKTAB:N:HKCDB:N:HKCSB:N:HKDMC:J:HKCSE:J:DKPSA:J:HKCDE:J:HKDSC:J:HKCCM:J:HKCMB:N:HKSAL:N:HKCML:J:HKCME:J:HKBME:J:HKEKA:N:HKSPA:N:HKPAE:J:HKPRO:N:HKDME:J:HKPSA:J:DKPAE:J:HKCDN:J'DIPINS:9:1:4+1+1+HKCCS:J:HKKAZ:N:HKKAU:N:HKTAN:N:HKCDL:J:HKCSL:J:HKTAB:N:HKCDB:N:HKCSB:N:HKDMC:J:HKCSE:J:DKPSA:J:HKCDE:J:HKDSC:J:HKCCM:J:HKCMB:N:HKSAL:N:HKCML:J:HKCME:J:HKBME:J:HKEKA:N:HKSPA:N:HKPRO:N:HKDME:J:DKPAE:J:HKCDN:J'HIPAES:10:1:4+1+1+0'DIPAES:11:1:4+1+1'HIPSAS:12:1:4+1+1+0'DIPSAS:13:1:4+1+1'HITANS:14:6:4+1+1+0+N:N:0:910:2:HHD1.3.2OPT:HHDOPT1:1.3.2:chipTAN optisch HHD1.3.2:6:1:Challenge:999:N:1:N:0:2:N:J:00:2:N:9:911:2:HHD1.3.2:HHD:1.3.2:chipTAN manuell HHD1.3.2:6:1:Challenge:999:N:1:N:0:2:N:J:00:2:N:9:912:2:HHD1.4OPT:HHDOPT1:1.4:chipTAN optisch HHD1.4:6:1:Challenge:999:N:1:N:0:2:N:J:00:2:N:9:913:2:HHD1.4:HHD:1.4:chipTAN manuell HHD1.4:6:1:Challenge:999:N:1:N:0:2:N:J:00:2:N:9:920:2:BestSign:BestSign::BestSign:6:2:BestSign:999:N:1:N:0:2:N:J:00:2:N:9:930:2:mobileTAN:mobileTAN::mobileTAN:6:2:mobileTAN:999:N:1:N:0:2:N:J:00:2:N:9'HITABS:15:2:4+1+1+0'HITABS:16:4:4+1+1+0'HIPROS:17:3:4+1+1'HISPAS:18:1:4+1+1+0+J:N:J:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.003.03:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.008.003.02:urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.008.001.02'HIKAZS:19:5:4+1+1+90:N:N'HIKAZS:20:6:4+1+1+0+90:N:N'HISALS:21:5:4+1+1'HISALS:22:6:4+1+1+0'HIEKAS:23:3:4+1+1+0+J:N:N:3'HIKAUS:24:1:4+1+1+0'HICCSS:25:1:4+1+1+0'HICSES:26:1:4+1+1+0+0:180'HICSBS:27:1:4+1+1+1+N:J'HICSLS:28:1:4+1+1+1+J'HICDES:29:1:4+1+1+1+4:1:180:00:00:00:12345'HICDBS:30:1:4+1+1+1+N'HICDNS:31:1:4+1+1+1+0:1:180:J:J:J:J:J:J:J:J:J:00:00:00:12345'HICDLS:32:1:4+1+1+1+1:1:N:J'HICCMS:33:1:4+1+1+0+1000:J:J'HICMES:34:1:4+1+1+0+1:180:1000:J:J'HICMBS:35:1:4+1+1+1+N:J'HICMLS:36:1:4+1+1+1'HIDMES:37:1:4+1+1+0+1:30:1:30:1000:J:J'HIBMES:38:1:4+1+1+0+1:30:1:30:1000:J:J'HIDSCS:39:1:4+1+1+1+1:30:1:30::urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.008.003.02'HIDMCS:40:1:4+1+1+1+1000:J:J:1:30:1:30::urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.008.003.02'", BPD.Value);
+        }
+
+        [Fact]
+        public void TestSplitSegments_4()
+        {
+            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"Resources\BankMessage_8.txt");
+            var message = File.ReadAllText(path);
+
+            var segments = Helper.SplitEncryptedSegments(message);
+            Assert.NotNull(segments);
+            Assert.True(segments.Exists(s => s.StartsWith("HIVPP")));
+
+            HIVPP hivpp = null;
+            foreach (var item in segments)
+            {
+                var segment = Helper.Parse_Segment(item);
+                if (segment is HIVPP)
+                {
+                    hivpp = (HIVPP) segment;
+                }
+            }
+
+            Assert.Null(hivpp.VopCheckResultSingleTransaction);
         }
 
         [Fact]

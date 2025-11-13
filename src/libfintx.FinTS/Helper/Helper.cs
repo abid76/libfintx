@@ -162,7 +162,8 @@ namespace libfintx.FinTS
             }
             catch (Exception ex)
             {
-                Log.Write($"Couldn't parse segment: {ex.Message}{Environment.NewLine}{segmentCode}");
+                Log.Write($"Couldn't parse segment: {ex.Message}{Environment.NewLine}{segmentCode}{Environment.NewLine}{ex.StackTrace}");
+                throw;
             }
             return segment;
         }

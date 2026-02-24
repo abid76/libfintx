@@ -339,7 +339,7 @@ namespace libfintx.FinTS
                         if (client.TanProcessCode == null)
                         {
                             // Die höchste HKTAN-Version auswählen, welche in den erlaubten TAN-Verfahren (3920) enthalten ist.
-                            if (hitans.TanProcesses.Select(tp => tp.TanCode).Intersect(client.AllowedTanProcesses).Any())
+                            if (client.AllowedTanProcesses != null && hitans.TanProcesses.Select(tp => tp.TanCode).Intersect(client.AllowedTanProcesses).Any())
                                 client.HktanVersion = segment.Version;
                         }
                         else
@@ -358,7 +358,7 @@ namespace libfintx.FinTS
                         if (client.HktanVersion == 0 || client.HktanVersion == segment.Version)
                         {
                             TanProcesses.Items.AddRange(hitans.TanProcesses
-                                .Where(ht => client.AllowedTanProcesses.Exists(t => t == Convert.ToInt16(ht.TanCode)))
+                                .Where(ht => client.AllowedTanProcesses != null && client.AllowedTanProcesses.Exists(t => t == Convert.ToInt16(ht.TanCode)))
                                 .Select(ht => new TanProcess() { ProcessName = ht.Name, ProcessNumber = ht.TanCode, TanMediumRequired = ht.TanMediumRequired }));
                         }
                     }

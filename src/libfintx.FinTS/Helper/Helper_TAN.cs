@@ -47,7 +47,8 @@ namespace libfintx.FinTS
             Log.Write($"Processing TAN process '{processname}' ...");
 
             // Smart-TAN photo
-            if (processname.Equals("Smart-TAN photo") || processname.Equals("photoTAN-Verfahren") || processname.Equals("photoTAN"))
+            if (processname.IndexOf("Smart-TAN photo", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                processname.IndexOf("photoTAN", StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 var PhotoCode = HITAN_challenge;
 

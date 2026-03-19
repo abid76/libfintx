@@ -224,7 +224,7 @@ namespace libfintx.Sample.Ui
 
                 HBCIOutput(accounts.Messages);
 
-                if (accounts.IsSuccess && !accounts.HasError)
+                if (accounts.IsSuccess && !accounts.HasError && accounts.Data != null)
                 {
                     foreach (var acc in accounts.Data)
                     {
@@ -714,7 +714,10 @@ namespace libfintx.Sample.Ui
         private TANDialog CreateTANDialog(FinTsClient client)
         {
             var dialog = new TANDialog(WaitForTanAsync);
-            if (client.TanProcessCode == 921 || client.TanProcessCode == 922 || client.TanProcessCode == 923 || client.TanProcessCode == 922 || client.TanProcessCode == 946)
+            if (client.TanProcessCode == 921 ||
+                (client.TanProcessCode == 922 && 30020900 != client.ConnectionDetails.Blz) ||
+                client.TanProcessCode == 923 ||
+                client.TanProcessCode == 946)
                 dialog.IsDecoupled = true;
 
             return dialog;

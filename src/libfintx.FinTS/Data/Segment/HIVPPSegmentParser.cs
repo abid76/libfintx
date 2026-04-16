@@ -11,18 +11,26 @@ namespace libfintx.FinTS.Data.Segment
         {
             var result = new HIVPP(segment);
 
-            result.VopId = segment.DataElements[0].Value;
-            result.VopIdValidUntil = segment.DataElements[1].Value;
-            result.PollingId = segment.DataElements[2].Value;
-            result.PaymentStatusReportDescriptor = segment.DataElements[3].Value;
-            result.PaymentStatusReport = segment.DataElements[4].Value;
-            result.VopCheckResultSingleTransaction = segment.DataElements.Count > 5 && segment.DataElements[5].DataElements?.Count > 0 ? ParseVopCheckResult(segment.DataElements[5]) : null;
-            result.AdditionalInfo = segment.DataElements.Count > 6 ?
-                segment.DataElements[6].Value :
-                null;
-            result.WaitUntilNextPolling = segment.DataElements.Count > 7 ?
-                (segment.DataElements[7].Value != null ? Convert.ToInt32(segment.DataElements[7].Value) : (int?) null) :
-                null;
+            if (segment.DataElements.Count > 4)
+            {
+                result.VopId = segment.DataElements[0].Value;
+                result.VopIdValidUntil = segment.DataElements[1].Value;
+                result.PollingId = segment.DataElements[2].Value;
+                result.PaymentStatusReportDescriptor = segment.DataElements[3].Value;
+                result.PaymentStatusReport = segment.DataElements[4].Value;
+            }
+            if (segment.DataElements.Count > 5)
+            {
+                result.VopCheckResultSingleTransaction = ParseVopCheckResult(segment.DataElements[5]);
+            }
+            if (segment.DataElements.Count > 6)
+            {
+                result.AdditionalInfo = segment.DataElements[6].Value;
+            }
+            if (segment.DataElements.Count > 7)
+            {
+                result.WaitUntilNextPolling = (segment.DataElements[7].Value != null ? Convert.ToInt32(segment.DataElements[7].Value) : (int?) null);
+            }
 
             return result;
         }

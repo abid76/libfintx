@@ -37,6 +37,11 @@ namespace libfintx.FinTS.Data.Segment
 
         private VopCheckResult ParseVopCheckResult(DataElement dataElement)
         {
+            if (dataElement?.DataElements?.Count < 5)
+            {
+                return null;
+            }
+
             var result = VopCheckResult.FromValue(dataElement.DataElements[4].Value);
             result.Iban = dataElement.DataElements[0].Value;
             result.IbanAdditionalInfo = dataElement.DataElements[1].Value;

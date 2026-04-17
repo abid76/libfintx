@@ -17,7 +17,7 @@ namespace libfintx.Tests
             var segment = new Segment(rawSegment);
             segment = new GenericSegmentParser().ParseSegment(segment);
             var parser = new HIVPPSegmentParser();
-            var hivpp = (HIVPP)parser.ParseSegment(segment);
+            var hivpp = (HIVPP) parser.ParseSegment(segment);
             Assert.Equal("HIVPP", hivpp.Name);
             Assert.Equal("0911-10-05-10.08.42.730944909325", hivpp.VopId);
             Assert.Empty(hivpp.VopIdValidUntil);
@@ -40,7 +40,7 @@ namespace libfintx.Tests
             var segment = new Segment(rawSegment);
             segment = new GenericSegmentParser().ParseSegment(segment);
             var parser = new HIVPPSegmentParser();
-            var hivpp = (HIVPP)parser.ParseSegment(segment);
+            var hivpp = (HIVPP) parser.ParseSegment(segment);
             Assert.NotNull(hivpp);
             Assert.Equal("5318-10-05-12.14.31.699628309325", hivpp.VopId);
             Assert.NotNull(hivpp.VopCheckResultSingleTransaction);
@@ -55,12 +55,31 @@ namespace libfintx.Tests
             var segment = new Segment(rawSegment);
             segment = new GenericSegmentParser().ParseSegment(segment);
             var parser = new HIVPPSegmentParser();
-            var hivpp = (HIVPP)parser.ParseSegment(segment);
+            var hivpp = (HIVPP) parser.ParseSegment(segment);
             Assert.NotNull(hivpp);
             Assert.Equal("cbcd6314-9386-4cab-835a-62b2ba9a5b69", hivpp.VopId);
             Assert.Equal("urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.002.001.10", hivpp.PaymentStatusReportDescriptor);
             Assert.Equal("Kontrollieren Sie das VOP-Prüfergebnis. Autorisieren Sie den Auftrag trotzdem, kann das Geld an eine falsche Person gehen.", hivpp.AdditionalInfo);
             var document = Pain00200110.Create(hivpp.PaymentStatusReport);
+        }
+
+        [Fact]
+        public void Test_HIVPP_4()
+        {
+            var rawSegment = @"HIVPP:6:1:3+++@36@e3ba13a9-5d5d-4821-823e-6aaeb757bce5+++++2";
+            var segment = new Segment(rawSegment);
+            segment = new GenericSegmentParser().ParseSegment(segment);
+            var parser = new HIVPPSegmentParser();
+            var hivpp = (HIVPP) parser.ParseSegment(segment);
+            Assert.NotNull(hivpp);
+            Assert.Empty(hivpp.VopId);
+            Assert.Empty(hivpp.VopIdValidUntil);
+            Assert.Equal("e3ba13a9-5d5d-4821-823e-6aaeb757bce5", hivpp.PollingId);
+            Assert.Empty(hivpp.PaymentStatusReportDescriptor);
+            Assert.Empty(hivpp.PaymentStatusReport);
+            Assert.Null(hivpp.VopCheckResultSingleTransaction);
+            Assert.Empty(hivpp.AdditionalInfo);
+            Assert.Equal(2, hivpp.WaitUntilNextPolling);
         }
     }
 }

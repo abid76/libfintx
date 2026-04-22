@@ -8,7 +8,7 @@ namespace libfintx.FinTS
     {
         public static string Init_HKVPA(FinTsClient client, string segments)
         {
-            segments = segments + "HKVPA:" + client.SegmentNumber + ":1+@" + client.VopId.Length + "@" + client.VopId + "'"; 
+            segments = segments + "HKVPA:" + client.SegmentNumber + ":1+@" + (client.VopId?.Length ?? 0) + "@" + client.VopId + "'"; 
             return segments;
         }
     }

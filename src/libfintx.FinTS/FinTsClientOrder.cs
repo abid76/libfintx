@@ -126,7 +126,7 @@ namespace libfintx.FinTS
             if (result.HasError)
                 return result;
 
-            result = await ProcessSCA(result, tanDialog);
+            result = await ProcessSCA(result, tanDialog, true);
             if (!result.IsSuccess)
                 return result;
 
@@ -165,7 +165,7 @@ namespace libfintx.FinTS
             if (result.HasError)
                 return result;
 
-            result = await ProcessSCA(result, tanDialog);
+            result = await ProcessSCA(result, tanDialog, true);
             if (!result.IsSuccess)
                 return result;
 
@@ -204,7 +204,7 @@ namespace libfintx.FinTS
             if (result.HasError)
                 return result;
 
-            result = await ProcessSCA(result, tanDialog);
+            result = await ProcessSCA(result, tanDialog, true);
             if (!result.IsSuccess)
                 return result;
 

@@ -49,7 +49,7 @@ namespace libfintx.FinTS
             if (result.HasError)
                 return result.TypedResult<List<BankersOrder>>();
 
-            result = await ProcessSCA(result, tanDialog);
+            result = await ProcessSCA(result, tanDialog, true);
             if (!result.IsSuccess)
                 return result.TypedResult<List<BankersOrder>>();
 

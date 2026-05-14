@@ -435,8 +435,10 @@ namespace libfintx.FinTS
             }
 
             result = await ProcessSCA(result, tanDialog);
-            if (result.HasError ||
-                result.IsSuccess) // Commerzbank antwortet bei erfolgreichem Namensabgleich hier mit einem Erfolg, also wurde die Transaktion von der Bank bereits angenommen.
+            if (result.HasError)
+            // Die Bedingung führt dazu, dass bei der Postbank der VOP-Prozess beendet wird, obwohl wir noch kein HKVPA gesendet haben. Deswegen erstmal auskommentiert.
+            // Evtl. hilft es, die Bedindung wieder reinzunehmen und dabei zu prüfen, ob PaymentStatusReport leer ist.
+            // || result.IsSuccess) // Commerzbank antwortet bei erfolgreichem Namensabgleich hier mit einem Erfolg, also wurde die Transaktion von der Bank bereits angenommen.
             {
                 return result;
             }

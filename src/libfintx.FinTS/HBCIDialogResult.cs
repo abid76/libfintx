@@ -36,6 +36,10 @@ namespace libfintx.FinTS
         public bool HasError => _messages.Any(m => m.IsError);
         public bool HasUnknown => _messages.Any(m => m.IsUnknown);
 
+        public bool IsOrderConfirmed => GetMessage("0010") != null;
+
+        public bool IsOrderExecuted => GetMessage("0020") != null;
+
         /// <summary>
         /// Returns true if there is any message with code <i>0030</i>.
         /// </summary>

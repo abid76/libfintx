@@ -352,15 +352,12 @@ namespace libfintx.FinTS
                             }
                         }
 
-                        if (TanProcesses.Items == null)
-                            TanProcesses.Items = new List<TanProcess>();
+                        if (client.TanProcesses == null)
+                            client.TanProcesses = new List<TanProcess>();
                         // Nur solche TAN-Verfahren berücksichtigen, die den erlaubten TAN-Verfahren entsprechen
-                        if (client.HktanVersion == 0 || client.HktanVersion == segment.Version)
-                        {
-                            TanProcesses.Items.AddRange(hitans.TanProcesses
-                                .Where(ht => client.AllowedTanProcesses != null && client.AllowedTanProcesses.Exists(t => t == Convert.ToInt16(ht.TanCode)))
-                                .Select(ht => new TanProcess() { ProcessName = ht.Name, ProcessNumber = ht.TanCode, TanMediumRequired = ht.TanMediumRequired }));
-                        }
+                        client.TanProcesses.AddRange(hitans.TanProcesses
+                            .Where(ht => client.AllowedTanProcesses != null && client.AllowedTanProcesses.Exists(t => t == Convert.ToInt16(ht.TanCode)))
+                            .Select(ht => new TanProcess() { ProcessName = ht.Name, ProcessNumber = ht.TanCode, TanMediumRequired = ht.TanMediumRequired }));
                     }
 
                     if (segment.Name == "HITAN")

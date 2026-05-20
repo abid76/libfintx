@@ -254,7 +254,7 @@ namespace libfintx.Sample.Ui
 
             if (sync.IsSuccess)
             {
-                foreach (var process in TanProcesses.Items)
+                foreach (var process in client.TanProcesses)
                 {
                     SimpleOutput("Name: " + process.ProcessName + " | " + "Nummer: " + process.ProcessNumber);
                 }

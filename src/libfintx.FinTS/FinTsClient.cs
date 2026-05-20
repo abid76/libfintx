@@ -47,7 +47,19 @@ namespace libfintx.FinTS
         public string TanMedium { get; set; }
         public int? TanProcessCode { get; set; }
         public int? TanMediumRequired { get; set; }
+
+        /// <summary>
+        /// Erlaubte TAN-Prozesse gemäß HIRMS:
+        /// <p>
+        /// <code>HIRMS:4:2:4+1040::BPD nicht mehr aktuell. Aktuelle Version folgt.+3920::Meldung unterstützter Ein- und Zwei-Schritt-Verfahren:920:921+0940::Letzte Anmeldung am 20.05.2026 - 12?:45?:02:20.05.2026 - 12?:45?:02'</code>
+        /// </p>
+        /// </summary>
         internal List<int> AllowedTanProcesses { get; set; }
+
+        /// <summary>
+        /// Erlaubte TAN-Verfahren gemäß HITANS und HIRMS.
+        /// </summary>
+        public List<TanProcess> TanProcesses { get; set; }
 
         public int HktanVersion { get; set; }
         public int HkcdbVersion { get; set; }

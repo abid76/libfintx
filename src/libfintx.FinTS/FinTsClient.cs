@@ -91,6 +91,8 @@ namespace libfintx.FinTS
         public bool VopDescriptionStructured { get; internal set; }
         // Needed for repeated call of GV, when confirming VOP
         internal string LastSepaMessage { get; set; }
+        public int HkkauVersion { get; internal set; }
+        public int HkekaVersion { get; internal set; }
 
         internal List<string> VopGvList = new List<string>();
 

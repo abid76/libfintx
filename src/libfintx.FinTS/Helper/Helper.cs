@@ -31,6 +31,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using libfintx.FinTS.Camt;
 using libfintx.FinTS.Data;
+using libfintx.FinTS.Data.BPD;
 using libfintx.FinTS.Data.Segment;
 using libfintx.Globals;
 using libfintx.Logger.Log;
@@ -458,9 +459,14 @@ namespace libfintx.FinTS
                         }
                     }
 
+                    if (segment.Name == "HIKAUS")
+                    {
+                        client.HkkauVersion = segment.Version;
+                    }
+
                     if (segment.Name == "HIEKAS")
                     {
-
+                        client.HkekaVersion = segment.Version;
                     }
                 }
 

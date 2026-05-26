@@ -29,7 +29,7 @@ namespace libfintx.FinTS.Segments
                 };
             }
             client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
-            segments += "HKEKA:" + client.SegmentNumber + ":3+" + Helper.CreateAccountInfo(client) + ":" + statementsFormat + ":" + statementsNumber + ":" + statementsYear + "'";
+            segments += "HKEKA:" + client.SegmentNumber + ":" + client.HkekaVersion + "+" + Helper.CreateAccountInfo(client) + ":" + statementsFormat + ":" + statementsNumber + ":" + statementsYear + "'";
 
             if (Helper.IsTANRequired("HKEKA"))
             {

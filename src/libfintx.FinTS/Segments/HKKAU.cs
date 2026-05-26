@@ -29,7 +29,7 @@ namespace libfintx.FinTS
                 };
             }
             client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
-            segments += "HKKAU:" + client.SegmentNumber + ":2+" + Helper.CreateAccountInfo(client) + "'";
+            segments += "HKKAU:" + client.SegmentNumber + ":" + client.HkkauVersion + "+" + Helper.CreateAccountInfo(client) + "'";
 
             if (Helper.IsTANRequired("HKKAU"))
             {

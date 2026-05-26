@@ -6,9 +6,9 @@ using libfintx.FinTS.Message;
 
 namespace libfintx.FinTS
 {
-    public static class HKEKA
+    public static class HKQTG
     {
-        public static async Task<String> Init_HKEKA(FinTsClient client, int statementsFormat, int statementsNumber, int statementsYear)
+        public static async Task<String> Init_HKQTG(FinTsClient client, byte[] acknowlegementCode)
         {
             string segments = string.Empty;
             var connectionDetails = client.ConnectionDetails;
@@ -29,12 +29,12 @@ namespace libfintx.FinTS
                 };
             }
             client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
-            segments += "HKEKA:" + client.SegmentNumber + ":" + client.HkekaVersion + "+" + Helper.CreateAccountInfo(client) + ":" + statementsFormat + ":" + statementsNumber + ":" + statementsYear + "'";
+            segments += "HKQTG:" + client.SegmentNumber + ":1+" + Encoding.GetEncoding("ISO-8859-1").GetString(acknowlegementCode) + "'";
 
-            if (Helper.IsTANRequired("HKEKA"))
+            if (Helper.IsTANRequired("HKQTG"))
             {
                 client.SegmentNumber++;
-                segments = HKTAN.Init_HKTAN(client, segments, "HKEKA");
+                segments = HKTAN.Init_HKTAN(client, segments, "HKQTG");
             }
 
             string message = FinTSMessage.Create(client, client.MessageNumber, client.DialogId, segments, client.TanProcessCode);

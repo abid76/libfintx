@@ -94,6 +94,8 @@ namespace libfintx.FinTS
         public int HkkauVersion { get; internal set; }
         public int HkekaVersion { get; internal set; }
 
+        public bool HkekaAcknowledgementNeeded { get; internal set; }
+
         internal List<string> VopGvList = new List<string>();
 
         public FinTsClient(ConnectionDetails conn, bool anon = false)

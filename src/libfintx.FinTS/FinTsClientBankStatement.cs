@@ -121,24 +121,24 @@ namespace libfintx.FinTS
             return result.TypedResult(bankStatements);
         }
 
-        public async Task<HBCIDialogResult<byte[]>> GetBankStatement(TANDialog tanDialog, BankStatementsFormat statementsFormat, int statementsNumber, int statementsYear)
+        public async Task<HBCIDialogResult> GetBankStatement(TANDialog tanDialog, BankStatementsFormat statementsFormat, int statementsNumber, int statementsYear, Action<byte[]> bankStatementHandler, bool acknowledge = true)
         {
             var result = await InitializeConnection();
             if (result.HasError)
-                return result.TypedResult<byte[]>();
+                return result;
 
             result = await ProcessSCA(result, tanDialog);
             if (result.HasError)
-                return result.TypedResult<byte[]>();
+                return result;
 
             var bankCode = await Transaction.HKEKA(this, (int) statementsFormat, statementsNumber, statementsYear);
             result = new HBCIDialogResult(Helper.Parse_BankCode(bankCode), bankCode);
             if (result.HasError)
-                return result.TypedResult<byte[]>();
+                return result;
 
             result = await ProcessSCA(result, tanDialog);
             if (result.HasError)
-                return result.TypedResult<byte[]>();
+                return result;
 
             bankCode = result.RawData;
             var values = Helper.SplitEncryptedSegments(bankCode);
@@ -149,11 +149,21 @@ namespace libfintx.FinTS
                 {
                     var hieka = segment as HIEKA;
                     if (hieka?.Statements != null)
-                        return result.TypedResult(hieka.Statements);
+                    {
+                        bankStatementHandler?.Invoke(hieka.Statements);
+                        if (HkekaAcknowledgementNeeded && acknowledge)
+                        {
+                            bankCode = await Transaction.HKQTG(this, hieka.AcknowledgementCode);
+                            result = new HBCIDialogResult(Helper.Parse_BankCode(bankCode), bankCode);
+                            if (result.HasError)
+                                return result;
+                            result = await ProcessSCA(result, tanDialog);
+                        }
+                    }
                 }
             }
 
-            return result.TypedResult<byte[]>();
+            return result;
         }
     }
 }

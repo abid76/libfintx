@@ -466,7 +466,10 @@ namespace libfintx.FinTS
 
                     if (segment.Name == "HIEKAS")
                     {
-                        client.HkekaVersion = segment.Version;
+                        var hiekas = segment as HIEKAS;
+
+                        client.HkekaVersion = hiekas.Version;
+                        client.HkekaAcknowledgementNeeded = hiekas.AcknowledgementNeeded;
                     }
                 }
 

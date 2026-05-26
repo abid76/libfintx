@@ -45,5 +45,12 @@ namespace libfintx.FinTS.Data.Segment
 
             return null;
         }
+
+        protected static byte[] ParseBytes(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return null;
+            return Encoding.GetEncoding("ISO-8859-1").GetBytes(value);
+        }
     }
 }

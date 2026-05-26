@@ -471,6 +471,14 @@ namespace libfintx.FinTS
                         client.HkekaVersion = hiekas.Version;
                         client.HkekaAcknowledgementNeeded = hiekas.AcknowledgementNeeded;
                     }
+
+                    if (segment.Name == "HIEKPS")
+                    {
+                        var hiekps = segment as HIEKPS;
+
+                        client.HiekaVersion = hiekps.Version;
+                        client.HiekaAcknowledgementNeeded = hiekps.AcknowledgementNeeded;
+                    }
                 }
 
                 // Fallback if HIKAZS is not delivered by BPD (eg. Postbank)

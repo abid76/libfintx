@@ -51,6 +51,7 @@ using static libfintx.FinTS.Tan;
 using static libfintx.FinTS.Tan4;
 using static libfintx.FinTS.HKKAU;
 using static libfintx.FinTS.HKEKA;
+using static libfintx.FinTS.HKEKP;
 using static libfintx.FinTS.HKQTG;
 using libfintx.Sepa;
 
@@ -187,6 +188,11 @@ namespace libfintx.FinTS
         public static async Task<String> HKEKA(FinTsClient client, int statementsFormat, int statementsNumber, int statementsYear)
         {
             return await Init_HKEKA(client, statementsFormat, statementsNumber, statementsYear);
+        }
+
+        public static async Task<String> HKEKP(FinTsClient client)
+        {
+            return await Init_HKEKP(client);
         }
 
         public static async Task<String> HKQTG(FinTsClient client, byte[] acknowlegementCode)

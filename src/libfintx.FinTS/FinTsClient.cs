@@ -95,6 +95,9 @@ namespace libfintx.FinTS
         public int HkekaVersion { get; internal set; }
 
         public bool HkekaAcknowledgementNeeded { get; internal set; }
+        public int HiekaVersion { get; internal set; }
+
+        public bool HiekaAcknowledgementNeeded { get; internal set; }
 
         internal List<string> VopGvList = new List<string>();
 

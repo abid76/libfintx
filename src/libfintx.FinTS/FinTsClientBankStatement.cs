@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Linq;
 using System.Threading.Tasks;
 using libfintx.FinTS.Camt;
 using libfintx.FinTS.Camt.Camt052;
@@ -118,6 +119,41 @@ namespace libfintx.FinTS
             }
 
             return result.TypedResult(bankStatements);
+        }
+
+        public async Task<HBCIDialogResult<byte[]>> GetBankStatement(TANDialog tanDialog, BankStatementsFormat statementsFormat, int statementsNumber, int statementsYear)
+        {
+            var result = await InitializeConnection();
+            if (result.HasError)
+                return result.TypedResult<byte[]>();
+
+            result = await ProcessSCA(result, tanDialog);
+            if (result.HasError)
+                return result.TypedResult<byte[]>();
+
+            var bankCode = await Transaction.HKEKA(this, (int) statementsFormat, statementsNumber, statementsYear);
+            result = new HBCIDialogResult(Helper.Parse_BankCode(bankCode), bankCode);
+            if (result.HasError)
+                return result.TypedResult<byte[]>();
+
+            result = await ProcessSCA(result, tanDialog);
+            if (result.HasError)
+                return result.TypedResult<byte[]>();
+
+            bankCode = result.RawData;
+            var values = Helper.SplitEncryptedSegments(bankCode);
+            foreach (var item in values)
+            {
+                var segment = Helper.Parse_Segment(item);
+                if (segment?.Name == "HIEKA")
+                {
+                    var hieka = segment as HIEKA;
+                    if (hieka?.Statements != null)
+                        return result.TypedResult(hieka.Statements);
+                }
+            }
+
+            return result.TypedResult<byte[]>();
         }
     }
 }

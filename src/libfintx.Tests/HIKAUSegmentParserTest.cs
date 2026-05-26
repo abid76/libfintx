@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using libfintx.FinTS.Data.Segment;
 using Xunit;
 
@@ -20,7 +20,7 @@ namespace libfintx.Tests
             Assert.Equal(5, segment.Number);
             Assert.Equal(2, segment.Version);
             Assert.Equal(4, hikau.StatementNumber);
-            Assert.Equal("1", hikau.AcknowledgementCode);
+            Assert.Equal(HIKAU.AcknowledgementCodeEnum.Done, hikau.AcknowledgementCode);
             Assert.True(hikau.PickupPossible);
             Assert.Equal(2026, hikau.Year);
             Assert.Equal(new DateTime(2026, 4, 30), hikau.CreationDate);
@@ -40,7 +40,7 @@ namespace libfintx.Tests
 
             Assert.Equal(6, segment.Number);
             Assert.Equal(90001, hikau.StatementNumber);
-            Assert.Equal("1", hikau.AcknowledgementCode);
+            Assert.Equal(HIKAU.AcknowledgementCodeEnum.Done, hikau.AcknowledgementCode);
             Assert.False(hikau.PickupPossible);
             Assert.Equal(2026, hikau.Year);
             Assert.Equal(new DateTime(2026, 4, 1), hikau.CreationDate);
@@ -60,7 +60,7 @@ namespace libfintx.Tests
 
             Assert.Equal(7, segment.Number);
             Assert.Equal(3, hikau.StatementNumber);
-            Assert.Equal("1", hikau.AcknowledgementCode);
+            Assert.Equal(HIKAU.AcknowledgementCodeEnum.Done, hikau.AcknowledgementCode);
             Assert.True(hikau.PickupPossible);
             Assert.Equal(2026, hikau.Year);
             Assert.Equal(new DateTime(2026, 4, 1), hikau.CreationDate);

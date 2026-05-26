@@ -533,7 +533,7 @@ namespace libfintx.Sample.Ui
             var result = new ConnectionDetails()
             {
                 AccountHolder = txt_empfängername.Text,
-                Account = txt_kontonummer.Text,
+                Account = Regex.Replace(txt_kontonummer.Text, @"\s+", ""),
                 SubAccount = txt_unterkontomerkmal.Text,
                 Blz = Convert.ToInt32(txt_bankleitzahl.Text),
                 BlzHeadquarter = string.IsNullOrWhiteSpace(txt_bankleitzahl_zentrale.Text) ? (int?)null : Convert.ToInt32(txt_bankleitzahl_zentrale.Text),
@@ -817,6 +817,43 @@ namespace libfintx.Sample.Ui
                             "Betrag: " + txInfo.Amount + " | " +
                             "Verwendungszweck: " + txInfo.RemittanceInformation + " | " +
                             "Ausführung: " + $"{paymentData.RequestedExecutionDate:d}");
+                    }
+                }
+            }
+        }
+
+        private async void btn_kontoauszuege_anzeigen_ClickAsync(object sender, EventArgs e)
+        {
+            var connectionDetails = GetConnectionDetails();
+            var client = new FinTsClient(connectionDetails);
+            var sync = await client.Synchronization();
+
+            HBCIOutput(sync.Messages);
+
+            if (sync.IsSuccess)
+            {
+                // TAN-Verfahren
+                client.TanProcessCode = Convert.ToInt16(txt_tanverfahren.Text);
+
+                if (!await InitTANMedium(client))
+                    return;
+
+                var result = await client.BankStatements(CreateTANDialog(client));
+
+                HBCIOutput(result.Messages);
+
+                if (result.Data != null && result.Data.Count > 0)
+                {
+                    foreach (var item in result.Data)
+                    {
+                        SimpleOutput(
+                            "Kontoauszug: " + item.StatementNumber + " | " +
+                            "Jahr: " + item.Year + " | " +
+                            "Erstellungsdatum: " + item.CreationDate + " | " +
+                            "Erstellungszeit: " + item.CreationTime + " | " +
+                            "Erstellungstyp: " + item.CreationType + " | " +
+                            "Abholung möglich: " + item.PickupPossible + " | " +
+                            "Quittung: " + item.AcknowledgementCode);
                     }
                 }
             }

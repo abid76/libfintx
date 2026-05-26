@@ -16,9 +16,12 @@ namespace libfintx.FinTS.Data.Segment
                 result.StatementNumber = ParseInteger(segment.DataElements[0].Value) ?? 0;
             }
 
-            if (segment.DataElements.Count > 1)
+            if (segment.DataElements.Count > 1 && !string.IsNullOrEmpty(segment.DataElements[1].Value))
             {
-                result.AcknowledgementCode = segment.DataElements[1].Value;
+                if (Enum.TryParse<HIKAU.AcknowledgementCodeEnum>(segment.DataElements[1].Value, out var code))
+                {
+                    result.AcknowledgementCode = code;
+                }
             }
 
             if (segment.DataElements.Count > 2)

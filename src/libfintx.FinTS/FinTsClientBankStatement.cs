@@ -87,16 +87,33 @@ namespace libfintx.FinTS
                 if (segment.Name == "HIKAU")
                 {
                     var hikau = segment as HIKAU;
-                    bankStatements.Add(new BankStatement()
+                    var statement = new BankStatement()
                     {
                         StatementNumber = hikau.StatementNumber,
-                        AcknowledgementCode = hikau.AcknowledgementCode,
                         PickupPossible = hikau.PickupPossible,
                         Year = hikau.Year,
                         CreationDate = hikau.CreationDate,
                         CreationTime = hikau.CreationTime,
                         CreationType = hikau.CreationType
-                    });
+                    };
+
+                    if (hikau.AcknowledgementCode.HasValue)
+                    {
+                        switch (hikau.AcknowledgementCode.Value)
+                        {
+                            case HIKAU.AcknowledgementCodeEnum.NotNeeded:
+                                statement.AcknowledgementNotNeeded = true;
+                                break;
+                            case HIKAU.AcknowledgementCodeEnum.Done:
+                                statement.AcknowledgementDone = true;
+                                break;
+                            case HIKAU.AcknowledgementCodeEnum.Pending:
+                                statement.AcknowledgementPending = true;
+                                break;
+                        }
+                    }
+
+                    bankStatements.Add(statement);
                 }
             }
 

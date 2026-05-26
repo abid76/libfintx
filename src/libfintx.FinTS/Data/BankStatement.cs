@@ -7,7 +7,9 @@ namespace libfintx.FinTS.Data
     public class BankStatement
     {
         public int StatementNumber { get; internal set; }
-        public string AcknowledgementCode { get; internal set; }
+        public bool AcknowledgementNotNeeded { get; internal set; }
+        public bool AcknowledgementDone { get; internal set; }
+        public bool AcknowledgementPending { get; internal set; }
         public bool? PickupPossible { get; internal set; }
         public int? Year { get; internal set; }
         public DateTime? CreationDate { get; internal set; }

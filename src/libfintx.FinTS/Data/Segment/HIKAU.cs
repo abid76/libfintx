@@ -6,9 +6,16 @@ namespace libfintx.FinTS.Data.Segment
 {
     public class HIKAU : SegmentBase
     {
+        public enum AcknowledgementCodeEnum
+        {
+            NotNeeded = 0,
+            Done = 1,
+            Pending = 2
+        }
+
         public int StatementNumber { get; set; }
 
-        public string AcknowledgementCode { get; set; }
+        public AcknowledgementCodeEnum? AcknowledgementCode { get; set; }
 
         public bool? PickupPossible { get; set; }
 

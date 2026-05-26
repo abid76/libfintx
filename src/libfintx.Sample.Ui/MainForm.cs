@@ -846,6 +846,10 @@ namespace libfintx.Sample.Ui
                 {
                     foreach (var item in result.Data)
                     {
+                        var ackStatus = item.AcknowledgementNotNeeded ? "Nicht benötigt" :
+                                           item.AcknowledgementDone ? "Erledigt" :
+                                           item.AcknowledgementPending ? "Ausstehend" : "Unbekannt";
+
                         SimpleOutput(
                             "Kontoauszug: " + item.StatementNumber + " | " +
                             "Jahr: " + item.Year + " | " +
@@ -853,7 +857,7 @@ namespace libfintx.Sample.Ui
                             "Erstellungszeit: " + item.CreationTime + " | " +
                             "Erstellungstyp: " + item.CreationType + " | " +
                             "Abholung möglich: " + item.PickupPossible + " | " +
-                            "Quittung: " + item.AcknowledgementCode);
+                            "Quittung: " + ackStatus);
                     }
                 }
             }

@@ -31,6 +31,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using libfintx.FinTS.Camt;
 using libfintx.FinTS.Data;
+using libfintx.FinTS.Data.BPD;
 using libfintx.FinTS.Data.Segment;
 using libfintx.Globals;
 using libfintx.Logger.Log;
@@ -456,6 +457,27 @@ namespace libfintx.FinTS
                             client.VopGvList = hivpps.ParamCheckOrder.VopOrderMandatory;
                             client.VopDescriptionStructured = hivpps.ParamCheckOrder.DescriptionStructured;
                         }
+                    }
+
+                    if (segment.Name == "HIKAUS")
+                    {
+                        client.HkkauVersion = segment.Version;
+                    }
+
+                    if (segment.Name == "HIEKAS")
+                    {
+                        var hiekas = segment as HIEKAS;
+
+                        client.HkekaVersion = hiekas.Version;
+                        client.HkekaAcknowledgementNeeded = hiekas.AcknowledgementNeeded;
+                    }
+
+                    if (segment.Name == "HIEKPS")
+                    {
+                        var hiekps = segment as HIEKPS;
+
+                        client.HiekaVersion = hiekps.Version;
+                        client.HiekaAcknowledgementNeeded = hiekps.AcknowledgementNeeded;
                     }
                 }
 

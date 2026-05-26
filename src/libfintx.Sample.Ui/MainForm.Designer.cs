@@ -89,6 +89,7 @@
             this.chk_tracingMaskCredentials = new System.Windows.Forms.CheckBox();
             this.lbl_unterkontomerkmal = new System.Windows.Forms.Label();
             this.txt_unterkontomerkmal = new System.Windows.Forms.TextBox();
+            this.btn_kontoauszuege_anzeigen = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pBox_tan)).BeginInit();
             this.SuspendLayout();
             // 
@@ -696,11 +697,23 @@
             this.txt_unterkontomerkmal.Size = new System.Drawing.Size(137, 29);
             this.txt_unterkontomerkmal.TabIndex = 104;
             // 
+            // btn_kontoauszuege_anzeigen
+            // 
+            this.btn_kontoauszuege_anzeigen.Location = new System.Drawing.Point(1047, 588);
+            this.btn_kontoauszuege_anzeigen.Margin = new System.Windows.Forms.Padding(6);
+            this.btn_kontoauszuege_anzeigen.Name = "btn_kontoauszuege_anzeigen";
+            this.btn_kontoauszuege_anzeigen.Size = new System.Drawing.Size(231, 72);
+            this.btn_kontoauszuege_anzeigen.TabIndex = 105;
+            this.btn_kontoauszuege_anzeigen.Text = "Kontoauszüge anzeigen";
+            this.btn_kontoauszuege_anzeigen.UseVisualStyleBackColor = true;
+            this.btn_kontoauszuege_anzeigen.Click += new System.EventHandler(this.btn_kontoauszuege_anzeigen_ClickAsync);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(2237, 1401);
+            this.Controls.Add(this.btn_kontoauszuege_anzeigen);
             this.Controls.Add(this.txt_unterkontomerkmal);
             this.Controls.Add(this.lbl_unterkontomerkmal);
             this.Controls.Add(this.chk_tracingMaskCredentials);
@@ -837,6 +850,7 @@
         private System.Windows.Forms.CheckBox chk_tracingMaskCredentials;
         internal System.Windows.Forms.Label lbl_unterkontomerkmal;
         internal System.Windows.Forms.TextBox txt_unterkontomerkmal;
+        internal System.Windows.Forms.Button btn_kontoauszuege_anzeigen;
     }
 }
 

@@ -457,6 +457,11 @@ namespace libfintx.FinTS
                             client.VopDescriptionStructured = hivpps.ParamCheckOrder.DescriptionStructured;
                         }
                     }
+
+                    if (segment.Name == "HIEKAS")
+                    {
+
+                    }
                 }
 
                 // Fallback if HIKAZS is not delivered by BPD (eg. Postbank)

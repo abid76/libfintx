@@ -5,9 +5,9 @@ using libfintx.FinTS.Data.BPD;
 
 namespace libfintx.FinTS.Data.Segment
 {
-    public class HIEKPSSegmentParser : ISegmentParser
+    public class HIEKPSSegmentParser : SegmentParserBase
     {
-        public Segment ParseSegment(Segment segment)
+        public override Segment ParseSegment(Segment segment)
         {
             var result = new HIEKPS(segment);
             if (segment.DataElements.Count > 3)
@@ -15,9 +15,9 @@ namespace libfintx.FinTS.Data.Segment
                 var paramDataElements = segment.DataElements[3];
                 if (paramDataElements.DataElements.Count > 3)
                 {
-                    result.BankStatementNumberAllowed = paramDataElements.DataElements[0].Value == "J";
-                    result.AcknowledgementNeeded = paramDataElements.DataElements[1].Value == "J";
-                    result.CountEntriesAllowed = paramDataElements.DataElements[2].Value == "J";
+                    result.BankStatementNumberAllowed = ParseBoolean(paramDataElements.DataElements[0].Value) ?? false;
+                    result.AcknowledgementNeeded = ParseBoolean(paramDataElements.DataElements[1].Value) ?? false;
+                    result.CountEntriesAllowed = ParseBoolean(paramDataElements.DataElements[2].Value) ?? false;
                 }
             }
             return result;

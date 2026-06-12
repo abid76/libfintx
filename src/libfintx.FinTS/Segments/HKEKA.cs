@@ -8,7 +8,7 @@ namespace libfintx.FinTS
 {
     public static class HKEKA
     {
-        public static async Task<String> Init_HKEKA(FinTsClient client, int statementsFormat, int statementsNumber, int statementsYear)
+        public static async Task<String> Init_HKEKA(FinTsClient client, int statementsFormat, int? statementsNumber = null, int? statementsYear = null)
         {
             string segments = string.Empty;
             var connectionDetails = client.ConnectionDetails;
@@ -29,7 +29,16 @@ namespace libfintx.FinTS
                 };
             }
             client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
-            segments += "HKEKA:" + client.SegmentNumber + ":" + client.HkekaVersion + "+" + Helper.CreateAccountInfo(client) + ":" + statementsFormat + ":" + statementsNumber + ":" + statementsYear + "'";
+            segments += "HKEKA:" + client.SegmentNumber + ":" + client.HkekaVersion + "+" + Helper.CreateAccountInfo(client) + "+" + statementsFormat;
+            if (statementsNumber.HasValue)
+            {
+                segments += "+" + statementsNumber.Value.ToString();
+            }
+            if (statementsYear.HasValue)
+            {
+                segments += "+" + statementsYear.Value.ToString();
+            }
+            segments += "'";
 
             if (Helper.IsTANRequired("HKEKA"))
             {

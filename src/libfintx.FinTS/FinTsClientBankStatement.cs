@@ -121,7 +121,7 @@ namespace libfintx.FinTS
             return result.TypedResult(bankStatements);
         }
 
-        public async Task<HBCIDialogResult> GetBankStatement(TANDialog tanDialog, BankStatementsFormat statementsFormat, int statementsNumber, int statementsYear, Action<byte[]> bankStatementHandler, bool acknowledge = true)
+        public async Task<HBCIDialogResult> GetBankStatement(TANDialog tanDialog, BankStatementsFormat statementsFormat, int? statementsNumber, int? statementsYear, Action<byte[]> bankStatementHandler, bool acknowledge = true)
         {
             var result = await InitializeConnection();
             if (result.HasError)
@@ -166,7 +166,7 @@ namespace libfintx.FinTS
             return result;
         }
 
-        public async Task<HBCIDialogResult> GetBankStatementPdf(TANDialog tanDialog, Action<byte[]> bankStatementHandler, bool acknowledge = true)
+        public async Task<HBCIDialogResult> GetBankStatementPdf(TANDialog tanDialog, int? bankStatementNumber, int? bankStatementYear, Action<byte[]> bankStatementHandler, bool acknowledge = true)
         {
             var result = await InitializeConnection();
             if (result.HasError)
@@ -176,7 +176,7 @@ namespace libfintx.FinTS
             if (result.HasError)
                 return result;
 
-            var bankCode = await Transaction.HKEKP(this);
+            var bankCode = await Transaction.HKEKP(this, bankStatementNumber, bankStatementYear);
             result = new HBCIDialogResult(Helper.Parse_BankCode(bankCode), bankCode);
             if (result.HasError)
                 return result;

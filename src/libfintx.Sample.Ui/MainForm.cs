@@ -665,6 +665,12 @@ namespace libfintx.Sample.Ui
 
         private static readonly string AccountFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "account.csv");
 
+        private static string GetDesktopPdfPath()
+        {
+            var desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+            return Path.Combine(desktop, $"Kontoauszug_{DateTime.Now:yyyyMMdd_HHmmss}.pdf");
+        }
+
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
             _closing = true;
@@ -822,7 +828,7 @@ namespace libfintx.Sample.Ui
             }
         }
 
-        private async void btn_kontoauszuege_anzeigen_ClickAsync(object sender, EventArgs e)
+        private async void btn_kontoauszuege_anzeigen_Click(object sender, EventArgs e)
         {
             var connectionDetails = GetConnectionDetails();
             var client = new FinTsClient(connectionDetails);
@@ -860,6 +866,75 @@ namespace libfintx.Sample.Ui
                             "Quittung: " + ackStatus);
                     }
                 }
+            }
+        }
+
+        private async void btn_kontoauszuege_herunterladen_Click(object sender, EventArgs e)
+        {
+            var connectionDetails = GetConnectionDetails();
+            var client = new FinTsClient(connectionDetails);
+            var sync = await client.Synchronization();
+
+            HBCIOutput(sync.Messages);
+
+            if (sync.IsSuccess)
+            {
+                // TAN-Verfahren
+                client.TanProcessCode = Convert.ToInt16(txt_tanverfahren.Text);
+
+                if (!await InitTANMedium(client))
+                    return;
+
+                HBCIDialogResult result;
+                if (client.HkekpVersion > 0)
+                {
+                    int? bankStatementNumber = null;
+                    int? bankStatementYear = null;
+                    if (client.HkekpBankStatementNumberAllowed)
+                    {
+                        var refDate = DateTime.Now.AddMonths(-1);
+                        bankStatementNumber = refDate.Month;
+                        bankStatementYear = refDate.Year;
+                    }
+                    result = await client.GetBankStatementPdf(CreateTANDialog(client), bankStatementNumber, bankStatementYear, (pdfData) =>
+                    {
+                        var fileName = GetDesktopPdfPath();
+                        File.WriteAllBytes(fileName, pdfData);
+                        SimpleOutput($"Kontoauszug wurde auf dem Desktop gespeichert: {fileName}");
+                    });
+                }
+                else if (client.HkekaVersion > 0)
+                {
+                    if (!client.HkekaIsPdfFormatSupported)
+                    {
+                        // Import anderer Formate noch nicht implementiert.
+                        SimpleOutput("Der Abruf von PDF-Kontoauszügen wird von der Bank nicht unterstützt.");
+                        return;
+                    }
+
+                    int? bankStatementNumber = null;
+                    int? bankStatementYear = null;
+                    if (client.HkekaBankStatementNumberAllowed)
+                    {
+                        var refDate = DateTime.Now.AddMonths(-1);
+                        bankStatementNumber = refDate.Month;
+                        bankStatementYear = refDate.Year;
+                    }
+
+                    result = await client.GetBankStatement(CreateTANDialog(client), BankStatementsFormat.Pdf, bankStatementNumber,  bankStatementYear, (pdfData) =>
+                    {
+                        var fileName = GetDesktopPdfPath();
+                        File.WriteAllBytes(fileName, pdfData);
+                        SimpleOutput($"Kontoauszug wurde auf dem Desktop gespeichert: {fileName}");
+                    });
+                }
+                else
+                {
+                    SimpleOutput("Der Abruf von Kontoauszügen wird von der Bank nicht unterstützt.");
+                    return;
+                }
+
+                HBCIOutput(result.Messages);
             }
         }
     }

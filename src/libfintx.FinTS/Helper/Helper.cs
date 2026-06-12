@@ -469,6 +469,9 @@ namespace libfintx.FinTS
                         var hiekas = segment as HIEKAS;
 
                         client.HkekaVersion = hiekas.Version;
+                        client.HkekaSupportedFormats = hiekas.SupportedFormats;
+                        client.HkekaIsPdfFormatSupported = hiekas.IsPdfFormatSupported;
+                        client.HkekaBankStatementNumberAllowed = hiekas.BankStatementNumberAllowed;
                         client.HkekaAcknowledgementNeeded = hiekas.AcknowledgementNeeded;
                     }
 
@@ -476,8 +479,9 @@ namespace libfintx.FinTS
                     {
                         var hiekps = segment as HIEKPS;
 
-                        client.HiekaVersion = hiekps.Version;
-                        client.HiekaAcknowledgementNeeded = hiekps.AcknowledgementNeeded;
+                        client.HkekpVersion = hiekps.Version;
+                        client.HkekpBankStatementNumberAllowed = hiekps.BankStatementNumberAllowed;
+                        client.HkekpAcknowledgementNeeded = hiekps.AcknowledgementNeeded;
                     }
                 }
 

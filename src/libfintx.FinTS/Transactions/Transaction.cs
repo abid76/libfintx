@@ -185,17 +185,17 @@ namespace libfintx.FinTS
             return await Init_HKKAU(client);
         }
 
-        public static async Task<String> HKEKA(FinTsClient client, int statementsFormat, int statementsNumber, int statementsYear)
+        public static async Task<String> HKEKA(FinTsClient client, int statementsFormat, int? statementsNumber, int? statementsYear)
         {
             return await Init_HKEKA(client, statementsFormat, statementsNumber, statementsYear);
         }
 
-        public static async Task<String> HKEKP(FinTsClient client)
+        public static async Task<String> HKEKP(FinTsClient client, int? bankStatementNumber, int? bankStatementYear)
         {
-            return await Init_HKEKP(client);
+            return await Init_HKEKP(client, bankStatementNumber, bankStatementYear);
         }
 
-        public static async Task<String> HKQTG(FinTsClient client, byte[] acknowlegementCode)
+        public static async Task<String> HKQTG(FinTsClient client, string acknowlegementCode)
         {
             return await Init_HKQTG(client, acknowlegementCode);
         }

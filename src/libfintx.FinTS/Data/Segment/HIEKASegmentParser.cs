@@ -4,9 +4,9 @@ using System.Text;
 
 namespace libfintx.FinTS.Data.Segment
 {
-    internal class HIEKASegmentParser : ISegmentParser
+    internal class HIEKASegmentParser : SegmentParserBase
     {
-        public Segment ParseSegment(Segment segment)
+        public override Segment ParseSegment(Segment segment)
         {
             var result = new HIEKA(segment);
 
@@ -28,7 +28,7 @@ namespace libfintx.FinTS.Data.Segment
                 }
                 if (segment.DataElements.Count > 6)
                 {
-                    result.AcknowledgementCode = Encoding.GetEncoding("ISO-8859-1").GetBytes(segment.DataElements[6].Value);
+                    result.AcknowledgementCode = segment.DataElements[6].Value;
                 }
             }
             else if ((segment.Version == 2 || segment.Version == 3 || segment.Version == 4))
@@ -39,7 +39,7 @@ namespace libfintx.FinTS.Data.Segment
                 }
                 if (segment.DataElements.Count > 12)
                 {
-                    result.AcknowledgementCode = Encoding.GetEncoding("ISO-8859-1").GetBytes(segment.DataElements[12].Value);
+                    result.AcknowledgementCode = segment.DataElements[12].Value;
                 }
             }
             else if (segment.Version == 5)
@@ -62,7 +62,7 @@ namespace libfintx.FinTS.Data.Segment
                 }
                 if (segment.DataElements.Count > 14 && segment.DataElements[14].Value?.Length > 0)
                 {
-                    result.AcknowledgementCode = Encoding.GetEncoding("ISO-8859-1").GetBytes(segment.DataElements[14].Value);
+                    result.AcknowledgementCode = segment.DataElements[14].Value;
                 }
             }
 

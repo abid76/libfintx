@@ -8,7 +8,7 @@ namespace libfintx.FinTS
 {
     public static class HKQTG
     {
-        public static async Task<String> Init_HKQTG(FinTsClient client, byte[] acknowlegementCode)
+        public static async Task<String> Init_HKQTG(FinTsClient client, string acknowlegementCode)
         {
             string segments = string.Empty;
             var connectionDetails = client.ConnectionDetails;
@@ -29,7 +29,7 @@ namespace libfintx.FinTS
                 };
             }
             client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
-            segments += "HKQTG:" + client.SegmentNumber + ":1+" + Encoding.GetEncoding("ISO-8859-1").GetString(acknowlegementCode) + "'";
+            segments += "HKQTG:" + client.SegmentNumber + ":1+@" + acknowlegementCode.Length + "@" + acknowlegementCode + "'";
 
             if (Helper.IsTANRequired("HKQTG"))
             {

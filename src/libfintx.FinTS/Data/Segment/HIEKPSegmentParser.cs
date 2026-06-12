@@ -11,11 +11,11 @@ namespace libfintx.FinTS.Data.Segment
             var result = new HIEKP(segment);
             if (segment.DataElements.Count > 0)
             {
-                result.Statements = ParseBytes(segment.DataElements[0].Value);
+                result.Statements = ParseBytesFromBase64(segment.DataElements[0].Value);
             }
             if (segment.DataElements.Count > 1)
             {
-                result.AcknowledgementCode = ParseBytes(segment.DataElements[1].Value);
+                result.AcknowledgementCode = segment.DataElements[1].Value;
             }
 
             return result;

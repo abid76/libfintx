@@ -95,17 +95,13 @@ namespace libfintx.FinTS
         public int HkekaVersion { get; internal set; }
 
         public bool HkekaAcknowledgementNeeded { get; internal set; }
+        public List<string> HkekaSupportedFormats { get; internal set; }
+        public bool HkekaIsPdfFormatSupported { get; internal set; }
+        public bool HkekaBankStatementNumberAllowed { get; internal set; }
+
         public int HiekaVersion { get; internal set; }
 
         public bool HiekaAcknowledgementNeeded { get; internal set; }
-
-        public int HkkauVersion { get; internal set; }
-
-        public int HkekaVersion { get; internal set; }
-        public List<string> HkekaSupportedFormats { get; internal set; }
-        public bool HkekaIsPdfFormatSupported { get; internal set; }
-        public bool HkekaAcknowledgementNeeded { get; internal set; }
-        public bool HkekaBankStatementNumberAllowed { get; internal set; }
 
         public int HkekpVersion { get; internal set; }
         public bool HkekpAcknowledgementNeeded { get; internal set; }

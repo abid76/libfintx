@@ -99,6 +99,18 @@ namespace libfintx.FinTS
 
         public bool HiekaAcknowledgementNeeded { get; internal set; }
 
+        public int HkkauVersion { get; internal set; }
+
+        public int HkekaVersion { get; internal set; }
+        public List<string> HkekaSupportedFormats { get; internal set; }
+        public bool HkekaIsPdfFormatSupported { get; internal set; }
+        public bool HkekaAcknowledgementNeeded { get; internal set; }
+        public bool HkekaBankStatementNumberAllowed { get; internal set; }
+
+        public int HkekpVersion { get; internal set; }
+        public bool HkekpAcknowledgementNeeded { get; internal set; }
+        public bool HkekpBankStatementNumberAllowed { get; internal set; }
+
         internal List<string> VopGvList = new List<string>();
 
         public FinTsClient(ConnectionDetails conn, bool anon = false)

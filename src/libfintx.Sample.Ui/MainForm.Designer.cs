@@ -90,6 +90,7 @@
             this.lbl_unterkontomerkmal = new System.Windows.Forms.Label();
             this.txt_unterkontomerkmal = new System.Windows.Forms.TextBox();
             this.btn_kontoauszuege_anzeigen = new System.Windows.Forms.Button();
+            this.btn_kontoauszuege_herunterladen = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pBox_tan)).BeginInit();
             this.SuspendLayout();
             // 
@@ -706,13 +707,25 @@
             this.btn_kontoauszuege_anzeigen.TabIndex = 105;
             this.btn_kontoauszuege_anzeigen.Text = "Kontoauszüge anzeigen";
             this.btn_kontoauszuege_anzeigen.UseVisualStyleBackColor = true;
-            this.btn_kontoauszuege_anzeigen.Click += new System.EventHandler(this.btn_kontoauszuege_anzeigen_ClickAsync);
+            this.btn_kontoauszuege_anzeigen.Click += new System.EventHandler(this.btn_kontoauszuege_anzeigen_Click);
+            // 
+            // btn_kontoauszuege_herunterladen
+            // 
+            this.btn_kontoauszuege_herunterladen.Location = new System.Drawing.Point(1290, 588);
+            this.btn_kontoauszuege_herunterladen.Margin = new System.Windows.Forms.Padding(6);
+            this.btn_kontoauszuege_herunterladen.Name = "btn_kontoauszuege_herunterladen";
+            this.btn_kontoauszuege_herunterladen.Size = new System.Drawing.Size(231, 72);
+            this.btn_kontoauszuege_herunterladen.TabIndex = 106;
+            this.btn_kontoauszuege_herunterladen.Text = "Kontoauszüge herunterladen";
+            this.btn_kontoauszuege_herunterladen.UseVisualStyleBackColor = true;
+            this.btn_kontoauszuege_herunterladen.Click += new System.EventHandler(this.btn_kontoauszuege_herunterladen_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(2237, 1401);
+            this.Controls.Add(this.btn_kontoauszuege_herunterladen);
             this.Controls.Add(this.btn_kontoauszuege_anzeigen);
             this.Controls.Add(this.txt_unterkontomerkmal);
             this.Controls.Add(this.lbl_unterkontomerkmal);
@@ -851,6 +864,7 @@
         internal System.Windows.Forms.Label lbl_unterkontomerkmal;
         internal System.Windows.Forms.TextBox txt_unterkontomerkmal;
         internal System.Windows.Forms.Button btn_kontoauszuege_anzeigen;
+        internal System.Windows.Forms.Button btn_kontoauszuege_herunterladen;
     }
 }
 

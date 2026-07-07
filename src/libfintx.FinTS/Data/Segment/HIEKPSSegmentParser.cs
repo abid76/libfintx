@@ -13,7 +13,7 @@ namespace libfintx.FinTS.Data.Segment
             if (segment.DataElements.Count > 3)
             {
                 var paramDataElements = segment.DataElements[3];
-                if (paramDataElements.DataElements.Count > 3)
+                if (paramDataElements.DataElements.Count > 2)
                 {
                     result.BankStatementNumberAllowed = ParseBoolean(paramDataElements.DataElements[0].Value) ?? false;
                     result.AcknowledgementNeeded = ParseBoolean(paramDataElements.DataElements[1].Value) ?? false;

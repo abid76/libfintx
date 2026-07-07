@@ -8,7 +8,7 @@ namespace libfintx.FinTS
 {
     public static class HKEKP
     {
-        public static async Task<String> Init_HKEKP(FinTsClient client)
+        public static async Task<String> Init_HKEKP(FinTsClient client, int? bankStatementNumber = null, int? bankStatementYear = null)
         {
             string segments = string.Empty;
             var connectionDetails = client.ConnectionDetails;
@@ -29,7 +29,16 @@ namespace libfintx.FinTS
                 };
             }
             client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
-            segments += "HKEKP:" + client.SegmentNumber + ":" + client.HkekaVersion + "+" + Helper.CreateAccountInfo(client) + "'";
+            segments += "HKEKP:" + client.SegmentNumber + ":" + client.HkekpVersion + "+" + Helper.CreateAccountInfo(client);
+            if (bankStatementNumber.HasValue)
+            {
+                segments += "+" + bankStatementNumber.Value.ToString();
+            }
+            if (bankStatementYear.HasValue)
+            {
+                segments += "+" + bankStatementYear.Value.ToString();
+            }
+            segments += "'";
 
             if (Helper.IsTANRequired("HKEKP"))
             {

@@ -18,7 +18,9 @@ namespace libfintx.FinTS.Data.Segment
                     result.BankStatementNumberAllowed = ParseBoolean(paramDataElements.DataElements[0].Value) ?? false;
                     result.AcknowledgementNeeded = ParseBoolean(paramDataElements.DataElements[1].Value) ?? false;
                     result.CountEntriesAllowed = ParseBoolean(paramDataElements.DataElements[2].Value) ?? false;
-                    result.SupportedFormats = paramDataElements.DataElements[3].DataElements.ConvertAll(de => de.Value);
+                    result.SupportedFormats = paramDataElements.DataElements[3].DataElements.Count > 0 ?
+                        paramDataElements.DataElements[3].DataElements.ConvertAll(de => de.Value) :
+                        new List<string>() { paramDataElements.DataElements[3].Value };
                 }
             }
             return result;

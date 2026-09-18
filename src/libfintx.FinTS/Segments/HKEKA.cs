@@ -30,13 +30,15 @@ namespace libfintx.FinTS
             }
             client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
             segments += "HKEKA:" + client.SegmentNumber + ":" + client.HkekaVersion + "+" + Helper.CreateAccountInfo(client) + "+" + statementsFormat;
+            segments += "+";
             if (statementsNumber.HasValue)
             {
-                segments += "+" + statementsNumber.Value.ToString();
+                segments += statementsNumber.Value.ToString();
             }
+            segments += "+";
             if (statementsYear.HasValue)
             {
-                segments += "+" + statementsYear.Value.ToString();
+                segments += statementsYear.Value.ToString();
             }
             segments += "'";
 

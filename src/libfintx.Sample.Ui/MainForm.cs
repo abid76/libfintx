@@ -282,8 +282,8 @@ namespace libfintx.Sample.Ui
                 if (!await InitTANMedium(client))
                     return;
 
-                DateTime? startDate = chk_umsatzabruf_von.Checked ? date_umsatzabruf_von.Value : (DateTime?)null;
-                DateTime? endDate = chk_umsatzabruf_bis.Checked ? date_umsatzabruf_bis.Value : (DateTime?)null;
+                DateTime? startDate = chk_umsatzabruf_von.Checked ? date_umsatzabruf_von.Value : (DateTime?) null;
+                DateTime? endDate = chk_umsatzabruf_bis.Checked ? date_umsatzabruf_bis.Value : (DateTime?) null;
 
                 int? maxDays = BPD.HIKAZS.OrderByDescending(s => s.Version).FirstOrDefault()?.Zeitraum;
                 if (startDate != null && maxDays != null && DateTime.Now.AddDays(maxDays.Value * -1).Date > startDate.Value.Date)
@@ -333,7 +333,7 @@ namespace libfintx.Sample.Ui
                 if (!await InitTANMedium(client))
                     return;
 
-                DateTime? startDate = chk_umsatzabruf_von.Checked ? date_umsatzabruf_von.Value : (DateTime?)null;
+                DateTime? startDate = chk_umsatzabruf_von.Checked ? date_umsatzabruf_von.Value : (DateTime?) null;
 
                 var transactions = await client.Transactions_camt(CreateTANDialog(client), CamtVersion.Camt052, startDate);
 
@@ -379,7 +379,7 @@ namespace libfintx.Sample.Ui
                 if (!await InitTANMedium(client))
                     return;
 
-                DateTime? startDate = chk_umsatzabruf_von.Checked ? date_umsatzabruf_von.Value : (DateTime?)null;
+                DateTime? startDate = chk_umsatzabruf_von.Checked ? date_umsatzabruf_von.Value : (DateTime?) null;
 
                 var transactions = await client.Transactions_camt(CreateTANDialog(client), CamtVersion.Camt053, startDate);
 
@@ -536,7 +536,7 @@ namespace libfintx.Sample.Ui
                 Account = Regex.Replace(txt_kontonummer.Text, @"\s+", ""),
                 SubAccount = txt_unterkontomerkmal.Text,
                 Blz = Convert.ToInt32(txt_bankleitzahl.Text),
-                BlzHeadquarter = string.IsNullOrWhiteSpace(txt_bankleitzahl_zentrale.Text) ? (int?)null : Convert.ToInt32(txt_bankleitzahl_zentrale.Text),
+                BlzHeadquarter = string.IsNullOrWhiteSpace(txt_bankleitzahl_zentrale.Text) ? (int?) null : Convert.ToInt32(txt_bankleitzahl_zentrale.Text),
                 Bic = txt_bic.Text,
                 Iban = Regex.Replace(txt_iban.Text, @"\s+", ""),
                 Url = txt_url.Text,
@@ -614,7 +614,7 @@ namespace libfintx.Sample.Ui
             if (tanDialog.IsDecoupled)
             {
                 _tanReady = true;
-                return await Task.FromResult((string)null);
+                return await Task.FromResult((string) null);
             }
 
             if (tanDialog.MatrixImage != null)
@@ -890,12 +890,12 @@ namespace libfintx.Sample.Ui
                 {
                     int? bankStatementNumber = null;
                     int? bankStatementYear = null;
-                    if (client.HkekpBankStatementNumberAllowed)
-                    {
-                        var refDate = DateTime.Now.AddMonths(-1);
-                        bankStatementNumber = refDate.Month;
-                        bankStatementYear = refDate.Year;
-                    }
+                    var refDate = DateTime.Now.AddMonths(-1);
+                    //if (client.HkekpBankStatementNumberAllowed)
+                    //{
+                    //    bankStatementNumber = refDate.Month;
+                    //}
+                    bankStatementYear = refDate.Year;
                     result = await client.GetBankStatementPdf(CreateTANDialog(client), bankStatementNumber, bankStatementYear, (pdfData) =>
                     {
                         var fileName = GetDesktopPdfPath();
@@ -921,7 +921,7 @@ namespace libfintx.Sample.Ui
                         bankStatementYear = refDate.Year;
                     }
 
-                    result = await client.GetBankStatement(CreateTANDialog(client), BankStatementsFormat.Pdf, bankStatementNumber,  bankStatementYear, (pdfData) =>
+                    result = await client.GetBankStatement(CreateTANDialog(client), BankStatementsFormat.Pdf, bankStatementNumber, bankStatementYear, (pdfData) =>
                     {
                         var fileName = GetDesktopPdfPath();
                         File.WriteAllBytes(fileName, pdfData);

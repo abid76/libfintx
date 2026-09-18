@@ -30,13 +30,15 @@ namespace libfintx.FinTS
             }
             client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
             segments += "HKEKP:" + client.SegmentNumber + ":" + client.HkekpVersion + "+" + Helper.CreateAccountInfo(client);
+            segments += "+";
             if (bankStatementNumber.HasValue)
             {
-                segments += "+" + bankStatementNumber.Value.ToString();
+                segments += bankStatementNumber.Value.ToString();
             }
+            segments += "+";
             if (bankStatementYear.HasValue)
             {
-                segments += "+" + bankStatementYear.Value.ToString();
+                segments += bankStatementYear.Value.ToString();
             }
             segments += "'";
 

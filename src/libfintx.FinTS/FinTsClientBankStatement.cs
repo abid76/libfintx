@@ -121,7 +121,7 @@ namespace libfintx.FinTS
             return result.TypedResult(bankStatements);
         }
 
-        public async Task<HBCIDialogResult> GetBankStatement(TANDialog tanDialog, BankStatementsFormat statementsFormat, int? statementsNumber, int? statementsYear, Action<byte[]> bankStatementHandler, bool acknowledge = true)
+        public async Task<HBCIDialogResult> GetBankStatement(TANDialog tanDialog, BankStatementsFormat statementsFormat, int? statementsNumber, int? statementsYear, Action<int, int, byte[]> bankStatementHandler, bool acknowledge = true)
         {
             var result = await InitializeConnection();
             if (result.HasError)
@@ -150,7 +150,7 @@ namespace libfintx.FinTS
                     var hieka = segment as HIEKA;
                     if (hieka?.Statements != null)
                     {
-                        bankStatementHandler?.Invoke(hieka.Statements);
+                        bankStatementHandler?.Invoke(hieka.StatementsYear, hieka.StatementsNumber, hieka.Statements);
                         if (HkekaAcknowledgementNeeded && acknowledge && hieka.AcknowledgementCode != null)
                         {
                             bankCode = await Transaction.HKQTG(this, hieka.AcknowledgementCode);
@@ -192,13 +192,13 @@ namespace libfintx.FinTS
                 var segment = Helper.Parse_Segment(item);
                 if (segment?.Name == "HIEKP")
                 {
-                    var hieka = segment as HIEKP;
-                    if (hieka?.Statements != null)
+                    var hiekp = segment as HIEKP;
+                    if (hiekp?.Statements != null)
                     {
-                        bankStatementHandler?.Invoke(hieka.Statements);
-                        if (HkekaAcknowledgementNeeded && acknowledge && hieka.AcknowledgementCode != null)
+                        bankStatementHandler?.Invoke(hiekp.Statements);
+                        if (HkekpAcknowledgementNeeded && acknowledge && hiekp.AcknowledgementCode != null)
                         {
-                            bankCode = await Transaction.HKQTG(this, hieka.AcknowledgementCode);
+                            bankCode = await Transaction.HKQTG(this, hiekp.AcknowledgementCode);
                             result = new HBCIDialogResult(Helper.Parse_BankCode(bankCode), bankCode);
                             if (result.HasError)
                                 return result;

@@ -920,7 +920,7 @@ namespace libfintx.Sample.Ui
                     //    bankStatementNumber = refDate.Month;
                     //}
                     bankStatementYear = refDate.Year;
-                    result = await client.GetBankStatement(CreateTANDialog(client), BankStatementsFormat.Pdf, bankStatementNumber, bankStatementYear, (pdfData) =>
+                    result = await client.GetBankStatement(CreateTANDialog(client), BankStatementsFormat.Pdf, bankStatementNumber, bankStatementYear, (number, year, pdfData) =>
                     {
                         var fileName = GetDesktopPdfPath();
                         File.WriteAllBytes(fileName, pdfData);

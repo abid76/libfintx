@@ -277,7 +277,15 @@ namespace libfintx.FinTS
                     if (match.Groups["modifiable"].Success)
                         modifiable = match.Groups["modifiable"].Value.Equals("j", StringComparison.OrdinalIgnoreCase) ? true : false;
 
-                    var painData = Pain00100103CtData.Create(xml);
+                    Pain001CtData painData;
+                    if (SepaPainVersion == 9)
+                    {
+                        painData = Pain00100109CtData.Create(xml);
+                    }
+                    else
+                    {
+                        painData = Pain00100103CtData.Create(xml);
+                    }
 
                     var item = new TerminatedTransfer(orderId, deleteable, modifiable, painData);
                     data.Add(item);

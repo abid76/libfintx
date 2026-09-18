@@ -412,7 +412,12 @@ namespace libfintx.FinTS
                             client.SepaAccountNationalAllowed = hispas.IsAccountNationalAllowed;
                             client.SupportedSepaPainSchemas.AddRange(hispas.SupportedPainSchemas);
 
-                            if (hispas.Payload.Contains("pain.001.001.03"))
+                            if (hispas.Payload.Contains("pain.001.001.09"))
+                            {
+                                client.SepaPainVersion = 9;
+                                client.SepaPainSchema = hispas.SupportedPainSchemas.FirstOrDefault(s => s.Contains("pain.001.001.09"));
+                            }
+                            else if (hispas.Payload.Contains("pain.001.001.03"))
                             {
                                 client.SepaPainVersion = 1;
                                 client.SepaPainSchema = hispas.SupportedPainSchemas.FirstOrDefault(s => s.Contains("pain.001.001.03"));
@@ -429,7 +434,9 @@ namespace libfintx.FinTS
                             }
 
                             if (client.SepaPainVersion == 0)
-                                client.SepaPainVersion = 3; // -> Fallback. Most banks accept the newest pain version
+                            {
+                                client.SepaPainVersion = 9; // -> Fallback. Most banks accept the newest pain version
+                            }
                         }
                     }
 

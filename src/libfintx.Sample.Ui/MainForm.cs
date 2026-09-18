@@ -915,11 +915,11 @@ namespace libfintx.Sample.Ui
                     int? bankStatementNumber = null;
                     int? bankStatementYear = null;
                     var refDate = DateTime.Now.AddMonths(-1);
-                    bankStatementYear = refDate.Year;
                     //if (client.HkekaBankStatementNumberAllowed)
                     //{
                     //    bankStatementNumber = refDate.Month;
                     //}
+                    bankStatementYear = refDate.Year;
                     result = await client.GetBankStatement(CreateTANDialog(client), BankStatementsFormat.Pdf, bankStatementNumber, bankStatementYear, (pdfData) =>
                     {
                         var fileName = GetDesktopPdfPath();

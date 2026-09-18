@@ -37,7 +37,9 @@ namespace libfintx.FinTS
         public static async Task<string> Init_HKCSA(FinTsClient client, string OrderId, string Receiver, string ReceiverIBAN, string ReceiverBIC, decimal Amount, string Usage, DateTime ExecutionDay)
         {
             Log.Write("Starting job HKCSA: Modify terminated transfer");
+            var connectionDetails = client.ConnectionDetails;
 
+            string sepaMessage = string.Empty;
             string segments = string.Empty;
             client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
 
@@ -57,10 +59,23 @@ namespace libfintx.FinTS
 
             var account = Helper.CreateAccountInfo(client);
 
-            var connectionDetails = client.ConnectionDetails;
-            segments += "HKCSA:" + client.SegmentNumber + ":1+" + account + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03+@@";
-
-            var sepaMessage = client.LastSepaMessage ?? pain00100103.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, Receiver, ReceiverIBAN, ReceiverBIC, Amount, Usage, ExecutionDay).Replace("'", "");
+            segments += "HKCSA:" + client.SegmentNumber + ":1+" + account + "+" + client.SepaPainSchema + "+@@";
+            if (client.SepaPainVersion == 1)
+            {
+                sepaMessage = client.LastSepaMessage ?? pain00100103.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, Receiver, ReceiverIBAN, ReceiverBIC, Amount, Usage, new DateTime(1999, 1, 1));
+            }
+            else if (client.SepaPainVersion == 2)
+            {
+                sepaMessage = client.LastSepaMessage ?? pain00100203.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, Receiver, ReceiverIBAN, ReceiverBIC, Amount, Usage, new DateTime(1999, 1, 1));
+            }
+            else if (client.SepaPainVersion == 3)
+            {
+                sepaMessage = client.LastSepaMessage ?? pain00100303.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, Receiver, ReceiverIBAN, ReceiverBIC, Amount, Usage, new DateTime(1999, 1, 1));
+            }
+            else if (client.SepaPainVersion == 9)
+            {
+                sepaMessage = client.LastSepaMessage ?? pain00100109.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, Receiver, ReceiverIBAN, ReceiverBIC, Amount, Usage, new DateTime(1999, 1, 1));
+            }
             client.LastSepaMessage = sepaMessage;
 
             segments = segments.Replace("@@", "@" + sepaMessage.Length + "@") + sepaMessage;

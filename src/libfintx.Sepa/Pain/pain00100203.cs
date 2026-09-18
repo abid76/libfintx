@@ -119,8 +119,7 @@ namespace libfintx.Sepa
                             "</CdtTrfTxInf>" +
                         "</PmtInf>" +
                     "</CstmrCdtTrfInitn>" +
-                "</Document>" +
-                "'";
+                "</Document>";
 
             return Message;
         }
@@ -223,7 +222,7 @@ namespace libfintx.Sepa
 
                 Message = Message + Message_;
             }
-            Message = Message + "</PmtInf></CstmrCdtTrfInitn></Document>'";
+            Message = Message + "</PmtInf></CstmrCdtTrfInitn></Document>";
 
             return Message;
         }

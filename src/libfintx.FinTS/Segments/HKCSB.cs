@@ -25,6 +25,7 @@ using System;
 using System.Threading.Tasks;
 using libfintx.FinTS.Message;
 using libfintx.Logger.Log;
+using libfintx.Sepa;
 
 namespace libfintx.FinTS
 {
@@ -37,12 +38,14 @@ namespace libfintx.FinTS
         {
             Log.Write("Starting job HKCSB: Get terminated transfers");
 
+            string segments = string.Empty;
             client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
 
             var account = Helper.CreateAccountInfo(client);
 
-            var connectionDetails = client.ConnectionDetails;
-            string segments = "HKCSB:" + client.SegmentNumber + ":1+" + account + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03'";
+            segments += "HKCSB:" + client.SegmentNumber + ":1+" + account + "+" + client.SepaPainSchema;
+
+            segments += "'";
 
             if (Helper.IsTANRequired("HKCSB"))
             {

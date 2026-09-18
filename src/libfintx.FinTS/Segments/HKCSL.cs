@@ -37,16 +37,49 @@ namespace libfintx.FinTS
         public static async Task<string> Init_HKCSL(FinTsClient client, string OrderId, string Receiver, string ReceiverIBAN, string ReceiverBIC, decimal Amount, string Usage, DateTime ExecutionDay)
         {
             Log.Write("Starting job HKCSL: Delete terminated transfer");
+            var connectionDetails = client.ConnectionDetails;
+
+            string sepaMessage = string.Empty;
+            string segments = string.Empty;
 
             client.SegmentNumber = Convert.ToInt16(SEG_NUM.Seg3);
 
+            if (client.VopGvList.Contains("HKCSL"))
+            {
+                if (client.Vop)
+                {
+                    segments = HKVPP.Init_HKVPP(client, segments);
+                    client.SegmentNumber++;
+                }
+                else
+                {
+                    segments = HKVPA.Init_HKVPA(client, segments);
+                    client.SegmentNumber++;
+                }
+            }
+
             var account = Helper.CreateAccountInfo(client);
 
-            var connectionDetails = client.ConnectionDetails;
-            string segments = "HKCSL:" + client.SegmentNumber + ":1+" + account + "+urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03+@@";
+            segments += "HKCSL:" + client.SegmentNumber + ":1+" + account + "+" + client.SepaPainSchema + "+@@";
+            if (client.SepaPainVersion == 1)
+            {
+                sepaMessage = client.LastSepaMessage ?? pain00100103.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, Receiver, ReceiverIBAN, ReceiverBIC, Amount, Usage, ExecutionDay);
+            }
+            else if (client.SepaPainVersion == 2)
+            {
+                sepaMessage = client.LastSepaMessage ?? pain00100203.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, Receiver, ReceiverIBAN, ReceiverBIC, Amount, Usage, ExecutionDay);
+            }
+            else if (client.SepaPainVersion == 3)
+            {
+                sepaMessage = client.LastSepaMessage ?? pain00100303.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, Receiver, ReceiverIBAN, ReceiverBIC, Amount, Usage, ExecutionDay);
+            }
+            else if (client.SepaPainVersion == 9)
+            {
+                sepaMessage = client.LastSepaMessage ?? pain00100109.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, Receiver, ReceiverIBAN, ReceiverBIC, Amount, Usage, ExecutionDay);
+            }
+            client.LastSepaMessage = sepaMessage;
 
-            var sepaMessage = pain00100103.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, Receiver, ReceiverIBAN, ReceiverBIC, Amount, Usage, ExecutionDay).Replace("'", "");
-            segments = segments.Replace("@@", "@" + sepaMessage.Length + "@") + sepaMessage;
+            segments = segments.Replace("@@", "@" + (sepaMessage.Length) + "@") + sepaMessage;
 
             segments += "+" + OrderId;
 

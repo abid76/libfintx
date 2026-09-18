@@ -151,8 +151,7 @@ namespace libfintx.Sepa
                             "</DrctDbtTxInf>" +
                         "</PmtInf>" +
                     "</CstmrDrctDbtInitn>" +
-                "</Document>" +
-                "'";
+                "</Document>";
 
             return Message;
         }
@@ -275,8 +274,7 @@ namespace libfintx.Sepa
             }
 
             string Message__ = "</CstmrDrctDbtInitn>" +
-                    "</Document>" +
-                    "'";
+                    "</Document>";
 
             Message = Message + Message__;
 

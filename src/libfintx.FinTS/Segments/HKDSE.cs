@@ -45,7 +45,9 @@ namespace libfintx.FinTS
 
             var message = pain00800202.Create(connectionDetails.AccountHolder, connectionDetails.Iban, connectionDetails.Bic, Payer, PayerIBAN, PayerBIC, Amount, Usage, SettlementDate, MandateNumber, MandateDate, CreditorIDNumber);
 
-            segments = segments.Replace("@@", "@" + (message.Length - 1) + "@") + message;
+            segments = segments.Replace("@@", "@" + (message.Length) + "@") + message;
+
+            segments += "'";
 
             if (Helper.IsTANRequired("HKDSE"))
             {

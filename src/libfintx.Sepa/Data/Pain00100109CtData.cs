@@ -28,43 +28,8 @@ using System.Xml.Serialization;
 
 namespace libfintx.Sepa
 {
-    public class Pain00100109CtData
+    public class Pain00100109CtData : Pain001CtData
     {
-        public string Initiator { get; set; }
-        public int NumberOfTransactions { get; set; }
-        public decimal? ControlSum { get; set; }
-        public List<PaymentInfo> Payments { get; set; }
-        public class PaymentInfo
-        {
-            public DateTime RequestedExecutionDate { get; set; }
-            public string Debtor { get; set; }
-            /// <summary>
-            /// IBAN
-            /// </summary>
-            public string DebtorAccount { get; set; }
-            /// <summary>
-            /// BIC
-            /// </summary>
-            public string DebtorAgent { get; set; }
-            public List<CreditTransferTransactionInfo> CreditTxInfos { get; set; }
-        }
-        public class CreditTransferTransactionInfo
-        {
-            public decimal Amount { get; set; }
-            public string Creditor { get; set; }
-            /// <summary>
-            /// BIC
-            /// </summary>
-            public string CreditorAgent { get; set; }
-            /// <summary>
-            /// IBAN
-            /// </summary>
-            public string CreditorAccount { get; set; }
-            /// <summary>
-            /// Verwendungszweck
-            /// </summary>
-            public string RemittanceInformation { get; set; }
-        }
         public static Pain00100109CtData Create(string xml)
         {
             XmlSerializer ser = new XmlSerializer(typeof(pain_001_001_09.Document), new XmlRootAttribute

@@ -26,7 +26,7 @@ namespace libfintx.Tests
             Assert.Equal(2026, hieka.StatementsYear);
             Assert.Equal(4, hieka.StatementsNumber);
             Assert.Equal("abc", Encoding.GetEncoding("ISO-8859-1").GetString(hieka.Statements));
-            Assert.Equal("ÅÒÁ@@ððððððððððððððððððððò÷ôôôò÷ðñóððôaòðòö@@@@@@@@@@@ðððððððððñòðòö`ðõ`ðñ`ðóKòôKôñKõòõóùöðñ", Encoding.GetEncoding("ISO-8859-1").GetString(hieka.AcknowledgementCode));
+            Assert.Equal("ÅÒÁ@@ððððððððððððððððððððò÷ôôôò÷ðñóððôaòðòö@@@@@@@@@@@ðððððððððñòðòö`ðõ`ðñ`ðóKòôKôñKõòõóùöðñ", hieka.AcknowledgementCode);
         }
     }
 }

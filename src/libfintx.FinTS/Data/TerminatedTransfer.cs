@@ -32,9 +32,9 @@ namespace libfintx.FinTS.Data
         public string OrderId { get; set; }
         public bool? Deleteable { get; set; }
         public bool? Modifiable { get; set; }
-        public Pain00100103CtData SepaData { get; set; }
+        public Pain001CtData SepaData { get; set; }
 
-        public TerminatedTransfer(string orderId, bool? deleteable, bool? modifiable, Pain00100103CtData sepaData)
+        public TerminatedTransfer(string orderId, bool? deleteable, bool? modifiable, Pain001CtData sepaData)
         {
             OrderId = orderId;
             Deleteable = deleteable;

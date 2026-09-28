@@ -30,14 +30,14 @@ namespace libfintx.FinTS.Data
     public class BankersOrder
     {
         public string OrderId { get; set; }
-        public Pain00100103CtData SepaData { get; set; }
+        public Pain001CtData SepaData { get; set; }
         public DateTime FirstExecutionDate { get; set; }
         public TimeUnit TimeUnit { get; set; }
         public string Rota { get; set; }
         public int ExecutionDay { get; set; }
         public DateTime? LastExecutionDate { get; set; }
 
-        public BankersOrder(string orderId, Pain00100103CtData sepaData, DateTime firstExecutionDate, TimeUnit timeUnit, string rota, int executionDay, DateTime? lastExecutionDate)
+        public BankersOrder(string orderId, Pain001CtData sepaData, DateTime firstExecutionDate, TimeUnit timeUnit, string rota, int executionDay, DateTime? lastExecutionDate)
         {
             OrderId = orderId;
             SepaData = sepaData;

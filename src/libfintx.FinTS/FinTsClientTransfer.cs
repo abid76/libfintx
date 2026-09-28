@@ -24,6 +24,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -277,14 +278,32 @@ namespace libfintx.FinTS
                     if (match.Groups["modifiable"].Success)
                         modifiable = match.Groups["modifiable"].Value.Equals("j", StringComparison.OrdinalIgnoreCase) ? true : false;
 
-                    Pain001CtData painData;
-                    if (SepaPainVersion == 9)
+                    Pain001CtData painData = null;
+                    // Wenn HISPAS mehrere Pain-Versionen unterstützt, können auch mehrere Versionen in der Antwort enthalten sein. Daher wird hier die Version anhand des XML-Namespace ermittelt.
+                    var xmlNamespaceMatch = Regex.Match(xml, @"<Document xmlns=""(?<namespace>.+?)""", RegexOptions.Singleline | RegexOptions.IgnoreCase);
+                    if (xmlNamespaceMatch.Success)
                     {
-                        painData = Pain00100109CtData.Create(xml);
+                        var xmlNamespace = xmlNamespaceMatch.Groups["namespace"].Value;
+                        if (xmlNamespace.Contains("pain.001.001.09"))
+                        {
+                            painData = Pain00100109CtData.Create(xml);
+                        }
+                        else if (xmlNamespace.Contains("pain.001.001.03"))
+                        {
+                            painData = Pain00100103CtData.Create(xml);
+                        }
                     }
-                    else
+
+                    if (painData == null)
                     {
-                        painData = Pain00100103CtData.Create(xml);
+                        if (SepaPainVersion == 9)
+                        {
+                            painData = Pain00100109CtData.Create(xml);
+                        }
+                        else
+                        {
+                            painData = Pain00100103CtData.Create(xml);
+                        }
                     }
 
                     var item = new TerminatedTransfer(orderId, deleteable, modifiable, painData);

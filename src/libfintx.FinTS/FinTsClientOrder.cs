@@ -96,7 +96,33 @@ namespace libfintx.FinTS
                     string lastExecutionDateStr = match.Groups["lastdate"].Value;
                     var lastExecutionDate = !string.IsNullOrWhiteSpace(lastExecutionDateStr) ? DateTime.ParseExact(lastExecutionDateStr, "yyyyMMdd", CultureInfo.InvariantCulture) : default(DateTime?);
 
-                    var painData = Pain00100103CtData.Create(xml);
+                    Pain001CtData painData = null;
+                    // Wenn HISPAS mehrere Pain-Versionen unterstützt, können auch mehrere Versionen in der Antwort enthalten sein. Daher wird hier die Version anhand des XML-Namespace ermittelt.
+                    var xmlNamespaceMatch = Regex.Match(xml, @"<Document xmlns=""(?<namespace>.+?)""", RegexOptions.Singleline | RegexOptions.IgnoreCase);
+                    if (xmlNamespaceMatch.Success)
+                    {
+                        var xmlNamespace = xmlNamespaceMatch.Groups["namespace"].Value;
+                        if (xmlNamespace.Contains("pain.001.001.09"))
+                        {
+                            painData = Pain00100109CtData.Create(xml);
+                        }
+                        else if (xmlNamespace.Contains("pain.001.001.03"))
+                        {
+                            painData = Pain00100103CtData.Create(xml);
+                        }
+                    }
+
+                    if (painData == null)
+                    {
+                        if (SepaPainVersion == 9)
+                        {
+                            painData = Pain00100109CtData.Create(xml);
+                        }
+                        else
+                        {
+                            painData = Pain00100103CtData.Create(xml);
+                        }
+                    }
 
                     if (firstExecutionDate.HasValue && executionDay > 0)
                     {
